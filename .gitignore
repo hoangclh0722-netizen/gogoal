@@ -1,0 +1,19 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Secrets
+.env
+*.env
+service-account*.json
+
+# Firebase
+firebase/functions/node_modules/
+firebase/functions/lib/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.firebase/
