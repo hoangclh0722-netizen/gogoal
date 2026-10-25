@@ -1,0 +1,145 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    function userDoc(uid) { return get(/databases/$(db)/documents/users/$(uid)).data; }
+    function notBanned() { return signedIn() && userDoc(me()).banned != true; }
+    function isAdmin() { return signedIn() && userDoc(me()).role == 'admin'; }
+    function changedOnly(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+    function sportOk(s) { return s in ['football', 'badminton', 'basketball', 'pickleball', 'tennis']; }
+    function perPerson(m) { return math.ceil(m.costTotal / m.playersTotal / 1000.0) * 1000; }
+
+    // Thông tin kèo dùng chung cho lúc tạo và lúc chủ kèo sửa (BR01, BR02, BR12)
+    function matchShapeOk(m) {
+      return m.title is string && m.title.size() >= 1 && m.title.size() <= 60
+        && m.approvalMode in ['manual', 'auto']
+        && m.playersTotal is int && m.playersTotal >= 2 && m.playersTotal <= 40
+        && m.slotsNeeded is int && m.slotsNeeded >= 1 && m.slotsNeeded <= m.playersTotal
+        && m.levelMin is int && m.levelMin >= 1 && m.levelMax is int && m.levelMax <= 4 && m.levelMin <= m.levelMax
+        && m.levels.size() == m.levelMax - m.levelMin + 1
+        && m.startAt is timestamp && m.endAt is timestamp
+        && m.startAt >= request.time + duration.value(30, 'm')
+        && m.startAt <= request.time + duration.value(30, 'd')
+        && m.endAt >= m.startAt + duration.value(30, 'm')
+        && m.endAt <= m.startAt + duration.value(4, 'h')
+        && m.costTotal is int && m.costTotal >= 0
+        && m.costPerPerson == perPerson(m)
+        && m.district == m.venue.district
+        && (m.note == null || m.note.size() <= 500);
+    }
+
+    match /venues/{venueId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn();
+
+      allow create: if signedIn() && uid == me()
+        && request.resource.data.role == 'user'
+        && request.resource.data.banned == false
+        && request.resource.data.stats.ratingCount == 0
+        && request.resource.data.stats.ratingSum == 0
+        && request.resource.data.stats.noShows == 0
+        && request.resource.data.stats.lateLeaves == 0
+        && request.resource.data.stats.lateCancels == 0;
+
+      allow update: if signedIn() && uid == me() && userDoc(me()).banned != true
+        && changedOnly(['displayName', 'avatarUrl', 'district', 'bio', 'sports', 'profileCompleted', 'updatedAt']);
+      allow update: if isAdmin() && changedOnly(['banned', 'updatedAt']);
+
+      match /private/{doc} {
+        allow read, write: if signedIn() && uid == me();
+      }
+
+      match /notifications/{id} {
+        allow read, delete: if signedIn() && uid == me();
+        allow update: if signedIn() && uid == me() && changedOnly(['read']);
+        allow create: if notBanned() && request.resource.data.actorId == me()
+          && request.resource.data.read == false;
+      }
+    }
+
+    match /matches/{matchId} {
+      // Rules không phải bộ lọc: truy vấn phải tự có where status == 'active' (hoặc hostId == me)
+      allow read: if resource.data.status != 'hidden'
+        || (signedIn() && resource.data.hostId == me()) || isAdmin();
+
+      allow create: if notBanned()
+        && request.resource.data.hostId == me()
+        && request.resource.data.status == 'active'
+        && request.resource.data.slotsFilled == 0
+        && request.resource.data.isFull == false
+        && sportOk(request.resource.data.sportId)
+        && request.resource.data.host.displayName == userDoc(me()).displayName
+        && matchShapeOk(request.resource.data);
+
+      // Chủ kèo sửa hoặc hủy kèo chưa bắt đầu; không đụng tới slotsFilled
+      allow update: if notBanned() && resource.data.hostId == me()
+        && resource.data.status == 'active'
+        && resource.data.startAt > request.time
+        && changedOnly(['title', 'format', 'playersTotal', 'slotsNeeded', 'isFull', 'levelMin', 'levelMax', 'levels',
+                        'startAt', 'endAt', 'venue', 'geo', 'district', 'costTotal', 'costPerPerson',
+                        'approvalMode', 'minReputation', 'note', 'status', 'cancelReason', 'updatedAt'])
+        && request.resource.data.status in ['active', 'cancelled']
+        && request.resource.data.slotsNeeded >= resource.data.slotsFilled
+        && request.resource.data.isFull == (resource.data.slotsFilled >= request.resource.data.slotsNeeded)
+        && (request.resource.data.status == 'cancelled' || matchShapeOk(request.resource.data));
+
+      // Người chơi tự vào kèo tự động: tăng slotsFilled đúng 1, kèm participant approved của chính mình trong cùng batch
+      allow update: if notBanned()
+        && resource.data.hostId != me()
+        && resource.data.approvalMode == 'auto'
+        && resource.data.status == 'active'
+        && resource.data.startAt > request.time
+        && resource.data.isFull == false
+        && changedOnly(['slotsFilled', 'isFull', 'updatedAt'])
+        && request.resource.data.slotsFilled == resource.data.slotsFilled + 1
+        && request.resource.data.slotsFilled <= resource.data.slotsNeeded
+        && request.resource.data.isFull == (request.resource.data.slotsFilled >= resource.data.slotsNeeded)
+        && !exists(/databases/$(db)/documents/matches/$(matchId)/participants/$(me()))
+        && getAfter(/databases/$(db)/documents/matches/$(matchId)/participants/$(me())).data.status == 'approved';
+
+      allow update: if isAdmin() && changedOnly(['status', 'updatedAt'])
+        && request.resource.data.status in ['active', 'hidden', 'cancelled'];
+
+      allow delete: if false;
+
+      match /participants/{uid} {
+        allow read: if signedIn();
+
+        // Xin vào kèo (BR03, BR04, BR06, BR13). Duyệt, rời, loại thành viên sẽ làm ở task sau.
+        allow create: if notBanned() && uid == me()
+          && request.resource.data.uid == me()
+          && request.resource.data.matchId == matchId
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.hostId != me()
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.status == 'active'
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.startAt > request.time
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.isFull == false
+          && request.resource.data.level == userDoc(me()).sports[get(/databases/$(db)/documents/matches/$(matchId)).data.sportId]
+          && request.resource.data.level in get(/databases/$(db)/documents/matches/$(matchId)).data.levels
+          && (
+            (get(/databases/$(db)/documents/matches/$(matchId)).data.approvalMode == 'manual'
+              && request.resource.data.status == 'pending')
+            || (get(/databases/$(db)/documents/matches/$(matchId)).data.approvalMode == 'auto'
+              && request.resource.data.status == 'approved'
+              && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled
+                 == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled + 1)
+          );
+      }
+
+      match /private/payment {
+        allow read: if signedIn() && (
+          get(/databases/$(db)/documents/matches/$(matchId)).data.hostId == me()
+          || get(/databases/$(db)/documents/matches/$(matchId)/participants/$(me())).data.status == 'approved');
+        allow write: if signedIn()
+          && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.hostId == me();
+      }
+    }
+  }
+}

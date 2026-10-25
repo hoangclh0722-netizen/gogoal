@@ -12,7 +12,7 @@
 | Khu vực ban đầu | TP.HCM |
 | Tính năng kèo | Trình độ, chia tiền sân, tìm kèo gần (bản đồ), uy tín/đánh giá, thông báo & chat |
 | Thanh toán | Chỉ hiển thị số tiền mỗi người + mã VietQR của chủ kèo, chuyển khoản ngoài app |
-| Đăng nhập | Giai đoạn 1: Google, email + mật khẩu. Số điện thoại (OTP) cần gói Blaze nên để sau MVP, cùng Facebook, Zalo |
+| Đăng nhập | Giai đoạn 1: **email + mật khẩu, Google, Facebook**. Không làm số điện thoại (OTP) và Zalo |
 | Mục tiêu | Đồ án + hướng tới sản phẩm thật |
 | Thời gian | 1–2 tháng cho MVP |
 
@@ -20,7 +20,7 @@
 
 - **Giai đoạn 1 (tuần 1–5):** đăng nhập, hồ sơ, tạo/tìm kèo, xin vào & duyệt, chia tiền + QR, thông báo đẩy
 - **Giai đoạn 2 (tuần 6–8):** bản đồ kèo gần, chat trong kèo, điểm danh, đánh giá & uy tín, báo cáo vi phạm
-- **Sau MVP:** Facebook/Zalo login, lập đội, đặt sân, trang Admin
+- **Sau MVP:** lập đội, đặt sân, thông báo đẩy khi app đóng
 
 ## Kỹ thuật
 
@@ -30,8 +30,10 @@
   - Số chỗ (`slotsFilled`), duyệt người vào: transaction phía app + security rules kiểm tra tính hợp lệ
   - Uy tín: tính từ `ratings` bằng transaction, rules giới hạn mỗi người chấm 1 lần / người / kèo
   - Thông báo: in-app (lắng nghe Firestore) + local notification để nhắc giờ. Push khi app đóng: để sau (có thể dùng Cloudflare Worker miễn phí gọi FCM)
-  - Ảnh đại diện: dùng ảnh từ tài khoản Google hoặc avatar mặc định; upload ảnh qua dịch vụ ngoài (vd Cloudinary) nếu cần, vì Cloud Storage yêu cầu Blaze
-  - Đăng nhập số điện thoại: SMS OTP yêu cầu liên kết tài khoản thanh toán (từ 09/2024) → không dùng trong MVP
+  - Ảnh đại diện: dùng ảnh từ tài khoản Google/Facebook hoặc avatar mặc định; upload ảnh qua dịch vụ ngoài (vd Cloudinary) nếu cần, vì Cloud Storage yêu cầu Blaze
+  - Đăng nhập số điện thoại: không làm (SMS OTP yêu cầu liên kết tài khoản thanh toán từ 09/2024, và người dùng không cần)
+- Facebook Login: cần tạo app trên Meta for Developers; ở chế độ Development chỉ tài khoản được thêm làm tester đăng nhập được (đủ cho demo đồ án); muốn mở cho mọi người phải chuyển Live, cần URL chính sách quyền riêng tư và hướng dẫn xóa dữ liệu
+- Một email chỉ gắn với một tài khoản: nếu đăng nhập Facebook trùng email với tài khoản email/Google có sẵn, app yêu cầu đăng nhập bằng cách cũ rồi liên kết (account linking)
 - Docker: trường không bắt buộc; không dùng trong MVP
 
 ## Quản trị & duyệt kèo

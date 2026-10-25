@@ -17,3 +17,10 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 .firebase/
+firebase/seed/node_modules/
+firebase/emulator.log
+
+node_modules/
+*.log
+firebase/rules-test/
+app/windows/

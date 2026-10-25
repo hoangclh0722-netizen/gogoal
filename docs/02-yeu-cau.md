@@ -4,7 +4,7 @@
 
 | Mã | Yêu cầu | Use case | Giai đoạn |
 |---|---|---|---|
-| FR01 | Đăng nhập bằng Google hoặc email + mật khẩu; đăng ký, quên mật khẩu, đăng xuất | UC01 | 1 |
+| FR01 | Đăng nhập bằng email + mật khẩu, Google hoặc Facebook; đăng ký, quên mật khẩu, đăng xuất; liên kết khi trùng email | UC01 | 1 |
 | FR02 | Lần đầu đăng nhập phải hoàn thành hồ sơ: tên hiển thị, khu vực, ít nhất 1 môn kèm trình độ | UC02 | 1 |
 | FR03 | Người chơi lưu thông tin ngân hàng (mã ngân hàng, số tài khoản, tên chủ tài khoản) để nhận tiền | UC02 | 1 |
 | FR04 | Xem danh sách kèo sắp diễn ra, lọc theo môn, quận, ngày, trình độ, còn chỗ | UC03 | 1 |

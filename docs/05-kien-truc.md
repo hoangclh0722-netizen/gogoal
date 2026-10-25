@@ -18,19 +18,21 @@ flowchart LR
     end
 
     subgraph Firebase["☁️ Firebase (gói Spark)"]
-        AUTH["Authentication<br/>Google · Email"]
+        AUTH["Authentication<br/>Email · Google · Facebook"]
         FS[("Cloud Firestore")]
         RULES{{"Security Rules"}}
         RULES --- FS
     end
 
     GSI["Google Sign-In"]
+    FBL["Facebook Login"]
     MAPS["Google Maps SDK"]
     VQR["VietQR<br/>img.vietqr.io"]
 
     DATA --> AUTH
     DATA --> RULES
     AUTH --> GSI
+    AUTH --> FBL
     UI --> MAPS
     UI --> VQR
 ```
@@ -536,7 +538,7 @@ final class UnexpectedFailure extends Failure { /* ... */ }
 | Mục đích | Package |
 |---|---|
 | Firebase | `firebase_core`, `firebase_auth`, `cloud_firestore` |
-| Đăng nhập Google | `google_sign_in` |
+| Đăng nhập Google / Facebook | `google_sign_in`, `flutter_facebook_auth` |
 | State + DI | `flutter_riverpod`, `riverpod_annotation`, `riverpod_generator` |
 | Điều hướng | `go_router` |
 | So sánh giá trị | `equatable` |

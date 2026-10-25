@@ -49,12 +49,12 @@ Các nhóm Facebook/Zalo hiện nay không có bộ lọc theo môn, giờ, khu 
 
 | Giai đoạn | Tính năng |
 |---|---|
-| **Giai đoạn 1** (tuần 1–5) | Đăng nhập Google / email · Hồ sơ người chơi (môn, trình độ, tài khoản ngân hàng) · Tạo / sửa / hủy kèo · Danh sách & lọc kèo · Chi tiết kèo · Xin vào / rời kèo · Duyệt tay hoặc tự động · Chia tiền + VietQR · Thông báo trong app · Nhắc giờ bằng local notification |
+| **Giai đoạn 1** (tuần 1–5) | Đăng nhập email / Google / Facebook · Hồ sơ người chơi (môn, trình độ, tài khoản ngân hàng) · Tạo / sửa / hủy kèo · Danh sách & lọc kèo · Chi tiết kèo · Xin vào / rời kèo · Duyệt tay hoặc tự động · Chia tiền + VietQR · Thông báo trong app · Nhắc giờ bằng local notification |
 | **Giai đoạn 2** (tuần 6–8) | Bản đồ kèo gần tôi · Chat trong kèo · Điểm danh · Đánh giá "GG" & điểm uy tín · Báo cáo vi phạm · Admin tối giản trong app |
 
 ### Ngoài phạm vi MVP
 
-- Đăng nhập số điện thoại (OTP), Facebook, Zalo
+- Đăng nhập số điện thoại (OTP), Zalo
 - Thông báo đẩy khi app đã đóng (cần server)
 - Thanh toán trong app (MoMo, VNPay), giữ tiền đặt cọc
 - Đặt sân trực tiếp với chủ sân, lập đội cố định, giải đấu
@@ -76,7 +76,7 @@ Các nhóm Facebook/Zalo hiện nay không có bộ lọc theo môn, giờ, khu 
 | Ứng dụng | Flutter 3.x, Dart 3 |
 | Quản lý state / DI | Riverpod |
 | Điều hướng | go_router |
-| Backend | Firebase Authentication, Cloud Firestore (gói Spark) |
+| Backend | Firebase Authentication (email, Google, Facebook), Cloud Firestore (gói Spark) |
 | Bản đồ & vị trí | google_maps_flutter, geolocator, geoflutterfire_plus (geohash) |
 | Thông báo | Thông báo trong app (Firestore) + flutter_local_notifications |
 | Mã QR chuyển khoản | Chuẩn VietQR (sinh ảnh qua img.vietqr.io) |

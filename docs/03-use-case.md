@@ -10,7 +10,7 @@
 | **Thành viên kèo** | Người chơi đã được duyệt vào một kèo; *kế thừa* Người chơi |
 | **Quản trị viên** | Người chơi có `role = admin` |
 | **Hệ thống thông báo** | Tác nhân phụ: thông báo trong app và local notification trên thiết bị |
-| **Google Sign-In** | Tác nhân phụ: nhà cung cấp danh tính |
+| **Google Sign-In**, **Facebook Login** | Tác nhân phụ: nhà cung cấp danh tính |
 
 ## 3.2. Sơ đồ use case
 
@@ -28,6 +28,7 @@ actor "Chủ kèo" as Host
 actor "Thành viên kèo" as Member
 actor "Quản trị viên" as Admin
 actor "Google Sign-In" as Google <<hệ thống>>
+actor "Facebook Login" as Facebook <<hệ thống>>
 actor "Hệ thống thông báo" as Notifier <<hệ thống>>
 
 Guest <|-- Player
@@ -62,6 +63,7 @@ Guest --> UC01
 Guest --> UC03
 Guest --> UC04
 UC01 --> Google
+UC01 --> Facebook
 
 Player --> UC02
 Player --> UC05
@@ -123,13 +125,13 @@ UC11 <-- Notifier
 
 | Mục | Nội dung |
 |---|---|
-| Tác nhân | Khách; phụ: Google Sign-In |
+| Tác nhân | Khách; phụ: Google Sign-In, Facebook Login |
 | Mô tả | Khách đăng nhập để dùng các chức năng cần tài khoản |
 | Tiền điều kiện | Thiết bị có kết nối mạng |
-| Hậu điều kiện | Phiên đăng nhập được lưu; nếu là lần đầu, tài liệu `users/{uid}` được tạo và người dùng được chuyển tới màn hình hoàn thành hồ sơ |
-| Luồng chính | 1. Khách chọn "Đăng nhập với Google". 2. Hệ thống mở hộp thoại Google. 3. Khách chọn tài khoản. 4. Hệ thống xác thực với Firebase Auth. 5. Hệ thống kiểm tra hồ sơ: đã đủ → vào Trang chủ; chưa có → UC02 |
+| Hậu điều kiện | Phiên đăng nhập được lưu; nếu là lần đầu, tài liệu `users/{uid}` được tạo (tên và ảnh lấy từ Google/Facebook nếu có) và người dùng được chuyển tới màn hình hoàn thành hồ sơ |
+| Luồng chính | 1. Khách chọn "Tiếp tục với Google" hoặc "Tiếp tục với Facebook". 2. Hệ thống mở hộp thoại của nhà cung cấp. 3. Khách chọn tài khoản và cho phép truy cập tên, ảnh, email. 4. Hệ thống xác thực với Firebase Auth. 5. Hệ thống kiểm tra hồ sơ: đã đủ → vào Trang chủ; chưa có → UC02 |
 | Luồng thay thế | 1a. Khách chọn email: nhập email + mật khẩu → đăng nhập. 1b. Chưa có tài khoản: chọn "Đăng ký", nhập email, mật khẩu (≥ 8 ký tự), xác nhận → tạo tài khoản, gửi email xác minh. 1c. Quên mật khẩu: nhập email → gửi email đặt lại |
-| Ngoại lệ | E1. Khách hủy hộp thoại Google → quay lại màn hình đăng nhập. E2. Sai mật khẩu → báo lỗi, không tiết lộ email có tồn tại hay không. E3. Tài khoản bị khóa (`banned = true`) → đăng xuất và hiển thị thông báo khóa |
+| Ngoại lệ | E1. Khách hủy hộp thoại Google/Facebook → quay lại màn hình đăng nhập. E2. Sai mật khẩu → báo lỗi, không tiết lộ email có tồn tại hay không. E3. Tài khoản bị khóa (`banned = true`) → đăng xuất và hiển thị thông báo khóa. E4. Email của tài khoản Google/Facebook đã được dùng cho tài khoản khác (`account-exists-with-different-credential`) → báo "Email này đã đăng ký bằng <cách cũ>", yêu cầu đăng nhập bằng cách cũ, sau đó liên kết hai cách đăng nhập vào một tài khoản. E5. Tài khoản Facebook không có email → vẫn đăng nhập được, email để trống |
 
 ### UC02 – Quản lý hồ sơ
 

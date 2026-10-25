@@ -8,8 +8,8 @@
 | 3 | [Use case](03-use-case.md) | Tác nhân, sơ đồ use case, đặc tả 18 use case, sơ đồ hoạt động |
 | 4 | [Cơ sở dữ liệu](04-co-so-du-lieu.md) | ERD, cấu trúc Firestore, sơ đồ trạng thái, chỉ mục, Security Rules, hạn mức |
 | 5 | [Kiến trúc](05-kien-truc.md) | Clean Architecture, cấu trúc thư mục, OOP & SOLID, sơ đồ lớp, sơ đồ tuần tự, code mẫu |
-| 6 | [Màn hình & Figma](06-man-hinh-figma.md) | Design tokens, danh sách màn hình, luồng màn hình, prompt thiết kế |
-| 7 | [Kế hoạch & task](07-ke-hoach-task.md) | Lộ trình 8 tuần, 25 task kèm tiêu chí hoàn thành và prompt |
+| 6 | [Màn hình & Figma](06-man-hinh-figma.md) | Design tokens, danh sách màn hình, luồng màn hình, link Figma |
+| 7 | [Kế hoạch & task](07-ke-hoach-task.md) | Lộ trình 8 tuần, 25 task kèm tiêu chí hoàn thành |
 | 8 | [Kiểm thử & triển khai](08-kiem-thu-trien-khai.md) | Chiến lược test, test case, CI, phát hành, rủi ro |
 
 ## Xem sơ đồ

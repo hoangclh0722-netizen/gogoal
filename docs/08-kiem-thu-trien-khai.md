@@ -29,6 +29,7 @@ test('không cho xin vào khi kèo đã đủ người', () {
 |---|---|---|---|
 | TC01 | UC01 | Đăng nhập Google lần đầu | Vào màn hoàn thành hồ sơ |
 | TC02 | UC01 | Đăng nhập email sai mật khẩu | Báo "Email hoặc mật khẩu không đúng" |
+| TC02b | UC01 | Đăng ký email X, sau đó đăng nhập Facebook có cùng email X | Báo email đã đăng ký; đăng nhập bằng email rồi liên kết, sau đó đăng nhập Facebook vào đúng tài khoản cũ |
 | TC03 | UC05 | Tạo kèo bắt đầu sau 10 phút | Báo lỗi BR01 |
 | TC04 | UC05 | Tạo kèo 600.000đ, 10 người | Hiển thị 60.000đ/người |
 | TC05 | UC06 | Xin vào kèo duyệt tay | Trạng thái "Đang chờ duyệt", chủ kèo nhận thông báo |
@@ -100,4 +101,5 @@ jobs:
 | "Con gà – quả trứng": ít kèo nên ít người dùng | Cao | Cao | Tập trung 1–2 quận và nhóm bạn bè có sẵn; chủ động tạo kèo thật hằng tuần |
 | Lừa đảo tiền sân | Thấp | Cao | Chỉ hiển thị QR cho thành viên đã duyệt; báo cáo vi phạm; uy tín |
 | Logo trùng thương hiệu khác | Thấp | Trung bình | Không dùng kiểu chữ G lồng nhau; tra cứu trước khi phát hành |
+| Facebook Login chỉ chạy cho tester khi app ở chế độ Development | Chắc chắn | Thấp (đồ án) / Cao (sản phẩm) | Thêm tài khoản demo làm tester; trước khi phát hành, chuẩn bị trang chính sách quyền riêng tư + hướng dẫn xóa dữ liệu và chuyển app sang Live |
 | Google Maps phát sinh phí | Thấp | Thấp | Gói miễn phí hằng tháng của Maps SDK đủ cho thử nghiệm; giới hạn key |

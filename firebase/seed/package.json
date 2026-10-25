@@ -1,0 +1,7 @@
+{
+  "name": "gogoal-seed",
+  "private": true,
+  "type": "module",
+  "scripts": { "seed": "node seed.mjs" },
+  "dependencies": { "firebase-admin": "^13.0.0", "ngeohash": "^0.6.3" }
+}

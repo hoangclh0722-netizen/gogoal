@@ -154,7 +154,7 @@ venues/{venueId}                         ← danh sách sân (admin nhập sẵn
 | Trường | Kiểu | Mô tả |
 |---|---|---|
 | displayName | string | 2–40 ký tự |
-| avatarUrl | string? | Ảnh từ Google hoặc null (dùng avatar chữ cái) |
+| avatarUrl | string? | Ảnh từ Google/Facebook hoặc null (dùng avatar chữ cái) |
 | district | string | Mã quận, vd `q1`, `binh-thanh`, `thu-duc` |
 | bio | string? | ≤ 200 ký tự |
 | sports | map<string, int> | `{ "football": 2, "badminton": 1 }` |
@@ -194,7 +194,8 @@ Chỉ chính chủ đọc/ghi được.
 | Trường | Kiểu | Mô tả |
 |---|---|---|
 | hostId | string | |
-| host | map | Bản sao `{ displayName, avatarUrl }` để danh sách không phải đọc thêm `users` |
+| host | map | Bản sao `{ displayName, avatarUrl, rep }` để danh sách không phải đọc thêm `users`. `rep` là điểm uy tín lúc tạo kèo, chỉ để hiển thị nên có thể cũ hơn điểm thật |
+| title | string | Tên kèo hiển thị trên thẻ, vd "Đá bóng sân 7". Mặc định ghép từ môn + thể thức, chủ kèo sửa được (≤ 60 ký tự) |
 | sportId, format | string | vd `football`, `5v5` |
 | playersTotal | int | Tổng người chơi của trận |
 | slotsNeeded | int | Số chỗ tuyển qua app |
@@ -303,7 +304,9 @@ stateDiagram-v2
 
 | Màn hình | Truy vấn | Chỉ mục composite |
 |---|---|---|
-| Khám phá (mặc định) | `matches` where `status == active`, `startAt > now`, orderBy `startAt`, limit 20 | `status ASC, startAt ASC` |
+| Khám phá (mặc định) | `matches` where `status == active`, `startAt >= now`, `startAt < now + 7 ngày`, orderBy `startAt`, limit 50. App tự tính khoảng cách từ `geo.geopoint` và sắp "gần tôi nhất"; không có vị trí thì giữ thứ tự theo `startAt` | `status ASC, startAt ASC` |
+| Chip thời gian (Hôm nay / Ngày mai / Cuối tuần) | Chỉ đổi cận `startAt` của truy vấn trên | dùng lại các chỉ mục bên dưới |
+| Ô tìm kiếm | Lọc trên danh sách đã tải (tên sân, quận), không truy vấn thêm | – |
 | Lọc theo môn | + where `sportId == X` | `status, sportId, startAt` |
 | Lọc theo quận | + where `district == X` | `status, district, startAt` |
 | Lọc môn + quận | + cả hai | `status, sportId, district, startAt` |
