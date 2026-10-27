@@ -153,12 +153,35 @@ class _SocialButton extends StatelessWidget {
 String? validateEmail(String? v) {
   final value = v?.trim() ?? '';
   if (value.isEmpty) return 'Nhập email của bạn';
-  if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value)) return 'Email chưa đúng định dạng';
+  if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value)) return 'Email không hợp lệ';
   return null;
 }
 
 String? validatePassword(String? v) {
   if ((v ?? '').isEmpty) return 'Nhập mật khẩu';
-  if (v!.length < 6) return 'Mật khẩu tối thiểu 6 ký tự';
+  if (v!.length < 8) return 'Mật khẩu cần ít nhất 8 ký tự';
   return null;
+}
+
+String? validateRequired(String? v) => (v ?? '').isEmpty ? 'Nhập mật khẩu' : null;
+
+class AuthErrorText extends StatelessWidget {
+  const AuthErrorText(this.message, {super.key});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.error_outline, color: AppColors.danger, size: 18),
+          const SizedBox(width: 6),
+          Expanded(child: Text(message, style: const TextStyle(color: AppColors.danger, fontSize: 13))),
+        ],
+      ),
+    );
+  }
 }

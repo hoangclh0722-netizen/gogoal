@@ -13,6 +13,20 @@ service cloud.firestore {
     function sportOk(s) { return s in ['football', 'badminton', 'basketball', 'pickleball', 'tennis']; }
     function perPerson(m) { return math.ceil(m.costTotal / m.playersTotal / 1000.0) * 1000; }
 
+    function levelOk(s, key) { return !(key in s) || s[key] in [1, 2, 3, 4]; }
+    function sportsOk(s) {
+      return s is map
+        && s.keys().hasOnly(['football', 'badminton', 'basketball', 'pickleball', 'tennis'])
+        && levelOk(s, 'football') && levelOk(s, 'badminton') && levelOk(s, 'basketball')
+        && levelOk(s, 'pickleball') && levelOk(s, 'tennis');
+    }
+    function profileOk(u) {
+      return u.displayName is string && u.displayName.size() >= 2 && u.displayName.size() <= 40
+        && u.district is string && u.district.size() > 0
+        && sportsOk(u.sports)
+        && (u.profileCompleted != true || u.sports.size() >= 1);
+    }
+
     // Thông tin kèo dùng chung cho lúc tạo và lúc chủ kèo sửa (BR01, BR02, BR12)
     function matchShapeOk(m) {
       return m.title is string && m.title.size() >= 1 && m.title.size() <= 60
@@ -47,10 +61,12 @@ service cloud.firestore {
         && request.resource.data.stats.ratingSum == 0
         && request.resource.data.stats.noShows == 0
         && request.resource.data.stats.lateLeaves == 0
-        && request.resource.data.stats.lateCancels == 0;
+        && request.resource.data.stats.lateCancels == 0
+        && profileOk(request.resource.data);
 
       allow update: if signedIn() && uid == me() && userDoc(me()).banned != true
-        && changedOnly(['displayName', 'avatarUrl', 'district', 'bio', 'sports', 'profileCompleted', 'updatedAt']);
+        && changedOnly(['displayName', 'avatarUrl', 'district', 'bio', 'sports', 'profileCompleted', 'updatedAt'])
+        && profileOk(request.resource.data);
       allow update: if isAdmin() && changedOnly(['banned', 'updatedAt']);
 
       match /private/{doc} {

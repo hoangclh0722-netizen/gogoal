@@ -24,3 +24,4 @@ node_modules/
 *.log
 firebase/rules-test/
 app/windows/
+docs/ux/02-auth.md

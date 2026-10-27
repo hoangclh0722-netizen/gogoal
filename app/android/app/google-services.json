@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "963197291163",
+    "project_id": "gogoal-9e66c",
+    "storage_bucket": "gogoal-9e66c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:963197291163:android:10f19ee13a7e15a3e2543e",
+        "android_client_info": {
+          "package_name": "vn.gogoal.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiiKPk14jHhwnW7mCp4DFQCk3ohCJHFlQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

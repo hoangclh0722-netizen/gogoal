@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "demo-gogoal"
+    "default": "demo-gogoal",
+    "prod": "gogoal-9e66c"
   }
 }

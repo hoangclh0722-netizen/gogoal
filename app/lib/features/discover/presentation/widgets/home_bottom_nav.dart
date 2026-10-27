@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class HomeBottomNav extends StatelessWidget {
-  const HomeBottomNav({super.key, required this.onTap});
+  const HomeBottomNav({super.key, required this.onTap, this.active = 'Khám phá'});
 
   final void Function(String title) onTap;
+  final String active;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,9 @@ class HomeBottomNav extends StatelessWidget {
           height: 64,
           child: Row(
             children: [
-              const Expanded(child: _Item(icon: Icons.explore, label: 'Khám phá', active: true)),
+              Expanded(
+                child: _Item(icon: Icons.explore, label: 'Khám phá', active: active == 'Khám phá', onTap: () => onTap('Khám phá')),
+              ),
               Expanded(
                 child: _Item(icon: Icons.event_note_outlined, label: 'Kèo của tôi', onTap: () => onTap('Kèo của tôi')),
               ),
@@ -29,7 +32,7 @@ class HomeBottomNav extends StatelessWidget {
                 child: _Item(icon: Icons.notifications_none, label: 'Thông báo', onTap: () => onTap('Thông báo')),
               ),
               Expanded(
-                child: _Item(icon: Icons.person_outline, label: 'Hồ sơ', onTap: () => onTap('Hồ sơ')),
+                child: _Item(icon: Icons.person_outline, label: 'Hồ sơ', active: active == 'Hồ sơ', onTap: () => onTap('Hồ sơ')),
               ),
             ],
           ),

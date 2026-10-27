@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/district.dart';
 import '../../../../core/utils/format.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../match/domain/entities/geo_point.dart';
@@ -91,7 +92,7 @@ class MatchCard extends StatelessWidget {
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  '${formatMatchTime(match.startAt, DateTime.now())} · ${match.venue.district}',
+                                  '${formatMatchTime(match.startAt, DateTime.now())} · ${districtName(match.district)}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),

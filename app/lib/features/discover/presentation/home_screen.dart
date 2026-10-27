@@ -24,7 +24,12 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _openLocked(BuildContext context, WidgetRef ref, String title) {
-    requireLogin(context, ref, () => context.push(Routes.comingSoon, extra: title));
+    if (title == 'Khám phá') return;
+    if (title == 'Hồ sơ') {
+      requireLogin(context, ref, () => context.go(Routes.profile));
+    } else {
+      requireLogin(context, ref, () => context.push(Routes.comingSoon, extra: title));
+    }
   }
 
   void _requestJoin(BuildContext context, WidgetRef ref, Match match) {

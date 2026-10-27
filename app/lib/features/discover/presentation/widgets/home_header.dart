@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/logo_wordmark.dart';
-import '../../../auth/application/auth_controller.dart';
+import '../../../auth/application/auth_providers.dart';
 import '../../application/home_providers.dart';
 import '../../application/location_controller.dart';
 

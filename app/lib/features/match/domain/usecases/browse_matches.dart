@@ -1,3 +1,4 @@
+import '../../../../core/utils/district.dart';
 import '../entities/geo_point.dart';
 import '../entities/match.dart';
 
@@ -35,7 +36,7 @@ List<Match> browseMatches(
     if (filter.sportId != null && m.sportId != filter.sportId) return false;
     if (filter.time != null && !_inTimeFilter(m.startAt, filter.time!, now)) return false;
     if (query.isEmpty) return true;
-    return _fold(m.venue.name).contains(query) || _fold(m.district).contains(query);
+    return _fold(m.venue.name).contains(query) || _fold(districtName(m.district)).contains(query);
   }).toList();
 
   if (origin != null) {
