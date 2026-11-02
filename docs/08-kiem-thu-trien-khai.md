@@ -94,7 +94,7 @@ jobs:
 
 | Rủi ro | Khả năng | Ảnh hưởng | Giảm thiểu |
 |---|---|---|---|
-| Trễ tiến độ do mới học Flutter | Cao | Cao | Ưu tiên giai đoạn 1; cắt T23 → T19 → T20; giao task chi tiết cho Claude và học qua code mẫu |
+| Trễ tiến độ do mới học Flutter | Cao | Cao | Ưu tiên giai đoạn 1; cắt T23 → T19 → T20; học qua code mẫu và tài liệu |
 | Logic ở client bị gian lận | Trung bình | Trung bình | Security Rules + rules test; khi có người dùng thật, chuyển logic quan trọng sang server (Blaze) |
 | Vượt hạn mức Spark | Thấp (giai đoạn đầu) | Trung bình | Phân trang, cache, tránh lắng nghe realtime không cần thiết; theo dõi trong Firebase Console |
 | Không có thông báo đẩy khi app đóng | Chắc chắn | Trung bình | Nhắc giờ bằng local notification; thông báo chưa đọc hiện khi mở app; giai đoạn sau thêm Cloudflare Worker + FCM |

@@ -56,13 +56,14 @@ class DefaultFirebaseOptions {
     projectId: 'gogoal-9e66c',
     storageBucket: 'gogoal-9e66c.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBoJeI6Mxo-20Wd2LXq_nZp4-Tkv5jw7lY',
     appId: '1:963197291163:ios:d2317795fa6c785be2543e',
     messagingSenderId: '963197291163',
     projectId: 'gogoal-9e66c',
     storageBucket: 'gogoal-9e66c.firebasestorage.app',
+    androidClientId: '963197291163-j4fb3kd7jm85d5ofpm8j3nbc2p03t5nr.apps.googleusercontent.com',
+    iosClientId: '963197291163-if27oobf80sob4gbt7ged79tudongbrm.apps.googleusercontent.com',
     iosBundleId: 'vn.gogoal.app',
   );
 }

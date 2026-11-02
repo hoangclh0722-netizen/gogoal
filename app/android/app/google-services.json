@@ -12,7 +12,20 @@
           "package_name": "vn.gogoal.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "963197291163-j4fb3kd7jm85d5ofpm8j3nbc2p03t5nr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vn.gogoal.app",
+            "certificate_hash": "6cc6034fa62952b25106c162627feeae4025c0e8"
+          }
+        },
+        {
+          "client_id": "963197291163-obm6qkvt901v0mkskmaopv1vdg07f0ja.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDiiKPk14jHhwnW7mCp4DFQCk3ohCJHFlQ"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "963197291163-obm6qkvt901v0mkskmaopv1vdg07f0ja.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "963197291163-if27oobf80sob4gbt7ged79tudongbrm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "vn.gogoal.app"
+              }
+            }
+          ]
         }
       }
     }

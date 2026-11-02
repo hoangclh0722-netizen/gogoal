@@ -4,4 +4,6 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Auth Emulator chạy http://127.0.0.1:9099, chỉ bản debug mới cho phép -->
+    <application android:usesCleartextTraffic="true"/>
 </manifest>

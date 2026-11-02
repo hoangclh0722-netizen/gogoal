@@ -32,12 +32,13 @@ The project is built in vertical slices: each feature goes through UX, UI, datab
 **Phase 1 – MVP**
 
 - [x] Onboarding and location permission
-- [x] Discover screen: games sorted by distance, sport and time filters, search, loading/empty/offline states (mock data)
-- [x] Login and register screens (UI only)
+- [x] Discover screen: games sorted by distance, sport and time filters, search, loading/empty/offline states (Firestore)
 - [x] Firestore data model, indexes and seed data for the Discover screen
 - [x] Firestore security rules for users, venues, games and join requests
-- [ ] Email, Google and Facebook sign-in with Firebase Auth
-- [ ] Profile setup (sports, skill levels, bank account for payments)
+- [x] Email and Google sign-in with Firebase Auth (Auth Emulator in development)
+- [x] Profile setup (display name, district, sports and skill levels) and profile screen
+- [ ] Facebook sign-in and password reset
+- [ ] Bank account setup for paid games
 - [ ] Game details, create game, join and approve requests
 - [ ] VietQR payment code for approved members
 - [ ] My games and in-app notifications
