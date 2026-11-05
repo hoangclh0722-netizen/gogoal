@@ -58,6 +58,12 @@ const specs = [
   ['tennis', 'singles', 'Kèo bị ẩn (vi phạm)', 'v-tb-tn', 600, 1, 4, 2, 1, 0, 100000, 'manual', 'u-nga', 'hidden'],
 ];
 
+const notes = {
+  0: 'Mang áo tối màu, sân có nước uống miễn phí.',
+  1: 'Cầu Yonex, tiền cầu chia đều sau buổi.',
+  4: 'Thiếu 1 thủ môn, ai bắt gôn được thì ưu tiên.',
+};
+
 const now = Date.now();
 const roundHalfHour = ms => Math.ceil(ms / 1800000) * 1800000;
 const batch = db.batch();
@@ -93,7 +99,7 @@ specs.forEach(([sportId, format, title, venueId, mins, lMin, lMax, total, needed
     geo: { geohash: ngeohash.encode(v.lat, v.lng, 9), geopoint: new GeoPoint(v.lat, v.lng) },
     district: v.district,
     costTotal, costPerPerson: Math.ceil(costTotal / total / 1000) * 1000,
-    approvalMode, minReputation: null, note: null,
+    approvalMode, minReputation: null, note: notes[i] ?? null,
     status, cancelReason: status === 'cancelled' ? 'Chủ kèo bận đột xuất' : null,
     attendanceTakenAt: null, createdAt: created, updatedAt: created,
   });

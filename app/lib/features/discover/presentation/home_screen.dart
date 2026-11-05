@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../match/domain/entities/match.dart';
 import '../application/home_providers.dart';
 import '../application/location_controller.dart';
 import 'widgets/home_bottom_nav.dart';
@@ -30,10 +29,6 @@ class HomeScreen extends ConsumerWidget {
     } else {
       requireLogin(context, ref, () => context.push(Routes.comingSoon, extra: title));
     }
-  }
-
-  void _requestJoin(BuildContext context, WidgetRef ref, Match match) {
-    requireLogin(context, ref, () => _toast(context, 'Đã gửi yêu cầu vào "${match.title}"'));
   }
 
   @override
@@ -112,8 +107,8 @@ class HomeScreen extends ConsumerWidget {
                       child: MatchCard(
                         match: list[i],
                         origin: location.position,
-                        onTap: () => context.push(Routes.comingSoon, extra: list[i].title),
-                        onJoin: () => _requestJoin(context, ref, list[i]),
+                        onTap: () => context.push(Routes.match(list[i].id)),
+                        onJoin: () => context.push(Routes.match(list[i].id)),
                       ),
                     ),
                   ),

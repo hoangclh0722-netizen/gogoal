@@ -31,4 +31,10 @@ Future<void> initFirebase() async {
     ..useFirestoreEmulator(_emulatorHost, 8080, automaticHostMapping: false);
   appAuth = FirebaseAuth.instanceFor(app: app);
   await appAuth.useAuthEmulator(_emulatorHost, 9099, automaticHostMapping: false);
+  // Emulator khởi động lại là mất hết tài khoản, phiên cũ lưu trên máy thành vô hiệu
+  try {
+    await appAuth.currentUser?.reload();
+  } on FirebaseAuthException catch (e) {
+    if (e.code != 'network-request-failed') await appAuth.signOut();
+  }
 }

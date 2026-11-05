@@ -1,6 +1,7 @@
 import '../domain/entities/geo_point.dart';
 import '../domain/entities/match.dart';
 import '../domain/entities/match_repository.dart';
+import '../domain/entities/participant.dart';
 
 enum FakeScenario { normal, offline }
 
@@ -17,6 +18,11 @@ class FakeMatchRepository implements MatchRepository {
     if (scenario == FakeScenario.offline) throw Exception('offline');
     final limit = _now.add(within);
     return _seed().where((m) => m.startAt.isAfter(_now) && m.startAt.isBefore(limit)).toList();
+  }
+
+  @override
+  Stream<Match?> watchMatch(String id) async* {
+    yield _seed().where((m) => m.id == id).firstOrNull;
   }
 
   DateTime _at(int dayOffset, int hour, [int minute = 0]) {
@@ -103,4 +109,9 @@ class FakeMatchRepository implements MatchRepository {
       ),
     ];
   }
+}
+
+class FakeParticipantRepository implements ParticipantRepository {
+  @override
+  Stream<ParticipantStatus?> watchMyStatus(String matchId, String uid) => Stream.value(null);
 }

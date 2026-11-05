@@ -25,8 +25,21 @@ class FirestoreMatchRepository implements MatchRepository {
     return snap.docs.map(_toMatch).toList();
   }
 
-  Match _toMatch(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
-    final d = doc.data();
+  @override
+  Stream<Match?> watchMatch(String id) async* {
+    try {
+      await for (final doc in _db.collection('matches').doc(id).snapshots()) {
+        yield doc.exists && doc.data()!['status'] != 'hidden' ? _toMatch(doc) : null;
+      }
+    } on FirebaseException catch (e) {
+      // Kèo bị ẩn thì rules chặn đọc
+      if (e.code != 'permission-denied') rethrow;
+      yield null;
+    }
+  }
+
+  Match _toMatch(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final d = doc.data()!;
     final venue = d['venue'] as Map<String, dynamic>;
     final host = d['host'] as Map<String, dynamic>;
     final point = (d['geo'] as Map<String, dynamic>)['geopoint'] as fs.GeoPoint;
@@ -44,11 +57,24 @@ class FirestoreMatchRepository implements MatchRepository {
       levelMin: i('levelMin'),
       levelMax: i('levelMax'),
       startAt: (d['startAt'] as Timestamp).toDate(),
-      venue: Venue(name: venue['name'] as String, district: venue['district'] as String),
+      endAt: (d['endAt'] as Timestamp?)?.toDate(),
+      venue: Venue(
+        name: venue['name'] as String,
+        district: venue['district'] as String,
+        address: venue['address'] as String? ?? '',
+      ),
       geo: GeoPoint(point.latitude, point.longitude),
       district: d['district'] as String,
       costPerPerson: i('costPerPerson'),
-      host: Host(displayName: host['displayName'] as String, rep: (host['rep'] as num).toDouble()),
+      host: Host(
+        displayName: host['displayName'] as String,
+        rep: (host['rep'] as num).toDouble(),
+        avatarUrl: host['avatarUrl'] as String?,
+      ),
+      hostId: d['hostId'] as String,
+      autoApprove: d['approvalMode'] == 'auto',
+      note: d['note'] as String?,
+      status: MatchStatus.values.byName(d['status'] as String),
     );
   }
 }
