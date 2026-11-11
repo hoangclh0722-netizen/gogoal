@@ -19,6 +19,7 @@ import '../application/match_providers.dart';
 import '../domain/entities/join_eligibility.dart';
 import '../domain/entities/match.dart';
 import '../domain/entities/participant.dart';
+import 'join_sheet.dart';
 
 class MatchDetailScreen extends ConsumerWidget {
   const MatchDetailScreen({super.key, required this.matchId});
@@ -427,7 +428,12 @@ class _ActionBar extends ConsumerWidget {
         main = AppButton(
           label: 'Xin vào',
           kind: AppButtonKind.accent,
-          onPressed: () => _toast(context, 'Xin vào sẽ có ở bước sau'),
+          onPressed: () async {
+            final ok = await showJoinSheet(context, match, profile.value!);
+            if (ok == true && context.mounted) {
+              _toast(context, match.autoApprove ? 'Bạn đã vào kèo' : 'Đã gửi yêu cầu, chờ chủ kèo duyệt');
+            }
+          },
         );
     }
 

@@ -114,4 +114,15 @@ class FakeMatchRepository implements MatchRepository {
 class FakeParticipantRepository implements ParticipantRepository {
   @override
   Stream<ParticipantStatus?> watchMyStatus(String matchId, String uid) => Stream.value(null);
+
+  @override
+  Future<void> requestJoin({
+    required Match match,
+    required String uid,
+    required String displayName,
+    required String? avatarUrl,
+    required int level,
+    String? message,
+  }) =>
+      Future<void>.delayed(const Duration(milliseconds: 800));
 }

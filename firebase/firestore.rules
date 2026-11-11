@@ -27,6 +27,15 @@ service cloud.firestore {
         && (u.profileCompleted != true || u.sports.size() >= 1);
     }
 
+    function joinShapeOk(p) {
+      return p.keys().hasOnly(['uid', 'matchId', 'matchStartAt', 'displayName', 'avatarUrl', 'level', 'status',
+                               'message', 'paid', 'paidConfirmed', 'attended', 'requestedAt', 'updatedAt'])
+        && p.displayName == userDoc(me()).displayName
+        && (p.message == null || (p.message is string && p.message.size() <= 200))
+        && p.paid == false && p.paidConfirmed == false && p.attended == null
+        && p.requestedAt == request.time;
+    }
+
     // Thông tin kèo dùng chung cho lúc tạo và lúc chủ kèo sửa (BR01, BR02, BR12)
     function matchShapeOk(m) {
       return m.title is string && m.title.size() >= 1 && m.title.size() <= 60
@@ -133,6 +142,7 @@ service cloud.firestore {
         allow create: if notBanned() && uid == me()
           && request.resource.data.uid == me()
           && request.resource.data.matchId == matchId
+          && joinShapeOk(request.resource.data)
           && get(/databases/$(db)/documents/matches/$(matchId)).data.hostId != me()
           && get(/databases/$(db)/documents/matches/$(matchId)).data.status == 'active'
           && get(/databases/$(db)/documents/matches/$(matchId)).data.startAt > request.time
