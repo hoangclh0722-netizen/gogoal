@@ -66,4 +66,30 @@ class FirestoreParticipantRepository implements ParticipantRepository {
       throw JoinException(e.code == 'unavailable' ? JoinError.network : JoinError.denied);
     }
   }
+
+  @override
+  Future<void> leave({required Match match, required String uid, required ParticipantStatus current}) async {
+    final matchRef = _db.doc('matches/${match.id}');
+    final ref = matchRef.collection('participants').doc(uid);
+    final left = {'status': 'left', 'updatedAt': FieldValue.serverTimestamp()};
+    try {
+      if (current == ParticipantStatus.pending) {
+        await ref.update(left).timeout(const Duration(seconds: 10));
+        return;
+      }
+      await _db.runTransaction((tx) async {
+        final filled = ((await tx.get(matchRef)).data()!['slotsFilled'] as num).toInt();
+        tx.update(ref, left);
+        tx.update(matchRef, {
+          'slotsFilled': filled - 1,
+          'isFull': false,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }).timeout(const Duration(seconds: 10));
+    } on TimeoutException {
+      throw const JoinException(JoinError.network);
+    } on FirebaseException catch (e) {
+      throw JoinException(e.code == 'unavailable' ? JoinError.network : JoinError.denied);
+    }
+  }
 }

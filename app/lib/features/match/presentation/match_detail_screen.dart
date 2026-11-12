@@ -350,6 +350,54 @@ class _ActionBar extends ConsumerWidget {
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(message)));
 
+  Future<void> _leave(BuildContext context, WidgetRef ref, String uid, ParticipantStatus current) async {
+    final pending = current == ParticipantStatus.pending;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: CircleAvatar(
+          radius: 28,
+          backgroundColor: const Color(0xFFFEE2E2),
+          child: Icon(pending ? Icons.cancel_outlined : Icons.logout, color: AppColors.danger),
+        ),
+        title: Text(pending ? 'Hủy yêu cầu tham gia?' : 'Rời khỏi kèo này?', textAlign: TextAlign.center),
+        content: Text(
+          pending ? 'Chủ kèo sẽ không thấy yêu cầu của bạn nữa.' : 'Chỗ của bạn sẽ được nhường cho người khác.',
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          Row(
+            spacing: 10,
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(pending ? 'Không' : 'Ở lại'),
+                ),
+              ),
+              Expanded(
+                child: FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(pending ? 'Hủy yêu cầu' : 'Rời kèo'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await ref.read(participantRepositoryProvider).leave(match: match, uid: uid, current: current);
+      if (context.mounted) _toast(context, pending ? 'Đã hủy yêu cầu' : 'Bạn đã rời kèo');
+    } on JoinException catch (e) {
+      if (context.mounted) {
+        _toast(context, e.error == JoinError.network ? 'Không kết nối được, thử lại' : 'Không thực hiện được, thử lại');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateProvider).value;
@@ -387,7 +435,11 @@ class _ActionBar extends ConsumerWidget {
       case AlreadyRequested(status: ParticipantStatus.pending):
         showPrice = false;
         note = const _Status(Icons.schedule, AppColors.warning, 'Đang chờ chủ kèo duyệt');
-        main = AppButton(label: 'Hủy yêu cầu', kind: AppButtonKind.outline, onPressed: soon);
+        main = AppButton(
+          label: 'Hủy yêu cầu',
+          kind: AppButtonKind.outline,
+          onPressed: () => _leave(context, ref, user.uid, ParticipantStatus.pending),
+        );
       case AlreadyRequested(status: ParticipantStatus.approved):
         showPrice = false;
         note = const _Status(Icons.check_circle_outline, AppColors.primaryDark, 'Bạn đã ở trong kèo');
@@ -401,7 +453,7 @@ class _ActionBar extends ConsumerWidget {
               ],
             ),
             TextButton(
-              onPressed: soon,
+              onPressed: () => _leave(context, ref, user.uid, ParticipantStatus.approved),
               child: const Text('Rời kèo',
                   style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w600, fontSize: 15)),
             ),

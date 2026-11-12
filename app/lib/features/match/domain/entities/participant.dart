@@ -23,4 +23,7 @@ abstract interface class ParticipantRepository {
     required int level,
     String? message,
   });
+
+  /// Hủy yêu cầu đang chờ, hoặc rời kèo đã được nhận (trả lại một chỗ).
+  Future<void> leave({required Match match, required String uid, required ParticipantStatus current});
 }

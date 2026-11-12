@@ -125,4 +125,8 @@ class FakeParticipantRepository implements ParticipantRepository {
     String? message,
   }) =>
       Future<void>.delayed(const Duration(milliseconds: 800));
+
+  @override
+  Future<void> leave({required Match match, required String uid, required ParticipantStatus current}) =>
+      Future<void>.delayed(const Duration(milliseconds: 800));
 }

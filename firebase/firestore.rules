@@ -130,6 +130,16 @@ service cloud.firestore {
         && !exists(/databases/$(db)/documents/matches/$(matchId)/participants/$(me()))
         && getAfter(/databases/$(db)/documents/matches/$(matchId)/participants/$(me())).data.status == 'approved';
 
+      // Thành viên rời kèo: trả lại đúng 1 chỗ, kèm participant của chính mình chuyển sang left trong cùng batch
+      allow update: if signedIn()
+        && resource.data.status == 'active'
+        && resource.data.startAt > request.time
+        && changedOnly(['slotsFilled', 'isFull', 'updatedAt'])
+        && request.resource.data.slotsFilled == resource.data.slotsFilled - 1
+        && request.resource.data.isFull == false
+        && get(/databases/$(db)/documents/matches/$(matchId)/participants/$(me())).data.status == 'approved'
+        && getAfter(/databases/$(db)/documents/matches/$(matchId)/participants/$(me())).data.status == 'left';
+
       allow update: if isAdmin() && changedOnly(['status', 'updatedAt'])
         && request.resource.data.status in ['active', 'hidden', 'cancelled'];
 
@@ -138,7 +148,7 @@ service cloud.firestore {
       match /participants/{uid} {
         allow read: if signedIn();
 
-        // Xin vào kèo (BR03, BR04, BR06, BR13). Duyệt, rời, loại thành viên sẽ làm ở task sau.
+        // Xin vào kèo (BR03, BR04, BR06, BR13). Duyệt và loại thành viên sẽ làm ở task sau.
         allow create: if notBanned() && uid == me()
           && request.resource.data.uid == me()
           && request.resource.data.matchId == matchId
@@ -157,6 +167,17 @@ service cloud.firestore {
               && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled
                  == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled + 1)
           );
+
+        // Hủy yêu cầu đang chờ, hoặc rời kèo đã được nhận (phải trả lại chỗ). Phạt rời muộn (BR07) để giai đoạn 2.
+        allow update: if signedIn() && uid == me()
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.status == 'active'
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.startAt > request.time
+          && changedOnly(['status', 'updatedAt'])
+          && request.resource.data.status == 'left'
+          && (resource.data.status == 'pending'
+            || (resource.data.status == 'approved'
+              && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled
+                 == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled - 1));
       }
 
       match /private/payment {
