@@ -17,6 +17,21 @@ class FirestoreParticipantRepository implements ParticipantRepository {
       .map((s) => s.exists ? ParticipantStatus.values.byName(s.data()!['status'] as String) : null);
 
   @override
+  Stream<List<Member>> watchMembers(String matchId) => _db
+      .collection('matches/$matchId/participants')
+      .where('status', isEqualTo: 'approved')
+      .snapshots()
+      .map((s) => s.docs.map((d) {
+            final p = d.data();
+            return Member(
+              uid: d.id,
+              displayName: p['displayName'] as String,
+              level: (p['level'] as num).toInt(),
+              avatarUrl: p['avatarUrl'] as String?,
+            );
+          }).toList());
+
+  @override
   Future<void> requestJoin({
     required Match match,
     required String uid,

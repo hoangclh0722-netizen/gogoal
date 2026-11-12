@@ -283,13 +283,18 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-class _SlotsCard extends StatelessWidget {
+class _SlotsCard extends ConsumerWidget {
   const _SlotsCard({required this.match});
 
   final Match match;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final uid = ref.watch(authStateProvider).value?.uid;
+    final insider = uid != null &&
+        (uid == match.hostId || ref.watch(myParticipationProvider(match.id)).value == ParticipantStatus.approved);
+    final members = insider ? ref.watch(membersProvider(match.id)).value : null;
+
     return _Card(children: [
       Row(
         children: [
@@ -316,28 +321,84 @@ class _SlotsCard extends StatelessWidget {
           backgroundColor: AppColors.border,
         ),
       ),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(10)),
-        child: Row(
-          children: [
-            const Icon(Icons.lock_outline, size: 18, color: AppColors.muted),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${match.slotsFilled + 1} người trong kèo',
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
-                  const Text('Chỉ thành viên trong kèo xem được danh sách',
-                      style: TextStyle(fontSize: 12, color: AppColors.muted)),
-                ],
-              ),
-            ),
-          ],
+      if (members != null) ...[
+        _MemberRow(
+          name: match.host.displayName,
+          avatarUrl: match.host.avatarUrl,
+          isMe: uid == match.hostId,
+          tag: 'Chủ kèo',
+          isHost: true,
         ),
-      ),
+        for (final m in members)
+          _MemberRow(name: m.displayName, avatarUrl: m.avatarUrl, isMe: m.uid == uid, tag: skillLevels[m.level - 1]),
+      ] else
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(10)),
+          child: Row(
+            children: [
+              const Icon(Icons.lock_outline, size: 18, color: AppColors.muted),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${match.slotsFilled + 1} người trong kèo',
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('Chỉ thành viên trong kèo xem được danh sách',
+                        style: TextStyle(fontSize: 12, color: AppColors.muted)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
     ]);
+  }
+}
+
+class _MemberRow extends StatelessWidget {
+  const _MemberRow({
+    required this.name,
+    required this.avatarUrl,
+    required this.isMe,
+    required this.tag,
+    this.isHost = false,
+  });
+
+  final String name;
+  final String? avatarUrl;
+  final bool isMe;
+  final String tag;
+  final bool isHost;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = isHost ? const Color(0xFFB45309) : AppColors.primaryDark;
+    return Row(
+      children: [
+        ProfileAvatar(photoUrl: avatarUrl, name: name, radius: 16),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(isMe ? '$name (bạn)' : name,
+              maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: isHost ? const Color(0xFFFEF3C7) : AppColors.primarySoft,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isHost) ...[Icon(Icons.workspace_premium_outlined, size: 13, color: fg), const SizedBox(width: 3)],
+              Text(tag, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg)),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 

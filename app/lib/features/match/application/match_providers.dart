@@ -29,6 +29,10 @@ final matchProvider = StreamProvider.family<Match?, String>(
   (ref, id) => ref.watch(matchRepositoryProvider).watchMatch(id),
 );
 
+final membersProvider = StreamProvider.family<List<Member>, String>(
+  (ref, matchId) => ref.watch(participantRepositoryProvider).watchMembers(matchId),
+);
+
 final myParticipationProvider = StreamProvider.family<ParticipantStatus?, String>((ref, matchId) {
   final user = ref.watch(authStateProvider).value;
   if (user == null) return Stream.value(null);

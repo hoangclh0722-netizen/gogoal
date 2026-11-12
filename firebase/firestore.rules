@@ -146,7 +146,11 @@ service cloud.firestore {
       allow delete: if false;
 
       match /participants/{uid} {
-        allow read: if signedIn();
+        // Chỉ người trong kèo (chủ kèo, thành viên đã được nhận) xem được danh sách; ai cũng xem được yêu cầu của chính mình
+        allow read: if signedIn() && (uid == me()
+          || get(/databases/$(db)/documents/matches/$(matchId)).data.hostId == me()
+          || (exists(/databases/$(db)/documents/matches/$(matchId)/participants/$(me()))
+            && get(/databases/$(db)/documents/matches/$(matchId)/participants/$(me())).data.status == 'approved'));
 
         // Xin vào kèo (BR03, BR04, BR06, BR13). Duyệt và loại thành viên sẽ làm ở task sau.
         allow create: if notBanned() && uid == me()

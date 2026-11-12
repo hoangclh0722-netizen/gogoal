@@ -116,6 +116,9 @@ class FakeParticipantRepository implements ParticipantRepository {
   Stream<ParticipantStatus?> watchMyStatus(String matchId, String uid) => Stream.value(null);
 
   @override
+  Stream<List<Member>> watchMembers(String matchId) => Stream.value(const []);
+
+  @override
   Future<void> requestJoin({
     required Match match,
     required String uid,

@@ -2,6 +2,15 @@ import 'match.dart';
 
 enum ParticipantStatus { pending, approved, rejected, left, removed }
 
+class Member {
+  const Member({required this.uid, required this.displayName, required this.level, this.avatarUrl});
+
+  final String uid;
+  final String displayName;
+  final int level;
+  final String? avatarUrl;
+}
+
 enum JoinError { full, denied, network }
 
 class JoinException implements Exception {
@@ -13,6 +22,9 @@ class JoinException implements Exception {
 abstract interface class ParticipantRepository {
   /// Trạng thái của [uid] trong kèo, null nếu chưa từng xin vào.
   Stream<ParticipantStatus?> watchMyStatus(String matchId, String uid);
+
+  /// Thành viên đã được nhận. Chỉ chủ kèo và thành viên mới đọc được (rules).
+  Stream<List<Member>> watchMembers(String matchId);
 
   /// Kèo duyệt tay: tạo yêu cầu chờ duyệt. Kèo vào ngay: vào luôn và giữ một chỗ.
   Future<void> requestJoin({
