@@ -143,4 +143,8 @@ class FakeParticipantRepository implements ParticipantRepository {
   @override
   Future<void> reject({required Match match, required String uid}) =>
       Future<void>.delayed(const Duration(milliseconds: 800));
+
+  @override
+  Future<void> remove({required Match match, required String uid}) =>
+      Future<void>.delayed(const Duration(milliseconds: 800));
 }

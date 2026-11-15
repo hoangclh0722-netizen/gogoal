@@ -151,6 +151,16 @@ service cloud.firestore {
         && get(/databases/$(db)/documents/matches/$(matchId)/participants/$(request.resource.data.changedMember)).data.status == 'pending'
         && getAfter(/databases/$(db)/documents/matches/$(matchId)/participants/$(request.resource.data.changedMember)).data.status == 'approved';
 
+      // Chủ kèo mời một thành viên ra: trả lại đúng 1 chỗ, changedMember chuyển approved → removed
+      allow update: if notBanned() && resource.data.hostId == me()
+        && resource.data.status == 'active'
+        && resource.data.startAt > request.time
+        && changedOnly(['slotsFilled', 'isFull', 'changedMember', 'updatedAt'])
+        && request.resource.data.slotsFilled == resource.data.slotsFilled - 1
+        && request.resource.data.isFull == false
+        && get(/databases/$(db)/documents/matches/$(matchId)/participants/$(request.resource.data.changedMember)).data.status == 'approved'
+        && getAfter(/databases/$(db)/documents/matches/$(matchId)/participants/$(request.resource.data.changedMember)).data.status == 'removed';
+
       allow update: if isAdmin() && changedOnly(['status', 'updatedAt'])
         && request.resource.data.status in ['active', 'hidden', 'cancelled'];
 
@@ -194,17 +204,19 @@ service cloud.firestore {
               && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled
                  == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled - 1));
 
-        // Chủ kèo từ chối, hoặc nhận (kèm tăng chỗ trong cùng batch) yêu cầu đang chờ (UC07)
+        // Chủ kèo từ chối hoặc nhận yêu cầu đang chờ, mời thành viên ra (UC07); nhận/mời ra phải đổi số chỗ cùng batch
         allow update: if notBanned()
           && get(/databases/$(db)/documents/matches/$(matchId)).data.hostId == me()
           && get(/databases/$(db)/documents/matches/$(matchId)).data.status == 'active'
           && get(/databases/$(db)/documents/matches/$(matchId)).data.startAt > request.time
           && changedOnly(['status', 'updatedAt'])
-          && resource.data.status == 'pending'
-          && (request.resource.data.status == 'rejected'
-            || (request.resource.data.status == 'approved'
+          && ((resource.data.status == 'pending' && request.resource.data.status == 'rejected')
+            || (resource.data.status == 'pending' && request.resource.data.status == 'approved'
               && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled
-                 == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled + 1));
+                 == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled + 1)
+            || (resource.data.status == 'approved' && request.resource.data.status == 'removed'
+              && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled
+                 == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled - 1));
       }
 
       match /private/payment {

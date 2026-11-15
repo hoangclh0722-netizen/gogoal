@@ -24,6 +24,52 @@ class ManageMatchScreen extends ConsumerStatefulWidget {
 class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
   int _tab = 0;
 
+  Future<void> _remove(Match match, Member member) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const CircleAvatar(
+          radius: 28,
+          backgroundColor: Color(0xFFFEE2E2),
+          child: Icon(Icons.person_remove_outlined, color: AppColors.danger),
+        ),
+        title: Text('Mời ${member.displayName} ra khỏi kèo?', textAlign: TextAlign.center),
+        content: Text(
+          '${member.displayName} sẽ không còn trong danh sách thành viên, kèo mở lại 1 chỗ.',
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          Row(
+            spacing: 10,
+            children: [
+              Expanded(
+                child: OutlinedButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Hủy')),
+              ),
+              Expanded(
+                child: FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Mời ra'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await ref.read(participantRepositoryProvider).remove(match: match, uid: member.uid);
+    } on JoinException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text(e.error == JoinError.network ? 'Không kết nối được, thử lại' : 'Không thực hiện được, thử lại'),
+        ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final match = ref.watch(matchProvider(widget.matchId)).value;
@@ -73,7 +119,12 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
                         children: [
                           _MemberTile(name: '${match.host.displayName} (bạn)', avatarUrl: match.host.avatarUrl, tag: 'Chủ kèo', isHost: true),
                           for (final m in members)
-                            _MemberTile(name: m.displayName, avatarUrl: m.avatarUrl, tag: skillLevels[m.level - 1]),
+                            _MemberTile(
+                              name: m.displayName,
+                              avatarUrl: m.avatarUrl,
+                              tag: skillLevels[m.level - 1],
+                              onRemove: editable ? () => _remove(match, m) : null,
+                            ),
                         ],
                       ),
                     ],
@@ -330,12 +381,13 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
 }
 
 class _MemberTile extends StatelessWidget {
-  const _MemberTile({required this.name, required this.avatarUrl, required this.tag, this.isHost = false});
+  const _MemberTile({required this.name, required this.avatarUrl, required this.tag, this.isHost = false, this.onRemove});
 
   final String name;
   final String? avatarUrl;
   final String tag;
   final bool isHost;
+  final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -348,6 +400,12 @@ class _MemberTile extends StatelessWidget {
               maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
         ),
         _Tag(tag, host: isHost),
+        if (onRemove != null)
+          TextButton(
+            onPressed: onRemove,
+            style: TextButton.styleFrom(foregroundColor: AppColors.danger, visualDensity: VisualDensity.compact),
+            child: const Text('Mời ra', style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
       ],
     );
   }

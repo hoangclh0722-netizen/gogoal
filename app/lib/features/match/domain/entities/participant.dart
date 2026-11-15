@@ -60,4 +60,7 @@ abstract interface class ParticipantRepository {
   Future<void> approve({required Match match, required String uid});
 
   Future<void> reject({required Match match, required String uid});
+
+  /// Chủ kèo mời thành viên ra: participant → removed và trả lại một chỗ.
+  Future<void> remove({required Match match, required String uid});
 }

@@ -156,6 +156,23 @@ class FirestoreParticipantRepository implements ParticipantRepository {
       .doc('matches/${match.id}/participants/$uid')
       .update({'status': 'rejected', 'updatedAt': FieldValue.serverTimestamp()}));
 
+  @override
+  Future<void> remove({required Match match, required String uid}) => _run(() async {
+        final matchRef = _db.doc('matches/${match.id}');
+        final ref = matchRef.collection('participants').doc(uid);
+        await _db.runTransaction((tx) async {
+          final filled = ((await tx.get(matchRef)).data()!['slotsFilled'] as num).toInt();
+          if ((await tx.get(ref)).data()?['status'] != 'approved') throw const JoinException(JoinError.denied);
+          tx.update(ref, {'status': 'removed', 'updatedAt': FieldValue.serverTimestamp()});
+          tx.update(matchRef, {
+            'slotsFilled': filled - 1,
+            'isFull': false,
+            'changedMember': uid,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        });
+      });
+
   Future<void> _run(Future<void> Function() action) async {
     try {
       await action().timeout(const Duration(seconds: 10));
