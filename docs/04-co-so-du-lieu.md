@@ -200,6 +200,7 @@ Chỉ chính chủ đọc/ghi được.
 | playersTotal | int | Tổng người chơi của trận |
 | slotsNeeded | int | Số chỗ tuyển qua app |
 | slotsFilled | int | Số người đã được nhận |
+| changedMember | string? | uid người vừa được chủ kèo nhận (hoặc mời ra), ghi cùng batch để rules kiểm tra đúng người |
 | isFull | bool | `slotsFilled >= slotsNeeded`, cập nhật cùng transaction, dùng để lọc "còn chỗ" |
 | levelMin, levelMax | int | 1–4 |
 | levels | int[] | Mảng các mức trong khoảng, vd `[2, 3]`, dùng cho truy vấn `array-contains` |

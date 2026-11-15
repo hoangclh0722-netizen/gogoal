@@ -489,9 +489,10 @@ class _ActionBar extends ConsumerWidget {
       case IsHost():
         showPrice = false;
         note = const _Status(Icons.workspace_premium_outlined, AppColors.warning, 'Kèo của bạn');
+        final waiting = ref.watch(requestsProvider(match.id)).value?.length ?? 0;
         main = AppButton(
-          label: 'Quản lý kèo',
-          onPressed: () => context.push(Routes.comingSoon, extra: 'Quản lý kèo'),
+          label: waiting > 0 ? 'Quản lý kèo · $waiting chờ duyệt' : 'Quản lý kèo',
+          onPressed: () => context.push(Routes.manage(match.id)),
         );
       case AlreadyRequested(status: ParticipantStatus.pending):
         showPrice = false;

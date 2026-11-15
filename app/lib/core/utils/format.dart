@@ -41,3 +41,11 @@ const skillLevels = ['Mới chơi', 'Trung bình', 'Khá', 'Giỏi'];
 
 String formatLevelRange(int min, int max) =>
     min == max ? skillLevels[min - 1] : '${skillLevels[min - 1]} – ${skillLevels[max - 1]}';
+
+String formatTimeAgo(DateTime t, DateTime now) {
+  final d = now.difference(t);
+  if (d.inMinutes < 1) return 'Vừa xong';
+  if (d.inHours < 1) return '${d.inMinutes} phút trước';
+  if (d.inDays < 1) return '${d.inHours} giờ trước';
+  return '${d.inDays} ngày trước';
+}

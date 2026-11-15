@@ -11,6 +11,20 @@ class Member {
   final String? avatarUrl;
 }
 
+class JoinRequest extends Member {
+  const JoinRequest({
+    required super.uid,
+    required super.displayName,
+    required super.level,
+    super.avatarUrl,
+    this.message,
+    this.requestedAt,
+  });
+
+  final String? message;
+  final DateTime? requestedAt;
+}
+
 enum JoinError { full, denied, network }
 
 class JoinException implements Exception {
@@ -38,4 +52,12 @@ abstract interface class ParticipantRepository {
 
   /// Hủy yêu cầu đang chờ, hoặc rời kèo đã được nhận (trả lại một chỗ).
   Future<void> leave({required Match match, required String uid, required ParticipantStatus current});
+
+  /// Yêu cầu đang chờ duyệt, cũ nhất trước. Chỉ chủ kèo đọc được.
+  Stream<List<JoinRequest>> watchRequests(String matchId);
+
+  /// Chủ kèo nhận người: participant → approved và giữ thêm một chỗ.
+  Future<void> approve({required Match match, required String uid});
+
+  Future<void> reject({required Match match, required String uid});
 }

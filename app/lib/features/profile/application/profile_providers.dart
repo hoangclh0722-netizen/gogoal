@@ -13,3 +13,8 @@ final myProfileProvider = StreamProvider<UserProfile?>((ref) {
   if (uid == null) return Stream.value(null);
   return ref.watch(profileRepositoryProvider).watch(uid);
 });
+
+/// Hồ sơ công khai của người khác, vd để chủ kèo xem uy tín người xin vào.
+final profileProvider = FutureProvider.family<UserProfile?, String>(
+  (ref, uid) => ref.watch(profileRepositoryProvider).fetch(uid),
+);

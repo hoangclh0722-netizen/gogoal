@@ -107,4 +107,62 @@ class FirestoreParticipantRepository implements ParticipantRepository {
       throw JoinException(e.code == 'unavailable' ? JoinError.network : JoinError.denied);
     }
   }
+
+  @override
+  Stream<List<JoinRequest>> watchRequests(String matchId) => _db
+      .collection('matches/$matchId/participants')
+      .where('status', isEqualTo: 'pending')
+      .snapshots()
+      .map((s) {
+        final list = s.docs.map((d) {
+          final p = d.data();
+          return JoinRequest(
+            uid: d.id,
+            displayName: p['displayName'] as String,
+            level: (p['level'] as num).toInt(),
+            avatarUrl: p['avatarUrl'] as String?,
+            message: p['message'] as String?,
+            // null trong lúc chờ server ghi giờ
+            requestedAt: (p['requestedAt'] as Timestamp?)?.toDate(),
+          );
+        }).toList();
+        list.sort((a, b) => (a.requestedAt ?? DateTime.now()).compareTo(b.requestedAt ?? DateTime.now()));
+        return list;
+      });
+
+  @override
+  Future<void> approve({required Match match, required String uid}) => _run(() async {
+        final matchRef = _db.doc('matches/${match.id}');
+        final ref = matchRef.collection('participants').doc(uid);
+        await _db.runTransaction((tx) async {
+          final d = (await tx.get(matchRef)).data()!;
+          final p = await tx.get(ref);
+          if (p.data()?['status'] != 'pending') throw const JoinException(JoinError.denied);
+          final filled = (d['slotsFilled'] as num).toInt();
+          final needed = (d['slotsNeeded'] as num).toInt();
+          if (filled >= needed) throw const JoinException(JoinError.full);
+          tx.update(ref, {'status': 'approved', 'updatedAt': FieldValue.serverTimestamp()});
+          tx.update(matchRef, {
+            'slotsFilled': filled + 1,
+            'isFull': filled + 1 >= needed,
+            'changedMember': uid,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        });
+      });
+
+  @override
+  Future<void> reject({required Match match, required String uid}) => _run(() => _db
+      .doc('matches/${match.id}/participants/$uid')
+      .update({'status': 'rejected', 'updatedAt': FieldValue.serverTimestamp()}));
+
+  Future<void> _run(Future<void> Function() action) async {
+    try {
+      await action().timeout(const Duration(seconds: 10));
+    } on TimeoutException {
+      throw const JoinException(JoinError.network);
+    } on FirebaseException catch (e) {
+      throw JoinException(e.code == 'unavailable' ? JoinError.network : JoinError.denied);
+    }
+  }
 }

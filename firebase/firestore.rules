@@ -140,6 +140,17 @@ service cloud.firestore {
         && get(/databases/$(db)/documents/matches/$(matchId)/participants/$(me())).data.status == 'approved'
         && getAfter(/databases/$(db)/documents/matches/$(matchId)/participants/$(me())).data.status == 'left';
 
+      // Chủ kèo nhận người: tăng đúng 1 chỗ, changedMember chỉ ra participant vừa chuyển pending → approved
+      allow update: if notBanned() && resource.data.hostId == me()
+        && resource.data.status == 'active'
+        && resource.data.startAt > request.time
+        && changedOnly(['slotsFilled', 'isFull', 'changedMember', 'updatedAt'])
+        && request.resource.data.slotsFilled == resource.data.slotsFilled + 1
+        && request.resource.data.slotsFilled <= resource.data.slotsNeeded
+        && request.resource.data.isFull == (request.resource.data.slotsFilled >= resource.data.slotsNeeded)
+        && get(/databases/$(db)/documents/matches/$(matchId)/participants/$(request.resource.data.changedMember)).data.status == 'pending'
+        && getAfter(/databases/$(db)/documents/matches/$(matchId)/participants/$(request.resource.data.changedMember)).data.status == 'approved';
+
       allow update: if isAdmin() && changedOnly(['status', 'updatedAt'])
         && request.resource.data.status in ['active', 'hidden', 'cancelled'];
 
@@ -182,6 +193,18 @@ service cloud.firestore {
             || (resource.data.status == 'approved'
               && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled
                  == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled - 1));
+
+        // Chủ kèo từ chối, hoặc nhận (kèm tăng chỗ trong cùng batch) yêu cầu đang chờ (UC07)
+        allow update: if notBanned()
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.hostId == me()
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.status == 'active'
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.startAt > request.time
+          && changedOnly(['status', 'updatedAt'])
+          && resource.data.status == 'pending'
+          && (request.resource.data.status == 'rejected'
+            || (request.resource.data.status == 'approved'
+              && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled
+                 == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled + 1));
       }
 
       match /private/payment {
