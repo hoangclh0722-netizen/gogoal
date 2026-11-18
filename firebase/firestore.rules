@@ -114,7 +114,12 @@ service cloud.firestore {
         && request.resource.data.status in ['active', 'cancelled']
         && request.resource.data.slotsNeeded >= resource.data.slotsFilled
         && request.resource.data.isFull == (resource.data.slotsFilled >= request.resource.data.slotsNeeded)
-        && (request.resource.data.status == 'cancelled' || matchShapeOk(request.resource.data));
+        && ((request.resource.data.status == 'cancelled'
+              && changedOnly(['status', 'cancelReason', 'updatedAt'])
+              && request.resource.data.cancelReason is string
+              && request.resource.data.cancelReason.size() >= 1
+              && request.resource.data.cancelReason.size() <= 100)
+          || (request.resource.data.status == 'active' && matchShapeOk(request.resource.data)));
 
       // Người chơi tự vào kèo tự động: tăng slotsFilled đúng 1, kèm participant approved của chính mình trong cùng batch
       allow update: if notBanned()

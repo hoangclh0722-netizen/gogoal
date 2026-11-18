@@ -24,6 +24,20 @@ class ManageMatchScreen extends ConsumerStatefulWidget {
 class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
   int _tab = 0;
 
+  Future<void> _cancel(Match match) async {
+    final done = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: Colors.white,
+      builder: (_) => _CancelSheet(match: match),
+    );
+    if (done == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã hủy kèo')));
+      context.pop();
+    }
+  }
+
   Future<void> _remove(Match match, Member member) async {
     final ok = await showDialog<bool>(
       context: context,
@@ -87,7 +101,7 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
     return Scaffold(
       body: Column(
         children: [
-          _Header(match: match),
+          _Header(match: match, onCancel: editable ? () => _cancel(match) : null),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: _Tabs(
@@ -137,9 +151,10 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.match});
+  const _Header({required this.match, this.onCancel});
 
   final Match match;
+  final VoidCallback? onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +179,19 @@ class _Header extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              const Text('Quản lý kèo', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+              const Expanded(
+                child: Text('Quản lý kèo', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+              ),
+              if (onCancel != null)
+                TextButton(
+                  onPressed: onCancel,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  child: const Text('Hủy kèo', style: TextStyle(fontWeight: FontWeight.w600)),
+                ),
             ],
           ),
           const SizedBox(height: 10),
@@ -432,6 +459,125 @@ class _Tag extends StatelessWidget {
           if (host) ...[Icon(Icons.workspace_premium_outlined, size: 13, color: fg), const SizedBox(width: 3)],
           Text(text, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg)),
         ],
+      ),
+    );
+  }
+}
+
+class _CancelSheet extends ConsumerStatefulWidget {
+  const _CancelSheet({required this.match});
+
+  final Match match;
+
+  @override
+  ConsumerState<_CancelSheet> createState() => _CancelSheetState();
+}
+
+class _CancelSheetState extends ConsumerState<_CancelSheet> {
+  static const _reasons = ['Trời mưa', 'Không đủ người', 'Bận đột xuất', 'Sân có vấn đề', 'Khác'];
+
+  final _other = TextEditingController();
+  String? _picked;
+  bool _sending = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _other.dispose();
+    super.dispose();
+  }
+
+  String get _reason => _picked == 'Khác' ? _other.text.trim() : _picked ?? '';
+
+  Future<void> _send() async {
+    setState(() {
+      _sending = true;
+      _error = null;
+    });
+    try {
+      await ref.read(matchRepositoryProvider).cancel(widget.match.id, _reason);
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _sending = false;
+          _error = 'Không hủy được, thử lại';
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 16 + MediaQuery.of(context).viewInsets.bottom),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 10,
+            children: [
+              const Text('Hủy kèo này?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              const Text('Mọi người trong kèo sẽ thấy kèo đã bị hủy. Chọn lý do:',
+                  style: TextStyle(color: AppColors.muted)),
+              for (final r in _reasons)
+                InkWell(
+                  onTap: () => setState(() => _picked = r),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: r == _picked ? AppColors.primarySoft : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: r == _picked ? AppColors.primaryDark : AppColors.border,
+                        width: r == _picked ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          r == _picked ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                          color: r == _picked ? AppColors.primaryDark : AppColors.muted,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(r, style: TextStyle(fontWeight: r == _picked ? FontWeight.w600 : FontWeight.w500)),
+                      ],
+                    ),
+                  ),
+                ),
+              if (_picked == 'Khác')
+                TextField(
+                  controller: _other,
+                  maxLength: 100,
+                  autofocus: true,
+                  onChanged: (_) => setState(() {}),
+                  decoration: const InputDecoration(hintText: 'Nhập lý do'),
+                ),
+              if (_error != null) Text(_error!, style: const TextStyle(color: AppColors.danger)),
+              Row(
+                spacing: 10,
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: OutlinedButton.styleFrom(minimumSize: const Size(0, 48)),
+                      child: const Text('Giữ kèo'),
+                    ),
+                  ),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _reason.isEmpty || _sending ? null : _send,
+                      style: FilledButton.styleFrom(minimumSize: const Size(0, 48), backgroundColor: AppColors.danger),
+                      child: Text(_sending ? 'Đang hủy…' : 'Hủy kèo'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -25,6 +25,9 @@ class FakeMatchRepository implements MatchRepository {
     yield _seed().where((m) => m.id == id).firstOrNull;
   }
 
+  @override
+  Future<void> cancel(String id, String reason) => Future<void>.delayed(const Duration(milliseconds: 800));
+
   DateTime _at(int dayOffset, int hour, [int minute = 0]) {
     final t = DateTime(_now.year, _now.month, _now.day + dayOffset, hour, minute);
     return t.isAfter(_now) ? t : _now.add(Duration(hours: 1 + hour % 3));

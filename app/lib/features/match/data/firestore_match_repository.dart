@@ -38,6 +38,13 @@ class FirestoreMatchRepository implements MatchRepository {
     }
   }
 
+  @override
+  Future<void> cancel(String id, String reason) => _db.collection('matches').doc(id).update({
+        'status': 'cancelled',
+        'cancelReason': reason,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }).timeout(const Duration(seconds: 10));
+
   Match _toMatch(DocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data()!;
     final venue = d['venue'] as Map<String, dynamic>;
