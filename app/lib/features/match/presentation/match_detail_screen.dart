@@ -98,6 +98,9 @@ class _Detail extends ConsumerWidget {
                         icon: Icons.calendar_today_outlined,
                         label: 'Thời gian',
                         value: formatTimeRange(match.startAt, match.endAt),
+                        sub: match.joinDeadline == null
+                            ? null
+                            : 'Hạn chốt người: ${formatHm(match.joinDeadline!)} ${formatDate(match.joinDeadline!)}',
                       ),
                       _InfoRow(
                         icon: Icons.place_outlined,
@@ -535,6 +538,9 @@ class _ActionBar extends ConsumerWidget {
       case MatchLocked():
         note = const _Status(Icons.lock_outline, AppColors.muted, 'Chủ kèo đã chốt, không nhận thêm người');
         main = const AppButton(label: 'Kèo đã chốt', onPressed: null);
+      case DeadlinePassed():
+        note = const _Status(Icons.timer_off_outlined, AppColors.muted, 'Đã qua hạn chốt, chờ chủ kèo quyết định');
+        main = const AppButton(label: 'Hết hạn nhận người', onPressed: null);
       case MatchFull():
         main = const AppButton(label: 'Đã đủ người', onPressed: null);
       case SportNotInProfile():

@@ -202,6 +202,9 @@ Chỉ chính chủ đọc/ghi được.
 | slotsFilled | int | Số người đã được nhận |
 | changedMember | string? | uid người vừa được chủ kèo nhận (hoặc mời ra), ghi cùng batch để rules kiểm tra đúng người |
 | isFull | bool | `slotsFilled >= slotsNeeded`, cập nhật cùng transaction, dùng để lọc "còn chỗ" |
+| slotsMin | int | Cần ít nhất bấy nhiêu người qua app thì kèo mới đá (1 … slotsNeeded) |
+| locked | bool | Chủ kèo đã chốt, không nhận thêm người |
+| joinDeadline | timestamp? | Hạn chốt người; qua hạn thì không xin vào được. Bắt buộc khi kèo đá sau hơn 6 giờ kể từ lúc tạo |
 | levelMin, levelMax | int | 1–4 |
 | levels | int[] | Mảng các mức trong khoảng, vd `[2, 3]`, dùng cho truy vấn `array-contains` |
 | startAt, endAt | timestamp | |

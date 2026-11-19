@@ -30,6 +30,10 @@ class MatchLocked extends JoinEligibility {
   const MatchLocked();
 }
 
+class DeadlinePassed extends JoinEligibility {
+  const DeadlinePassed();
+}
+
 class MatchFull extends JoinEligibility {
   const MatchFull();
 }

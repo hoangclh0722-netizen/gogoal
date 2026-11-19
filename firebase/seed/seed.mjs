@@ -100,7 +100,7 @@ specs.forEach(([sportId, format, title, venueId, mins, lMin, lMax, total, needed
     district: v.district,
     costTotal, costPerPerson: Math.ceil(costTotal / total / 1000) * 1000,
     approvalMode, minReputation: null, note: notes[i] ?? null,
-    status, locked: false, cancelReason: status === 'cancelled' ? 'Chủ kèo bận đột xuất' : null,
+    status, locked: false, slotsMin: needed, joinDeadline: null, cancelReason: status === 'cancelled' ? 'Chủ kèo bận đột xuất' : null,
     attendanceTakenAt: null, createdAt: created, updatedAt: created,
   });
 });

@@ -47,7 +47,10 @@ class Match {
     this.note,
     this.status = MatchStatus.active,
     this.locked = false,
-  }) : endAt = endAt ?? startAt.add(const Duration(hours: 2));
+    this.joinDeadline,
+    int? slotsMin,
+  })  : endAt = endAt ?? startAt.add(const Duration(hours: 2)),
+        slotsMin = slotsMin ?? slotsNeeded;
 
   final String id;
   final String title;
@@ -75,6 +78,14 @@ class Match {
   /// Chủ kèo đã chốt, không nhận thêm người.
   final bool locked;
 
+  /// Qua mốc này kèo dừng nhận người; null là nhận tới giờ đá.
+  final DateTime? joinDeadline;
+
+  /// Cần ít nhất bấy nhiêu người qua app thì kèo mới đá được.
+  final int slotsMin;
+
+  bool deadlinePassed(DateTime now) => joinDeadline != null && !now.isBefore(joinDeadline!);
+
   int get slotsLeft => slotsNeeded - slotsFilled;
 
   double? distanceFrom(GeoPoint? origin) => origin?.distanceTo(geo);
@@ -91,6 +102,7 @@ class Match {
     if (hostId == uid) return const IsHost();
     if (myStatus != null) return AlreadyRequested(myStatus);
     if (locked) return const MatchLocked();
+    if (deadlinePassed(now)) return const DeadlinePassed();
     if (isFull) return const MatchFull();
     final level = sports[sportId];
     if (level == null) return const SportNotInProfile();
@@ -122,6 +134,8 @@ class MatchDraft {
     required this.venue,
     required this.costTotal,
     required this.autoApprove,
+    required this.slotsMin,
+    this.joinDeadline,
     this.note,
   });
 
@@ -137,6 +151,8 @@ class MatchDraft {
   final VenueOption venue;
   final int costTotal;
   final bool autoApprove;
+  final int slotsMin;
+  final DateTime? joinDeadline;
   final String? note;
 
   // BR02: làm tròn lên nghìn đồng

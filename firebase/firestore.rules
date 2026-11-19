@@ -42,6 +42,7 @@ service cloud.firestore {
         && m.approvalMode in ['manual', 'auto']
         && m.playersTotal is int && m.playersTotal >= 2 && m.playersTotal <= 40
         && m.slotsNeeded is int && m.slotsNeeded >= 1 && m.slotsNeeded <= m.playersTotal
+        && m.slotsMin is int && m.slotsMin >= 1 && m.slotsMin <= m.slotsNeeded
         && m.levelMin is int && m.levelMin >= 1 && m.levelMax is int && m.levelMax <= 4 && m.levelMin <= m.levelMax
         && m.levels.size() == m.levelMax - m.levelMin + 1
         && m.startAt is timestamp && m.endAt is timestamp
@@ -49,6 +50,10 @@ service cloud.firestore {
         && m.startAt <= request.time + duration.value(30, 'd')
         && m.endAt >= m.startAt + duration.value(30, 'm')
         && m.endAt <= m.startAt + duration.value(4, 'h')
+        // Hạn chốt người: trước giờ đá ít nhất 30 phút; kèo đá sau hơn 6 giờ nữa thì bắt buộc có hạn
+        && (m.joinDeadline == null
+          ? m.startAt <= request.time + duration.value(6, 'h')
+          : m.joinDeadline is timestamp && m.joinDeadline <= m.startAt - duration.value(30, 'm'))
         && m.costTotal is int && m.costTotal >= 0
         && m.costPerPerson == perPerson(m)
         && m.district == m.venue.district
@@ -108,6 +113,7 @@ service cloud.firestore {
         && request.resource.data.locked == false
         && sportOk(request.resource.data.sportId)
         && request.resource.data.host.displayName == userDoc(me()).displayName
+        && (request.resource.data.joinDeadline == null || request.resource.data.joinDeadline > request.time)
         && matchShapeOk(request.resource.data);
 
       // Chủ kèo sửa hoặc hủy kèo chưa bắt đầu; không đụng tới slotsFilled
@@ -116,7 +122,8 @@ service cloud.firestore {
         && resource.data.startAt > request.time
         && changedOnly(['title', 'format', 'playersTotal', 'slotsNeeded', 'isFull', 'levelMin', 'levelMax', 'levels',
                         'startAt', 'endAt', 'venue', 'geo', 'district', 'costTotal', 'costPerPerson',
-                        'approvalMode', 'minReputation', 'note', 'status', 'cancelReason', 'updatedAt'])
+                        'approvalMode', 'minReputation', 'note', 'status', 'cancelReason', 'updatedAt',
+                        'slotsMin', 'joinDeadline'])
         && request.resource.data.status in ['active', 'cancelled']
         && request.resource.data.slotsNeeded >= resource.data.slotsFilled
         && request.resource.data.isFull == (resource.data.slotsFilled >= request.resource.data.slotsNeeded)
@@ -125,7 +132,11 @@ service cloud.firestore {
               && request.resource.data.cancelReason is string
               && request.resource.data.cancelReason.size() >= 1
               && request.resource.data.cancelReason.size() <= 100)
-          || (request.resource.data.status == 'active' && matchShapeOk(request.resource.data)));
+          || (request.resource.data.status == 'active' && matchShapeOk(request.resource.data)
+            // Hạn đã qua thì giữ nguyên hoặc lùi sang tương lai, không đặt hạn mới trong quá khứ
+            && (request.resource.data.joinDeadline == resource.data.get('joinDeadline', null)
+              || request.resource.data.joinDeadline == null
+              || request.resource.data.joinDeadline > request.time)));
 
       // Chủ kèo chốt kèo (không nhận thêm người) hoặc mở lại
       allow update: if notBanned() && resource.data.hostId == me()
@@ -142,6 +153,7 @@ service cloud.firestore {
         && resource.data.startAt > request.time
         && resource.data.isFull == false
         && resource.data.get('locked', false) == false
+        && (resource.data.get('joinDeadline', null) == null || request.time < resource.data.joinDeadline)
         && changedOnly(['slotsFilled', 'isFull', 'updatedAt'])
         && request.resource.data.slotsFilled == resource.data.slotsFilled + 1
         && request.resource.data.slotsFilled <= resource.data.slotsNeeded
@@ -203,6 +215,8 @@ service cloud.firestore {
           && get(/databases/$(db)/documents/matches/$(matchId)).data.startAt > request.time
           && get(/databases/$(db)/documents/matches/$(matchId)).data.isFull == false
           && get(/databases/$(db)/documents/matches/$(matchId)).data.get('locked', false) == false
+          && (get(/databases/$(db)/documents/matches/$(matchId)).data.get('joinDeadline', null) == null
+            || request.time < get(/databases/$(db)/documents/matches/$(matchId)).data.joinDeadline)
           && request.resource.data.level == userDoc(me()).sports[get(/databases/$(db)/documents/matches/$(matchId)).data.sportId]
           && request.resource.data.level in get(/databases/$(db)/documents/matches/$(matchId)).data.levels
           && (

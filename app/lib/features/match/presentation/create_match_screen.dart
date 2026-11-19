@@ -42,6 +42,8 @@ const _formats = <String, List<_Format>>{
 
 const _durations = [60, 90, 120, 180];
 
+enum _Deadline { twoHours, evening, custom, none }
+
 /// Tạo kèo mới, hoặc sửa kèo [initial] khi chủ kèo bấm "Sửa".
 class CreateMatchScreen extends ConsumerStatefulWidget {
   const CreateMatchScreen({super.key, this.initial});
@@ -65,6 +67,10 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
   RangeValues _levels = const RangeValues(1, 4);
   bool _auto = false;
   bool _titleEdited = false;
+  late int _slotsMin;
+  bool _minEdited = false;
+  _Deadline _deadlineMode = _Deadline.none;
+  DateTime? _customDeadline;
   bool _saving = false;
   String? _error;
   String? _id;
@@ -92,6 +98,17 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
         orElse: () => (id: m.format, label: formatLabel(m.format), players: m.playersTotal),
       );
       _slots = m.slotsNeeded;
+      _slotsMin = m.slotsMin;
+      _minEdited = true;
+      final d = m.joinDeadline;
+      _deadlineMode = d == null
+          ? _Deadline.none
+          : d == m.startAt.subtract(const Duration(hours: 2))
+              ? _Deadline.twoHours
+              : d == _eveningBefore(m.startAt)
+                  ? _Deadline.evening
+                  : _Deadline.custom;
+      _customDeadline = d;
       _title.text = m.title;
       _titleEdited = true;
       _start = m.startAt;
@@ -123,9 +140,16 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
     super.dispose();
   }
 
+  static DateTime _eveningBefore(DateTime start) => DateTime(start.year, start.month, start.day - 1, 20);
+
+  void _setSlots(int v) {
+    _slots = v;
+    _slotsMin = _minEdited ? min(_slotsMin, v) : v;
+  }
+
   void _pickFormat(_Format f) {
     _format = f;
-    _slots = _editing ? _slots.clamp(_minSlots, f.players - 1) : (f.players - 1).clamp(1, 4);
+    _setSlots(_editing ? _slots.clamp(_minSlots, f.players - 1) : (f.players - 1).clamp(1, 4));
     if (!_titleEdited) {
       _title.text = '${Sport.fromId(_sportId).displayName} ${f.label.toLowerCase()}';
     }
@@ -147,7 +171,50 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
     return null;
   }
 
-  bool get _canSubmit => !_saving && _venue != null && _title.text.trim().isNotEmpty && _timeError == null;
+  bool get _deadlineRequired => _start.isAfter(DateTime.now().add(const Duration(hours: 6)));
+
+  DateTime? get _deadline => switch (_deadlineMode) {
+        _Deadline.twoHours => _start.subtract(const Duration(hours: 2)),
+        _Deadline.evening => _eveningBefore(_start),
+        _Deadline.custom => _customDeadline,
+        _Deadline.none => null,
+      };
+
+  String? get _deadlineError {
+    final d = _deadline;
+    if (d == null) return _deadlineRequired ? 'Kèo đá sau 6 giờ nữa cần đặt hạn chốt người' : null;
+    if (d.isAfter(_start.subtract(const Duration(minutes: 30)))) return 'Hạn chốt phải trước giờ đá ít nhất 30 phút';
+    // Sửa kèo đã qua hạn mà giữ nguyên hạn cũ thì vẫn lưu được
+    if (!d.isAfter(DateTime.now()) && d != widget.initial?.joinDeadline) return 'Hạn chốt đã qua, chọn hạn khác';
+    return null;
+  }
+
+  // Đổi giờ đá mà kèo cần hạn chốt thì tự chọn hạn hợp lý nhất
+  void _fixDeadline() {
+    if (_deadlineMode != _Deadline.none || !_deadlineRequired) return;
+    _deadlineMode = _eveningBefore(_start).isAfter(DateTime.now()) ? _Deadline.evening : _Deadline.twoHours;
+  }
+
+  bool get _canSubmit =>
+      !_saving && _venue != null && _title.text.trim().isNotEmpty && _timeError == null && _deadlineError == null;
+
+  Future<void> _pickCustomDeadline() async {
+    final today = DateUtils.dateOnly(DateTime.now());
+    final initial = _customDeadline ?? _start.subtract(const Duration(hours: 2));
+    final d = await showDatePicker(
+      context: context,
+      initialDate: initial.isBefore(today) ? today : initial,
+      firstDate: today,
+      lastDate: _start,
+    );
+    if (d == null || !mounted) return;
+    final t = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(initial));
+    if (t == null) return;
+    setState(() {
+      _customDeadline = DateTime(d.year, d.month, d.day, t.hour, t.minute);
+      _deadlineMode = _Deadline.custom;
+    });
+  }
 
   Future<void> _pickDate() async {
     final today = DateUtils.dateOnly(DateTime.now());
@@ -157,12 +224,22 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
       firstDate: today,
       lastDate: today.add(const Duration(days: 30)),
     );
-    if (d != null) setState(() => _start = DateTime(d.year, d.month, d.day, _start.hour, _start.minute));
+    if (d != null) {
+      setState(() {
+        _start = DateTime(d.year, d.month, d.day, _start.hour, _start.minute);
+        _fixDeadline();
+      });
+    }
   }
 
   Future<void> _pickTime() async {
     final t = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_start));
-    if (t != null) setState(() => _start = DateTime(_start.year, _start.month, _start.day, t.hour, t.minute));
+    if (t != null) {
+      setState(() {
+        _start = DateTime(_start.year, _start.month, _start.day, t.hour, t.minute);
+        _fixDeadline();
+      });
+    }
   }
 
   Future<void> _pickVenue() async {
@@ -184,6 +261,8 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
       format: _format.id,
       playersTotal: _format.players,
       slotsNeeded: _slots,
+      slotsMin: _slotsMin,
+      joinDeadline: _deadline,
       levelMin: _levels.start.round(),
       levelMax: _levels.end.round(),
       startAt: _start,
@@ -303,8 +382,31 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
               ),
               _Stepper(
                 value: _slots,
-                onMinus: _slots > _minSlots ? () => setState(() => _slots--) : null,
-                onPlus: _slots < _format.players - 1 ? () => setState(() => _slots++) : null,
+                onMinus: _slots > _minSlots ? () => setState(() => _setSlots(_slots - 1)) : null,
+                onPlus: _slots < _format.players - 1 ? () => setState(() => _setSlots(_slots + 1)) : null,
+              ),
+            ]),
+            Row(children: [
+              const Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Cần ít nhất', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  Text('Đủ số này mới đá được', style: TextStyle(fontSize: 13, color: AppColors.muted)),
+                ]),
+              ),
+              _Stepper(
+                value: _slotsMin,
+                onMinus: _slotsMin > 1
+                    ? () => setState(() {
+                          _slotsMin--;
+                          _minEdited = true;
+                        })
+                    : null,
+                onPlus: _slotsMin < _slots
+                    ? () => setState(() {
+                          _slotsMin++;
+                          _minEdited = true;
+                        })
+                    : null,
               ),
             ]),
           ]),
@@ -329,6 +431,29 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                 ),
             ]),
             Text('Kết thúc lúc ${formatHm(end)}', style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+            const _Label('Hạn chốt người'),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final (mode, label) in [
+                (_Deadline.twoHours, '2 giờ trước'),
+                (_Deadline.evening, 'Tối hôm trước'),
+                (_Deadline.custom, 'Tự chọn'),
+                if (!_deadlineRequired || _deadlineMode == _Deadline.none) (_Deadline.none, 'Không đặt'),
+              ])
+                _Chip(
+                  label: label,
+                  selected: mode == _deadlineMode,
+                  onTap: mode == _Deadline.custom
+                      ? _pickCustomDeadline
+                      : () => setState(() => _deadlineMode = mode),
+                ),
+            ]),
+            if (_deadlineError case final e?)
+              Text(e, style: const TextStyle(fontSize: 13, color: AppColors.danger, fontWeight: FontWeight.w500))
+            else if (_deadline case final d?)
+              Text('Chốt lúc ${formatHm(d)} ${formatDate(d)} · nên đặt trước hạn hủy sân miễn phí',
+                  style: const TextStyle(fontSize: 13, color: AppColors.muted))
+            else
+              const Text('Nhận người tới giờ đá', style: TextStyle(fontSize: 13, color: AppColors.muted)),
           ]),
           _Section(title: 'Sân', children: [
             _VenueTile(venue: _venue, onTap: _pickVenue),

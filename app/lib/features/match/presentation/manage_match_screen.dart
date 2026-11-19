@@ -23,6 +23,52 @@ class ManageMatchScreen extends ConsumerStatefulWidget {
 
 class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
   int _tab = 0;
+  bool _asked = false;
+
+  // Qua hạn chốt mà chưa đủ số tối thiểu thì hỏi chủ kèo một lần mỗi lần mở màn này
+  Future<void> _askAfterDeadline(Match match) async {
+    _asked = true;
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const CircleAvatar(
+          radius: 28,
+          backgroundColor: Color(0xFFFEF3C7),
+          child: Icon(Icons.error_outline, color: Color(0xFFB45309)),
+        ),
+        title: const Text('Kèo chưa đủ người', textAlign: TextAlign.center),
+        content: Text(
+          'Đã qua hạn chốt, kèo mới có ${match.slotsFilled}/${match.slotsNeeded} người '
+          '(cần ít nhất ${match.slotsMin}). Bạn có đủ người ngoài app không?',
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 8,
+            children: [
+              FilledButton(onPressed: () => Navigator.of(context).pop('lock'), child: const Text('Vẫn đá – chốt kèo')),
+              OutlinedButton(onPressed: () => Navigator.of(context).pop('extend'), child: const Text('Gia hạn')),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                onPressed: () => Navigator.of(context).pop('cancel'),
+                child: const Text('Hủy kèo'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    switch (choice) {
+      case 'lock':
+        await ref.read(matchRepositoryProvider).setLocked(match.id, true);
+      case 'extend':
+        await _edit(match);
+      case 'cancel':
+        await _cancel(match);
+    }
+  }
 
   Future<void> _edit(Match match) async {
     final saved = await context.push<bool>(Routes.edit(match.id), extra: match);
@@ -148,6 +194,9 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
     final members = ref.watch(membersProvider(match.id)).value ?? const [];
     // Kèo đã bắt đầu hoặc đã hủy thì chỉ xem
     final editable = match.status == MatchStatus.active && match.startAt.isAfter(DateTime.now());
+    if (editable && !_asked && !match.locked && match.deadlinePassed(DateTime.now()) && match.slotsFilled < match.slotsMin) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _askAfterDeadline(match));
+    }
 
     return Scaffold(
       body: Column(
@@ -310,7 +359,13 @@ class _LockBar extends StatelessWidget {
                       fontWeight: FontWeight.w700, color: locked ? AppColors.ink : AppColors.primaryDark, fontSize: 14),
                 ),
                 Text(
-                  locked ? 'Không nhận thêm người' : 'Đủ người thì chốt để báo mọi người',
+                  locked
+                      ? 'Không nhận thêm người'
+                      : match.deadlinePassed(DateTime.now())
+                          ? 'Đã qua hạn chốt, bấm chốt để báo mọi người'
+                          : match.joinDeadline != null
+                              ? 'Hạn chốt ${formatHm(match.joinDeadline!)} ${formatDate(match.joinDeadline!)}'
+                              : 'Đủ người thì chốt để báo mọi người',
                   style: const TextStyle(fontSize: 12, color: AppColors.muted),
                 ),
               ],

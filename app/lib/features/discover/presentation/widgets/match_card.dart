@@ -27,7 +27,8 @@ class MatchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final sport = Sport.fromId(match.sportId);
     final distance = match.distanceFrom(origin);
-    final closed = match.isFull || match.locked;
+    final expired = match.deadlinePassed(DateTime.now());
+    final closed = match.isFull || match.locked || expired;
 
     return Opacity(
       opacity: closed ? 0.6 : 1,
@@ -112,7 +113,13 @@ class MatchCard extends StatelessWidget {
                                 foreground: const Color(0xFF1D4ED8),
                               ),
                               _Pill(
-                                match.locked ? 'Đã chốt' : match.isFull ? 'Đã đủ người' : 'Còn ${match.slotsLeft} chỗ',
+                                match.locked
+                                    ? 'Đã chốt'
+                                    : match.isFull
+                                        ? 'Đã đủ người'
+                                        : expired
+                                            ? 'Hết hạn nhận'
+                                            : 'Còn ${match.slotsLeft} chỗ',
                                 background: closed ? AppColors.border : AppColors.primarySoft,
                                 foreground: closed ? AppColors.muted : AppColors.primaryDark,
                               ),
@@ -171,7 +178,7 @@ class MatchCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 10),
                               AppButton(
-                                label: match.locked ? 'Đã chốt' : match.isFull ? 'Đã đủ' : 'Xin vào',
+                                label: match.locked ? 'Đã chốt' : match.isFull ? 'Đã đủ' : expired ? 'Hết hạn' : 'Xin vào',
                                 kind: AppButtonKind.accent,
                                 height: 40,
                                 expand: false,

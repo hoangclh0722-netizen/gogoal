@@ -136,6 +136,8 @@ class FirestoreMatchRepository implements MatchRepository {
       'format': m.format,
       'playersTotal': m.playersTotal,
       'slotsNeeded': m.slotsNeeded,
+      'slotsMin': m.slotsMin,
+      'joinDeadline': m.joinDeadline == null ? null : Timestamp.fromDate(m.joinDeadline!),
       'levelMin': m.levelMin,
       'levelMax': m.levelMax,
       'levels': [for (var l = m.levelMin; l <= m.levelMax; l++) l],
@@ -216,6 +218,8 @@ class FirestoreMatchRepository implements MatchRepository {
       note: d['note'] as String?,
       status: MatchStatus.values.byName(d['status'] as String),
       locked: d['locked'] as bool? ?? false,
+      joinDeadline: (d['joinDeadline'] as Timestamp?)?.toDate(),
+      slotsMin: (d['slotsMin'] as num?)?.toInt(),
     );
   }
 }
