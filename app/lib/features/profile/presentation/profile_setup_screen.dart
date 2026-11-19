@@ -295,7 +295,7 @@ class _SportTile extends StatelessWidget {
             CircleAvatar(
               radius: 22,
               backgroundColor: sport.color.withValues(alpha: selected ? 0.25 : 0.12),
-              child: Icon(sport.icon, color: sport.color),
+              child: SportIcon(sport, size: 28),
             ),
             const SizedBox(height: 6),
             Text(sport.displayName, style: TextStyle(fontSize: 13, fontWeight: selected ? FontWeight.w700 : FontWeight.w500)),

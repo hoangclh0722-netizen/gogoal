@@ -209,7 +209,7 @@ class _Header extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(sport.icon, color: Colors.white, size: 16),
+                SportIcon(sport, size: 18),
                 const SizedBox(width: 6),
                 Text(sport.displayName,
                     style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),

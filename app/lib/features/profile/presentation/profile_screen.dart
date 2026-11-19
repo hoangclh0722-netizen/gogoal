@@ -298,7 +298,7 @@ class _SportsCard extends StatelessWidget {
                   color: s.color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                child: Icon(s.icon, color: s.color, size: 22),
+                child: SportIcon(s, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(child: Text(s.displayName, style: const TextStyle(fontWeight: FontWeight.w600))),

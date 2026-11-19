@@ -32,7 +32,7 @@ class HomeFilters extends ConsumerWidget {
             children: [
               _SportChip(
                 label: 'Tất cả',
-                icon: Icons.apps,
+                icon: Icon(Icons.apps, color: filter.sportId == null ? Colors.white : AppColors.primary, size: 24),
                 color: AppColors.primary,
                 selected: filter.sportId == null,
                 onTap: () => controller.setSport(null),
@@ -40,7 +40,7 @@ class HomeFilters extends ConsumerWidget {
               for (final sport in Sport.all)
                 _SportChip(
                   label: sport.displayName,
-                  icon: sport.icon,
+                  icon: SportIcon(sport, size: 28),
                   color: sport.color,
                   selected: filter.sportId == sport.id,
                   onTap: () => controller.setSport(sport.id),
@@ -82,7 +82,7 @@ class _SportChip extends StatelessWidget {
   });
 
   final String label;
-  final IconData icon;
+  final Widget icon;
   final Color color;
   final bool selected;
   final VoidCallback onTap;
@@ -106,7 +106,8 @@ class _SportChip extends StatelessWidget {
                 color: selected ? color : color.withValues(alpha: 0.14),
                 border: selected ? Border.all(color: color.withValues(alpha: 0.35), width: 3) : null,
               ),
-              child: Icon(icon, color: selected ? Colors.white : color, size: 24),
+              alignment: Alignment.center,
+              child: icon,
             ),
             const SizedBox(height: 6),
             Text(

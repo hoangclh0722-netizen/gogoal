@@ -154,3 +154,5 @@ Cao Lê Huy Hoàng
 ## License
 
 Released under the [MIT License](LICENSE).
+
+Sport icons are from [Noto Emoji](https://github.com/googlefonts/noto-emoji) by Google, licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).

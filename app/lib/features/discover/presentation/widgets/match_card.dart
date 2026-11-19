@@ -70,7 +70,8 @@ class MatchCard extends StatelessWidget {
                                   color: sport.color.withValues(alpha: 0.14),
                                   borderRadius: BorderRadius.circular(AppRadius.md),
                                 ),
-                                child: Icon(sport.icon, color: sport.color, size: 22),
+                                alignment: Alignment.center,
+                                child: SportIcon(sport, size: 26),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
