@@ -29,6 +29,10 @@ class FakeMatchRepository implements MatchRepository {
   Future<void> cancel(String id, String reason) => Future<void>.delayed(const Duration(milliseconds: 800));
 
   @override
+  Future<void> update(String id, MatchDraft draft, {required int slotsFilled}) =>
+      Future<void>.delayed(const Duration(milliseconds: 800));
+
+  @override
   Future<List<MyMatch>> myMatches(String uid) async => [
         for (final m in _seed().take(3)) MyMatch(m, MyRole.approved),
       ];
@@ -62,7 +66,7 @@ class FakeMatchRepository implements MatchRepository {
         levelMin: 2, levelMax: 3, startAt: _at(0, 19),
         venue: const Venue(name: 'Sân Chảo Lửa', district: 'q1'),
         geo: const GeoPoint(10.7769, 106.7009), district: 'q1',
-        costPerPerson: 60000, host: const Host(displayName: 'Minh', rep: 4.8),
+        costTotal: 840000, costPerPerson: 60000, host: const Host(displayName: 'Minh', rep: 4.8),
       ),
       Match(
         id: 'm2', title: 'Cầu lông đôi nam nữ', sportId: 'badminton', format: 'doubles',
@@ -70,7 +74,7 @@ class FakeMatchRepository implements MatchRepository {
         levelMin: 2, levelMax: 4, startAt: _at(0, 20, 30),
         venue: const Venue(name: 'CLB Cầu lông Phú Nhuận', district: 'phu-nhuan'),
         geo: const GeoPoint(10.7993, 106.6803), district: 'phu-nhuan',
-        costPerPerson: 45000, host: const Host(displayName: 'Lan', rep: 4.6),
+        costTotal: 180000, costPerPerson: 45000, host: const Host(displayName: 'Lan', rep: 4.6),
       ),
       Match(
         id: 'm3', title: 'Đá bóng sân 5 giao lưu', sportId: 'football', format: '5v5',
@@ -78,7 +82,7 @@ class FakeMatchRepository implements MatchRepository {
         levelMin: 1, levelMax: 2, startAt: _at(0, 21),
         venue: const Venue(name: 'Sân Hoa Lư', district: 'q1'),
         geo: const GeoPoint(10.7897, 106.6962), district: 'q1',
-        costPerPerson: 50000, host: const Host(displayName: 'Tuấn', rep: 4.2),
+        costTotal: 500000, costPerPerson: 50000, host: const Host(displayName: 'Tuấn', rep: 4.2),
       ),
       Match(
         id: 'm4', title: 'Bóng rổ 3x3 sau giờ làm', sportId: 'basketball', format: '3v3',
@@ -86,7 +90,7 @@ class FakeMatchRepository implements MatchRepository {
         levelMin: 2, levelMax: 3, startAt: _at(1, 18),
         venue: const Venue(name: 'Sân bóng rổ Phú Thọ', district: 'q11'),
         geo: const GeoPoint(10.7656, 106.6620), district: 'q11',
-        costPerPerson: 30000, host: const Host(displayName: 'Khoa', rep: 4.9),
+        costTotal: 180000, costPerPerson: 30000, host: const Host(displayName: 'Khoa', rep: 4.9),
       ),
       Match(
         id: 'm5', title: 'Pickleball vui vẻ', sportId: 'pickleball', format: 'doubles',
@@ -94,7 +98,7 @@ class FakeMatchRepository implements MatchRepository {
         levelMin: 1, levelMax: 2, startAt: _at(1, 19, 30),
         venue: const Venue(name: 'Pickleball Thảo Điền', district: 'thu-duc'),
         geo: const GeoPoint(10.8040, 106.7346), district: 'thu-duc',
-        costPerPerson: 70000, host: const Host(displayName: 'Hà', rep: 4.7),
+        costTotal: 280000, costPerPerson: 70000, host: const Host(displayName: 'Hà', rep: 4.7),
       ),
       Match(
         id: 'm6', title: 'Tennis đánh đơn', sportId: 'tennis', format: 'singles',
@@ -102,7 +106,7 @@ class FakeMatchRepository implements MatchRepository {
         levelMin: 3, levelMax: 4, startAt: _at(sat, 7),
         venue: const Venue(name: 'Sân Tennis Tao Đàn', district: 'q1'),
         geo: const GeoPoint(10.7740, 106.6930), district: 'q1',
-        costPerPerson: 120000, host: const Host(displayName: 'Phong', rep: 4.5),
+        costTotal: 240000, costPerPerson: 120000, host: const Host(displayName: 'Phong', rep: 4.5),
       ),
       Match(
         id: 'm7', title: 'Đá bóng sân 11 cuối tuần', sportId: 'football', format: '11v11',
@@ -110,7 +114,7 @@ class FakeMatchRepository implements MatchRepository {
         levelMin: 2, levelMax: 4, startAt: _at(sat, 16),
         venue: const Venue(name: 'Sân Thống Nhất', district: 'q10'),
         geo: const GeoPoint(10.7601, 106.6633), district: 'q10',
-        costPerPerson: 40000, host: const Host(displayName: 'Dũng', rep: 4.4),
+        costTotal: 880000, costPerPerson: 40000, host: const Host(displayName: 'Dũng', rep: 4.4),
       ),
       Match(
         id: 'm8', title: 'Cầu lông sáng chủ nhật', sportId: 'badminton', format: 'doubles',
@@ -118,7 +122,7 @@ class FakeMatchRepository implements MatchRepository {
         levelMin: 1, levelMax: 3, startAt: _at(sat + 1, 8),
         venue: const Venue(name: 'Nhà thi đấu Bình Thạnh', district: 'binh-thanh'),
         geo: const GeoPoint(10.8106, 106.7091), district: 'binh-thanh',
-        costPerPerson: 40000, host: const Host(displayName: 'Trang', rep: 4.3),
+        costTotal: 160000, costPerPerson: 40000, host: const Host(displayName: 'Trang', rep: 4.3),
       ),
       Match(
         id: 'm9', title: 'Bóng rổ nửa sân', sportId: 'basketball', format: '5v5',
@@ -126,7 +130,7 @@ class FakeMatchRepository implements MatchRepository {
         levelMin: 3, levelMax: 4, startAt: _at(3, 19),
         venue: const Venue(name: 'CLB Bóng rổ Gò Vấp', district: 'go-vap'),
         geo: const GeoPoint(10.8387, 106.6652), district: 'go-vap',
-        costPerPerson: 35000, host: const Host(displayName: 'Nam', rep: 4.1),
+        costTotal: 350000, costPerPerson: 35000, host: const Host(displayName: 'Nam', rep: 4.1),
       ),
     ];
   }

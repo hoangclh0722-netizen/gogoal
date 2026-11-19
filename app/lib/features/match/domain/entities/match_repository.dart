@@ -18,4 +18,7 @@ abstract interface class MatchRepository {
   String newId();
 
   Future<void> create(String id, MatchDraft draft, {required String hostId, required Host host});
+
+  /// Chủ kèo sửa kèo chưa bắt đầu; [slotsFilled] để tính lại isFull. Môn không đổi được.
+  Future<void> update(String id, MatchDraft draft, {required int slotsFilled});
 }

@@ -5,8 +5,10 @@ import 'participant.dart';
 enum MatchStatus { active, cancelled, hidden }
 
 class Venue {
-  const Venue({required this.name, required this.district, this.address = ''});
+  const Venue({required this.name, required this.district, this.address = '', this.id = ''});
 
+  /// Rỗng khi sân không nằm trong danh sách `venues`.
+  final String id;
   final String name;
   final String district;
   final String address;
@@ -37,6 +39,7 @@ class Match {
     required this.venue,
     required this.geo,
     required this.district,
+    required this.costTotal,
     required this.costPerPerson,
     required this.host,
     this.hostId = '',
@@ -60,6 +63,7 @@ class Match {
   final Venue venue;
   final GeoPoint geo;
   final String district;
+  final int costTotal;
   final int costPerPerson;
   final Host host;
   final String hostId;

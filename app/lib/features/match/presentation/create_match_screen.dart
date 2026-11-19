@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,8 +42,11 @@ const _formats = <String, List<_Format>>{
 
 const _durations = [60, 90, 120, 180];
 
+/// Tạo kèo mới, hoặc sửa kèo [initial] khi chủ kèo bấm "Sửa".
 class CreateMatchScreen extends ConsumerStatefulWidget {
-  const CreateMatchScreen({super.key});
+  const CreateMatchScreen({super.key, this.initial});
+
+  final Match? initial;
 
   @override
   ConsumerState<CreateMatchScreen> createState() => _CreateMatchScreenState();
@@ -64,9 +69,40 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
   String? _error;
   String? _id;
 
+  bool get _editing => widget.initial != null;
+
+  // Đã nhận bao nhiêu người thì không giảm số chỗ xuống dưới mức đó
+  int get _minSlots => max(1, widget.initial?.slotsFilled ?? 0);
+
+  List<_Format> get _formatOptions {
+    final list = _formats[_sportId]!;
+    return list.contains(_format) ? list : [_format, ...list];
+  }
+
   @override
   void initState() {
     super.initState();
+    _cost.addListener(() => setState(() {}));
+    _title.addListener(() => setState(() {}));
+    final m = widget.initial;
+    if (m != null) {
+      _sportId = m.sportId;
+      _format = _formats[m.sportId]!.firstWhere(
+        (f) => f.id == m.format && f.players == m.playersTotal,
+        orElse: () => (id: m.format, label: formatLabel(m.format), players: m.playersTotal),
+      );
+      _slots = m.slotsNeeded;
+      _title.text = m.title;
+      _titleEdited = true;
+      _start = m.startAt;
+      _duration = m.endAt.difference(m.startAt).inMinutes;
+      _venue = VenueOption(id: m.venue.id, venue: m.venue, geo: m.geo);
+      _levels = RangeValues(m.levelMin.toDouble(), m.levelMax.toDouble());
+      if (m.costTotal > 0) _cost.text = NumberFormat.decimalPattern('vi').format(m.costTotal);
+      _auto = m.autoApprove;
+      _note.text = m.note ?? '';
+      return;
+    }
     _sportId = 'football';
     final now = DateTime.now();
     _start = DateTime(now.year, now.month, now.day, now.hour + 2);
@@ -77,8 +113,6 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
       if (prev?.value != null || sports == null || sports.isEmpty) return;
       _pickSport(Sport.all.map((s) => s.id).firstWhere(sports.contains, orElse: () => _sportId));
     }, fireImmediately: true);
-    _cost.addListener(() => setState(() {}));
-    _title.addListener(() => setState(() {}));
   }
 
   @override
@@ -91,14 +125,14 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
 
   void _pickFormat(_Format f) {
     _format = f;
-    _slots = (f.players - 1).clamp(1, 4);
+    _slots = _editing ? _slots.clamp(_minSlots, f.players - 1) : (f.players - 1).clamp(1, 4);
     if (!_titleEdited) {
       _title.text = '${Sport.fromId(_sportId).displayName} ${f.label.toLowerCase()}';
     }
   }
 
   void _pickSport(String id) => setState(() {
-        if (id == _sportId) return;
+        if (id == _sportId || _editing) return;
         _sportId = id;
         _venue = null;
         _pickFormat(_formats[id]!.first);
@@ -142,7 +176,44 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
     if (v != null) setState(() => _venue = v);
   }
 
-  Future<void> _submit() async {
+  MatchDraft get _draft {
+    final note = _note.text.trim();
+    return MatchDraft(
+      title: _title.text.trim(),
+      sportId: _sportId,
+      format: _format.id,
+      playersTotal: _format.players,
+      slotsNeeded: _slots,
+      levelMin: _levels.start.round(),
+      levelMax: _levels.end.round(),
+      startAt: _start,
+      endAt: _start.add(Duration(minutes: _duration)),
+      venue: _venue!,
+      costTotal: _costTotal,
+      autoApprove: _auto,
+      note: note.isEmpty ? null : note,
+    );
+  }
+
+  Future<void> _submit() => _editing ? _save() : _create();
+
+  Future<void> _save() async {
+    final m = widget.initial!;
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await ref.read(matchRepositoryProvider).update(m.id, _draft, slotsFilled: m.slotsFilled);
+      if (mounted) context.pop(true);
+    } catch (_) {
+      if (mounted) setState(() => _error = 'Không lưu được thay đổi, thử lại');
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _create() async {
     final user = ref.read(authStateProvider).value;
     setState(() {
       _saving = true;
@@ -155,25 +226,10 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
     }
     final repo = ref.read(matchRepositoryProvider);
     final id = _id ??= repo.newId();
-    final note = _note.text.trim();
     try {
       await repo.create(
         id,
-        MatchDraft(
-          title: _title.text.trim(),
-          sportId: _sportId,
-          format: _format.id,
-          playersTotal: _format.players,
-          slotsNeeded: _slots,
-          levelMin: _levels.start.round(),
-          levelMax: _levels.end.round(),
-          startAt: _start,
-          endAt: _start.add(Duration(minutes: _duration)),
-          venue: _venue!,
-          costTotal: _costTotal,
-          autoApprove: _auto,
-          note: note.isEmpty ? null : note,
-        ),
+        _draft,
         hostId: user.uid,
         // Chưa có đánh giá thì lấy mức khởi điểm 4.0 như BR11
         host: Host(displayName: profile.displayName, rep: profile.reputation ?? 4.0, avatarUrl: profile.avatarUrl),
@@ -195,7 +251,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Tạo kèo', style: TextStyle(fontWeight: FontWeight.w700)),
+        title: Text(_editing ? 'Sửa kèo' : 'Tạo kèo', style: const TextStyle(fontWeight: FontWeight.w700)),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         shape: const Border(bottom: BorderSide(color: AppColors.border)),
@@ -207,15 +263,25 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
             const _Label('Môn'),
             Wrap(spacing: 8, runSpacing: 8, children: [
               for (final s in Sport.all)
-                _Chip(label: s.displayName, color: s.color, selected: s.id == _sportId, onTap: () => _pickSport(s.id)),
+                if (!_editing || s.id == _sportId)
+                  _Chip(label: s.displayName, color: s.color, selected: s.id == _sportId, onTap: () => _pickSport(s.id)),
             ]),
+            if (_editing)
+              const Text('Không đổi môn khi sửa kèo', style: TextStyle(fontSize: 12, color: AppColors.muted)),
             const _Label('Thể thức'),
             Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final f in _formats[_sportId]!)
+              for (final f in _formatOptions)
                 _Chip(
                   label: '${f.label} · ${f.players} người',
                   selected: f == _format,
-                  onTap: () => setState(() => _pickFormat(f)),
+                  onTap: () {
+                    if (f.players - 1 < _minSlots) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Đã nhận $_minSlots người, không đổi sang ${f.label.toLowerCase()} được')));
+                      return;
+                    }
+                    setState(() => _pickFormat(f));
+                  },
                 ),
             ]),
             const _Label('Tên kèo'),
@@ -237,7 +303,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
               ),
               _Stepper(
                 value: _slots,
-                onMinus: _slots > 1 ? () => setState(() => _slots--) : null,
+                onMinus: _slots > _minSlots ? () => setState(() => _slots--) : null,
                 onPlus: _slots < _format.players - 1 ? () => setState(() => _slots++) : null,
               ),
             ]),
@@ -255,7 +321,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
               Text(timeError, style: const TextStyle(fontSize: 13, color: AppColors.danger, fontWeight: FontWeight.w500)),
             const _Label('Thời lượng'),
             Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final d in _durations)
+              for (final d in ({..._durations, _duration}.toList()..sort()))
                 _Chip(
                   label: '${d % 60 == 0 ? d ~/ 60 : (d / 60).toString().replaceAll('.', ',')} giờ',
                   selected: d == _duration,
@@ -341,7 +407,8 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(_error!, style: const TextStyle(color: AppColors.danger, fontWeight: FontWeight.w500)),
               ),
-            AppButton(label: _saving ? 'Đang đăng…' : 'Đăng kèo', onPressed: _canSubmit ? _submit : null),
+            AppButton(
+                label: _saving ? 'Đang lưu…' : (_editing ? 'Lưu thay đổi' : 'Đăng kèo'), onPressed: _canSubmit ? _submit : null),
           ],
         ),
       ),

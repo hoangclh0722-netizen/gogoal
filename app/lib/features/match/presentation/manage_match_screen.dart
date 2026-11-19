@@ -24,6 +24,13 @@ class ManageMatchScreen extends ConsumerStatefulWidget {
 class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
   int _tab = 0;
 
+  Future<void> _edit(Match match) async {
+    final saved = await context.push<bool>(Routes.edit(match.id), extra: match);
+    if (saved == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã lưu thay đổi')));
+    }
+  }
+
   Future<void> _cancel(Match match) async {
     final done = await showModalBottomSheet<bool>(
       context: context,
@@ -101,7 +108,11 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
     return Scaffold(
       body: Column(
         children: [
-          _Header(match: match, onCancel: editable ? () => _cancel(match) : null),
+          _Header(
+            match: match,
+            onEdit: editable ? () => _edit(match) : null,
+            onCancel: editable ? () => _cancel(match) : null,
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: _Tabs(
@@ -151,9 +162,10 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.match, this.onCancel});
+  const _Header({required this.match, this.onEdit, this.onCancel});
 
   final Match match;
+  final VoidCallback? onEdit;
   final VoidCallback? onCancel;
 
   @override
@@ -182,6 +194,18 @@ class _Header extends StatelessWidget {
               const Expanded(
                 child: Text('Quản lý kèo', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
               ),
+              if (onEdit != null) ...[
+                TextButton(
+                  onPressed: onEdit,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  child: const Text('Sửa', style: TextStyle(fontWeight: FontWeight.w600)),
+                ),
+                const SizedBox(width: 8),
+              ],
               if (onCancel != null)
                 TextButton(
                   onPressed: onCancel,

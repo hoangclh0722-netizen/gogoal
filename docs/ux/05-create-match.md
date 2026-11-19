@@ -27,9 +27,17 @@ Một màn cuộn, mở từ nút "+" ở thanh dưới (khách phải đăng nh
 | Đang lưu | Nút "Đang đăng…", khóa bấm |
 | Mất mạng / lỗi lưu | Chữ đỏ trên nút "Không đăng được kèo, thử lại", giữ nguyên dữ liệu (E3) |
 
+## Sửa kèo (UC09)
+
+Mở từ nút "Sửa" ở màn Quản lý kèo (chỉ khi kèo chưa bắt đầu, chưa hủy). Dùng lại màn này với dữ liệu điền sẵn, tiêu đề "Sửa kèo", nút "Lưu thay đổi".
+
+- Không đổi được môn (chỉ hiện môn hiện tại).
+- Số chỗ cần tuyển không giảm dưới số người đã nhận; thể thức nào quá ít người so với số đã nhận thì báo và không cho chọn.
+- Lưu xong quay về Quản lý kèo, hiện "Đã lưu thay đổi". Tiền mỗi người và "đủ người" tính lại theo dữ liệu mới.
+
 ## Để sau
 
-- Sửa kèo (UC09 phần sửa).
+- Báo cho thành viên khi đổi giờ hoặc sân (chờ lát Thông báo).
 - Ghim sân trên bản đồ, nhập sân ngoài danh sách.
 - Nhắc bổ sung tài khoản ngân hàng khi có thu tiền (10a), bản sao `private/payment`.
 - Uy tín tối thiểu.

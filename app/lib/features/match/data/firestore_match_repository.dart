@@ -92,17 +92,36 @@ class FirestoreMatchRepository implements MatchRepository {
 
   @override
   Future<void> create(String id, MatchDraft m, {required String hostId, required Host host}) {
-    final v = m.venue;
     return _db.collection('matches').doc(id).set({
       'hostId': hostId,
       'host': {'displayName': host.displayName, 'avatarUrl': host.avatarUrl, 'rep': host.rep},
-      'title': m.title,
       'sportId': m.sportId,
+      'slotsFilled': 0,
+      'isFull': false,
+      ..._editable(m),
+      'minReputation': null,
+      'status': 'active',
+      'cancelReason': null,
+      'attendanceTakenAt': null,
+      'createdAt': FieldValue.serverTimestamp(),
+    }).timeout(const Duration(seconds: 10));
+  }
+
+  @override
+  Future<void> update(String id, MatchDraft m, {required int slotsFilled}) =>
+      _db.collection('matches').doc(id).update({
+        ..._editable(m),
+        'isFull': slotsFilled >= m.slotsNeeded,
+      }).timeout(const Duration(seconds: 10));
+
+  /// Các trường chủ kèo nhập, dùng chung cho tạo và sửa kèo.
+  Map<String, Object?> _editable(MatchDraft m) {
+    final v = m.venue;
+    return {
+      'title': m.title,
       'format': m.format,
       'playersTotal': m.playersTotal,
       'slotsNeeded': m.slotsNeeded,
-      'slotsFilled': 0,
-      'isFull': false,
       'levelMin': m.levelMin,
       'levelMax': m.levelMax,
       'levels': [for (var l = m.levelMin; l <= m.levelMax; l++) l],
@@ -114,14 +133,9 @@ class FirestoreMatchRepository implements MatchRepository {
       'costTotal': m.costTotal,
       'costPerPerson': m.costPerPerson,
       'approvalMode': m.autoApprove ? 'auto' : 'manual',
-      'minReputation': null,
       'note': m.note,
-      'status': 'active',
-      'cancelReason': null,
-      'attendanceTakenAt': null,
-      'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
-    }).timeout(const Duration(seconds: 10));
+    };
   }
 
   static String _geohash(double lat, double lng, [int length = 9]) {
@@ -172,9 +186,11 @@ class FirestoreMatchRepository implements MatchRepository {
         name: venue['name'] as String,
         district: venue['district'] as String,
         address: venue['address'] as String? ?? '',
+        id: venue['venueId'] as String? ?? '',
       ),
       geo: GeoPoint(point.latitude, point.longitude),
       district: d['district'] as String,
+      costTotal: i('costTotal'),
       costPerPerson: i('costPerPerson'),
       host: Host(
         displayName: host['displayName'] as String,
