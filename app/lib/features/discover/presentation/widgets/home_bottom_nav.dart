@@ -25,7 +25,7 @@ class HomeBottomNav extends StatelessWidget {
                 child: _Item(icon: Icons.explore, label: 'Khám phá', active: active == 'Khám phá', onTap: () => onTap('Khám phá')),
               ),
               Expanded(
-                child: _Item(icon: Icons.event_note_outlined, label: 'Kèo của tôi', onTap: () => onTap('Kèo của tôi')),
+                child: _Item(icon: Icons.event_note_outlined, label: 'Kèo của tôi', active: active == 'Kèo của tôi', onTap: () => onTap('Kèo của tôi')),
               ),
               Expanded(child: _CreateButton(onTap: () => onTap('Tạo kèo'))),
               Expanded(

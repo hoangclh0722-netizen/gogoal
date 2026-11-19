@@ -90,6 +90,11 @@ service cloud.firestore {
       }
     }
 
+    // "Kèo của tôi": truy vấn collection group phải tự lọc where uid == mình
+    match /{path=**}/participants/{uid} {
+      allow read: if signedIn() && resource.data.uid == me();
+    }
+
     match /matches/{matchId} {
       // Rules không phải bộ lọc: truy vấn phải tự có where status == 'active' (hoặc hostId == me)
       allow read: if resource.data.status != 'hidden'

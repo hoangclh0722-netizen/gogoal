@@ -46,6 +46,33 @@ class FirestoreMatchRepository implements MatchRepository {
       }).timeout(const Duration(seconds: 10));
 
   @override
+  Future<List<MyMatch>> myMatches(String uid) async {
+    final hosted = _db.collection('matches').where('hostId', isEqualTo: uid).get();
+    final joined = _db.collectionGroup('participants').where('uid', isEqualTo: uid).get();
+    final result = [
+      for (final d in (await hosted).docs)
+        if (d.data()['status'] != 'hidden') MyMatch(_toMatch(d), MyRole.host),
+    ];
+
+    final roles = {
+      for (final p in (await joined).docs)
+        if (p.data()['status'] case 'approved' || 'pending')
+          p.reference.parent.parent!.id: p.data()['status'] == 'approved' ? MyRole.approved : MyRole.pending,
+    };
+    final docs = await Future.wait(roles.keys.map((id) async {
+      try {
+        return await _db.collection('matches').doc(id).get();
+      } on FirebaseException {
+        return null; // kèo bị ẩn
+      }
+    }));
+    for (final d in docs) {
+      if (d != null && d.exists) result.add(MyMatch(_toMatch(d), roles[d.id]!));
+    }
+    return result;
+  }
+
+  @override
   Future<List<VenueOption>> venues(String sportId) async {
     final snap = await _db.collection('venues').where('sportIds', arrayContains: sportId).get();
     final list = snap.docs.map((doc) {

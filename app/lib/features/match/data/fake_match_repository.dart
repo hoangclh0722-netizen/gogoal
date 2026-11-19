@@ -29,6 +29,11 @@ class FakeMatchRepository implements MatchRepository {
   Future<void> cancel(String id, String reason) => Future<void>.delayed(const Duration(milliseconds: 800));
 
   @override
+  Future<List<MyMatch>> myMatches(String uid) async => [
+        for (final m in _seed().take(3)) MyMatch(m, MyRole.approved),
+      ];
+
+  @override
   Future<List<VenueOption>> venues(String sportId) async => [
         for (final m in _seed().where((m) => m.sportId == sportId))
           VenueOption(id: m.id, venue: m.venue, geo: m.geo),

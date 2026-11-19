@@ -133,3 +133,13 @@ class MatchDraft {
   // BR02: làm tròn lên nghìn đồng
   int get costPerPerson => (costTotal / playersTotal / 1000).ceil() * 1000;
 }
+
+enum MyRole { host, approved, pending }
+
+/// Một dòng trong "Kèo của tôi": kèo kèm vai trò của mình trong kèo.
+class MyMatch {
+  const MyMatch(this.match, this.role);
+
+  final Match match;
+  final MyRole role;
+}

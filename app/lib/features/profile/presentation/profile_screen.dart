@@ -61,6 +61,7 @@ class ProfileScreen extends ConsumerWidget {
   void _onTab(BuildContext context, String title) {
     if (title == 'Hồ sơ') return;
     if (title == 'Khám phá') return context.go(Routes.home);
+    if (title == 'Kèo của tôi') return context.go(Routes.myMatches);
     context.push(title == 'Tạo kèo' ? Routes.createMatch : Routes.comingSoon, extra: title);
   }
 

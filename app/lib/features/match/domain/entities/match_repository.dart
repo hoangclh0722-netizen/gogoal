@@ -9,6 +9,9 @@ abstract interface class MatchRepository {
   /// Chủ kèo hủy kèo chưa bắt đầu. Phạt hủy muộn (BR08) để giai đoạn 2.
   Future<void> cancel(String id, String reason);
 
+  /// Kèo mình tạo và kèo mình đã vào hoặc đang chờ duyệt.
+  Future<List<MyMatch>> myMatches(String uid);
+
   Future<List<VenueOption>> venues(String sportId);
 
   /// Id sinh trước để bấm "thử lại" sau khi mất mạng không tạo ra hai kèo.

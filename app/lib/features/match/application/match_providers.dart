@@ -29,6 +29,12 @@ final matchProvider = StreamProvider.family<Match?, String>(
   (ref, id) => ref.watch(matchRepositoryProvider).watchMatch(id),
 );
 
+final myMatchesProvider = FutureProvider.autoDispose<List<MyMatch>>((ref) {
+  final uid = ref.watch(authStateProvider.select((s) => s.value?.uid));
+  if (uid == null) return const [];
+  return ref.watch(matchRepositoryProvider).myMatches(uid);
+});
+
 final venuesProvider = FutureProvider.family<List<VenueOption>, String>(
   (ref, sportId) => ref.watch(matchRepositoryProvider).venues(sportId),
 );
