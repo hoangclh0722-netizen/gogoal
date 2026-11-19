@@ -27,9 +27,10 @@ class MatchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final sport = Sport.fromId(match.sportId);
     final distance = match.distanceFrom(origin);
+    final closed = match.isFull || match.locked;
 
     return Opacity(
-      opacity: match.isFull ? 0.6 : 1,
+      opacity: closed ? 0.6 : 1,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -111,9 +112,9 @@ class MatchCard extends StatelessWidget {
                                 foreground: const Color(0xFF1D4ED8),
                               ),
                               _Pill(
-                                match.isFull ? 'Đã đủ người' : 'Còn ${match.slotsLeft} chỗ',
-                                background: match.isFull ? AppColors.border : AppColors.primarySoft,
-                                foreground: match.isFull ? AppColors.muted : AppColors.primaryDark,
+                                match.locked ? 'Đã chốt' : match.isFull ? 'Đã đủ người' : 'Còn ${match.slotsLeft} chỗ',
+                                background: closed ? AppColors.border : AppColors.primarySoft,
+                                foreground: closed ? AppColors.muted : AppColors.primaryDark,
                               ),
                             ],
                           ),
@@ -170,11 +171,11 @@ class MatchCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 10),
                               AppButton(
-                                label: match.isFull ? 'Đã đủ' : 'Xin vào',
+                                label: match.locked ? 'Đã chốt' : match.isFull ? 'Đã đủ' : 'Xin vào',
                                 kind: AppButtonKind.accent,
                                 height: 40,
                                 expand: false,
-                                onPressed: match.isFull ? null : onJoin,
+                                onPressed: closed ? null : onJoin,
                               ),
                             ],
                           ),

@@ -105,6 +105,7 @@ service cloud.firestore {
         && request.resource.data.status == 'active'
         && request.resource.data.slotsFilled == 0
         && request.resource.data.isFull == false
+        && request.resource.data.locked == false
         && sportOk(request.resource.data.sportId)
         && request.resource.data.host.displayName == userDoc(me()).displayName
         && matchShapeOk(request.resource.data);
@@ -126,6 +127,13 @@ service cloud.firestore {
               && request.resource.data.cancelReason.size() <= 100)
           || (request.resource.data.status == 'active' && matchShapeOk(request.resource.data)));
 
+      // Chủ kèo chốt kèo (không nhận thêm người) hoặc mở lại
+      allow update: if notBanned() && resource.data.hostId == me()
+        && resource.data.status == 'active'
+        && resource.data.startAt > request.time
+        && changedOnly(['locked', 'updatedAt'])
+        && request.resource.data.locked is bool;
+
       // Người chơi tự vào kèo tự động: tăng slotsFilled đúng 1, kèm participant approved của chính mình trong cùng batch
       allow update: if notBanned()
         && resource.data.hostId != me()
@@ -133,6 +141,7 @@ service cloud.firestore {
         && resource.data.status == 'active'
         && resource.data.startAt > request.time
         && resource.data.isFull == false
+        && resource.data.get('locked', false) == false
         && changedOnly(['slotsFilled', 'isFull', 'updatedAt'])
         && request.resource.data.slotsFilled == resource.data.slotsFilled + 1
         && request.resource.data.slotsFilled <= resource.data.slotsNeeded
@@ -153,6 +162,7 @@ service cloud.firestore {
       // Chủ kèo nhận người: tăng đúng 1 chỗ, changedMember chỉ ra participant vừa chuyển pending → approved
       allow update: if notBanned() && resource.data.hostId == me()
         && resource.data.status == 'active'
+        && resource.data.get('locked', false) == false
         && resource.data.startAt > request.time
         && changedOnly(['slotsFilled', 'isFull', 'changedMember', 'updatedAt'])
         && request.resource.data.slotsFilled == resource.data.slotsFilled + 1
@@ -192,6 +202,7 @@ service cloud.firestore {
           && get(/databases/$(db)/documents/matches/$(matchId)).data.status == 'active'
           && get(/databases/$(db)/documents/matches/$(matchId)).data.startAt > request.time
           && get(/databases/$(db)/documents/matches/$(matchId)).data.isFull == false
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.get('locked', false) == false
           && request.resource.data.level == userDoc(me()).sports[get(/databases/$(db)/documents/matches/$(matchId)).data.sportId]
           && request.resource.data.level in get(/databases/$(db)/documents/matches/$(matchId)).data.levels
           && (

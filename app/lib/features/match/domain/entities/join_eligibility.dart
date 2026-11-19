@@ -26,6 +26,10 @@ class AlreadyRequested extends JoinEligibility {
   final ParticipantStatus status;
 }
 
+class MatchLocked extends JoinEligibility {
+  const MatchLocked();
+}
+
 class MatchFull extends JoinEligibility {
   const MatchFull();
 }

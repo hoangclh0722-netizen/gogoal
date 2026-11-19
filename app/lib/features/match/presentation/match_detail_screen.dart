@@ -21,6 +21,8 @@ import '../domain/entities/match.dart';
 import '../domain/entities/participant.dart';
 import 'join_sheet.dart';
 
+const _showPayment = false;
+
 class MatchDetailScreen extends ConsumerWidget {
   const MatchDetailScreen({super.key, required this.matchId});
 
@@ -510,7 +512,9 @@ class _ActionBar extends ConsumerWidget {
             Row(
               spacing: 10,
               children: [
-                Expanded(child: AppButton(label: 'Thanh toán', kind: AppButtonKind.outline, height: 48, onPressed: soon)),
+                // Tiền sân người chơi tự giải quyết ngoài app, tạm ẩn Thanh toán (UC10)
+                if (_showPayment)
+                  Expanded(child: AppButton(label: 'Thanh toán', kind: AppButtonKind.outline, height: 48, onPressed: soon)),
                 Expanded(child: AppButton(label: 'Chat', kind: AppButtonKind.outline, height: 48, onPressed: soon)),
               ],
             ),
@@ -528,6 +532,9 @@ class _ActionBar extends ConsumerWidget {
           ParticipantStatus.removed => 'Bạn đã bị mời ra khỏi kèo',
           _ => 'Bạn đã rời kèo',
         });
+      case MatchLocked():
+        note = const _Status(Icons.lock_outline, AppColors.muted, 'Chủ kèo đã chốt, không nhận thêm người');
+        main = const AppButton(label: 'Kèo đã chốt', onPressed: null);
       case MatchFull():
         main = const AppButton(label: 'Đã đủ người', onPressed: null);
       case SportNotInProfile():

@@ -98,6 +98,7 @@ class FirestoreMatchRepository implements MatchRepository {
       'sportId': m.sportId,
       'slotsFilled': 0,
       'isFull': false,
+      'locked': false,
       ..._editable(m),
       'minReputation': null,
       'status': 'active',
@@ -105,6 +106,19 @@ class FirestoreMatchRepository implements MatchRepository {
       'attendanceTakenAt': null,
       'createdAt': FieldValue.serverTimestamp(),
     }).timeout(const Duration(seconds: 10));
+  }
+
+  @override
+  Future<void> setLocked(String id, bool locked) async {
+    final ref = _db.collection('matches').doc(id);
+    final batch = _db.batch()..update(ref, {'locked': locked, 'updatedAt': FieldValue.serverTimestamp()});
+    if (locked) {
+      final pending = await ref.collection('participants').where('status', isEqualTo: 'pending').get();
+      for (final p in pending.docs) {
+        batch.update(p.reference, {'status': 'rejected', 'updatedAt': FieldValue.serverTimestamp()});
+      }
+    }
+    await batch.commit().timeout(const Duration(seconds: 10));
   }
 
   @override
@@ -201,6 +215,7 @@ class FirestoreMatchRepository implements MatchRepository {
       autoApprove: d['approvalMode'] == 'auto',
       note: d['note'] as String?,
       status: MatchStatus.values.byName(d['status'] as String),
+      locked: d['locked'] as bool? ?? false,
     );
   }
 }

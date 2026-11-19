@@ -29,6 +29,9 @@ class FakeMatchRepository implements MatchRepository {
   Future<void> cancel(String id, String reason) => Future<void>.delayed(const Duration(milliseconds: 800));
 
   @override
+  Future<void> setLocked(String id, bool locked) => Future<void>.delayed(const Duration(milliseconds: 800));
+
+  @override
   Future<void> update(String id, MatchDraft draft, {required int slotsFilled}) =>
       Future<void>.delayed(const Duration(milliseconds: 800));
 

@@ -45,6 +45,50 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
     }
   }
 
+  Future<void> _lock(Match match, int waiting) async {
+    if (!match.locked) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          icon: const CircleAvatar(
+            radius: 28,
+            backgroundColor: AppColors.primarySoft,
+            child: Icon(Icons.lock_outline, color: AppColors.primaryDark),
+          ),
+          title: const Text('Chốt kèo?', textAlign: TextAlign.center),
+          content: Text(
+            waiting > 0
+                ? 'Kèo sẽ không nhận thêm người. $waiting yêu cầu đang chờ sẽ bị từ chối.'
+                : 'Kèo sẽ không nhận thêm người.',
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            Row(
+              spacing: 10,
+              children: [
+                Expanded(
+                  child: OutlinedButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Để sau')),
+                ),
+                Expanded(
+                  child: FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Chốt kèo')),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+      if (ok != true) return;
+    }
+    try {
+      await ref.read(matchRepositoryProvider).setLocked(match.id, !match.locked);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('Không kết nối được, thử lại')));
+    }
+  }
+
   Future<void> _remove(Match match, Member member) async {
     final ok = await showDialog<bool>(
       context: context,
@@ -113,6 +157,11 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
             onEdit: editable ? () => _edit(match) : null,
             onCancel: editable ? () => _cancel(match) : null,
           ),
+          if (editable)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: _LockBar(match: match, onTap: () => _lock(match, requests.value?.length ?? 0)),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: _Tabs(
@@ -225,6 +274,51 @@ class _Header extends StatelessWidget {
             '${formatTimeRange(match.startAt, match.endAt)} · Đã nhận ${match.slotsFilled}/${match.slotsNeeded}',
             style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.w500),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LockBar extends StatelessWidget {
+  const _LockBar({required this.match, required this.onTap});
+
+  final Match match;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final locked = match.locked;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+      decoration: BoxDecoration(
+        color: locked ? const Color(0xFFF1F5F9) : AppColors.primarySoft,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Row(
+        children: [
+          Icon(locked ? Icons.lock_outline : Icons.group_outlined,
+              color: locked ? AppColors.ink : AppColors.primaryDark, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  locked ? 'Đã chốt kèo' : 'Đang nhận người · ${match.slotsFilled}/${match.slotsNeeded}',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, color: locked ? AppColors.ink : AppColors.primaryDark, fontSize: 14),
+                ),
+                Text(
+                  locked ? 'Không nhận thêm người' : 'Đủ người thì chốt để báo mọi người',
+                  style: const TextStyle(fontSize: 12, color: AppColors.muted),
+                ),
+              ],
+            ),
+          ),
+          locked
+              ? OutlinedButton(onPressed: onTap, child: const Text('Mở lại'))
+              : FilledButton(onPressed: onTap, child: const Text('Chốt kèo')),
         ],
       ),
     );

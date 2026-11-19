@@ -9,6 +9,9 @@ abstract interface class MatchRepository {
   /// Chủ kèo hủy kèo chưa bắt đầu. Phạt hủy muộn (BR08) để giai đoạn 2.
   Future<void> cancel(String id, String reason);
 
+  /// Chốt kèo thì các yêu cầu đang chờ bị từ chối cùng lúc; mở lại thì chỉ đổi cờ.
+  Future<void> setLocked(String id, bool locked);
+
   /// Kèo mình tạo và kèo mình đã vào hoặc đang chờ duyệt.
   Future<List<MyMatch>> myMatches(String uid);
 

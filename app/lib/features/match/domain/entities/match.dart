@@ -46,6 +46,7 @@ class Match {
     this.autoApprove = false,
     this.note,
     this.status = MatchStatus.active,
+    this.locked = false,
   }) : endAt = endAt ?? startAt.add(const Duration(hours: 2));
 
   final String id;
@@ -71,6 +72,9 @@ class Match {
   final String? note;
   final MatchStatus status;
 
+  /// Chủ kèo đã chốt, không nhận thêm người.
+  final bool locked;
+
   int get slotsLeft => slotsNeeded - slotsFilled;
 
   double? distanceFrom(GeoPoint? origin) => origin?.distanceTo(geo);
@@ -86,6 +90,7 @@ class Match {
     if (!startAt.isAfter(now)) return const MatchStarted();
     if (hostId == uid) return const IsHost();
     if (myStatus != null) return AlreadyRequested(myStatus);
+    if (locked) return const MatchLocked();
     if (isFull) return const MatchFull();
     final level = sports[sportId];
     if (level == null) return const SportNotInProfile();
