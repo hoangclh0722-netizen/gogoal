@@ -12,6 +12,7 @@ import '../../sport/domain/sport.dart';
 import '../../sport/presentation/sport_style.dart';
 import '../application/match_providers.dart';
 import '../domain/entities/match.dart';
+import 'health_badge.dart';
 
 class MyMatchesScreen extends ConsumerStatefulWidget {
   const MyMatchesScreen({super.key});
@@ -170,6 +171,9 @@ class _MyMatchCard extends StatelessWidget {
     final m = item.match;
     final sport = Sport.fromId(m.sportId);
     final cancelled = m.status == MatchStatus.cancelled;
+    final now = DateTime.now();
+    final health = m.health(now);
+    final detail = healthDetail(m, now);
     final (label, bg, fg) = cancelled
         ? ('Đã hủy', const Color(0xFFFEE2E2), const Color(0xFFB91C1C))
         : switch (item.role) {
@@ -232,6 +236,19 @@ class _MyMatchCard extends StatelessWidget {
                           Text('${m.slotsFilled}/${m.slotsNeeded}',
                               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.muted)),
                         ]),
+                        if (health != null && !cancelled)
+                          Row(children: [
+                            HealthBadge(health),
+                            if (detail != null) ...[
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(detail,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+                              ),
+                            ],
+                          ]),
                       ],
                     ),
                   ),

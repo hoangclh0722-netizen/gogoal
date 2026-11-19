@@ -4,6 +4,9 @@ import 'participant.dart';
 
 enum MatchStatus { active, cancelled, hidden }
 
+/// Tình trạng kèo trước giờ đá, tính từ dữ liệu hiện có (không lưu xuống Firestore).
+enum MatchHealth { confirmed, recruiting, atRisk, cancelled }
+
 class Venue {
   const Venue({required this.name, required this.district, this.address = '', this.id = ''});
 
@@ -83,6 +86,20 @@ class Match {
 
   /// Cần ít nhất bấy nhiêu người qua app thì kèo mới đá được.
   final int slotsMin;
+
+  int get missing => slotsMin - slotsFilled;
+
+  /// null khi kèo đã bắt đầu.
+  MatchHealth? health(DateTime now) {
+    if (status == MatchStatus.cancelled) return MatchHealth.cancelled;
+    if (!startAt.isAfter(now)) return null;
+    if (locked || isFull) return MatchHealth.confirmed;
+    if (missing <= 0) return MatchHealth.recruiting;
+    // Chưa đủ tối thiểu mà sắp tới hạn chốt (hoặc sắp đá nếu không đặt hạn) thì báo nguy cơ bể
+    final cutoff = joinDeadline ?? startAt;
+    final warnBefore = joinDeadline != null ? const Duration(hours: 12) : const Duration(hours: 3);
+    return cutoff.difference(now) < warnBefore ? MatchHealth.atRisk : MatchHealth.recruiting;
+  }
 
   bool deadlinePassed(DateTime now) => joinDeadline != null && !now.isBefore(joinDeadline!);
 

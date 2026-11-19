@@ -19,6 +19,7 @@ import '../application/match_providers.dart';
 import '../domain/entities/join_eligibility.dart';
 import '../domain/entities/match.dart';
 import '../domain/entities/participant.dart';
+import 'health_badge.dart';
 import 'join_sheet.dart';
 
 const _showPayment = false;
@@ -326,6 +327,14 @@ class _SlotsCard extends ConsumerWidget {
           backgroundColor: AppColors.border,
         ),
       ),
+      if (match.health(DateTime.now()) case final h? when h != MatchHealth.cancelled)
+        Row(children: [
+          HealthBadge(h),
+          if (healthDetail(match, DateTime.now()) case final d?) ...[
+            const SizedBox(width: 8),
+            Expanded(child: Text(d, style: const TextStyle(fontSize: 13, color: AppColors.muted))),
+          ],
+        ]),
       if (members != null) ...[
         _MemberRow(
           name: match.host.displayName,

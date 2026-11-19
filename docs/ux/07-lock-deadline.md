@@ -32,9 +32,23 @@ Khi qua hạn:
 
 Chi tiết kèo hiện dòng "Hạn chốt người: 20:00 T7, 22/11".
 
+## Phần 3 – Nhãn tình trạng kèo
+
+Tính trong app từ dữ liệu sẵn có, chỉ hiện trước giờ đá.
+
+| Nhãn | Khi nào |
+|---|---|
+| Đã chốt | `locked` hoặc đủ người |
+| Đang tìm người | Còn thiếu người, chưa gần hạn |
+| Có nguy cơ bể | Chưa đủ số tối thiểu và còn dưới 12 giờ tới hạn chốt (không đặt hạn: dưới 3 giờ tới giờ đá), hoặc đã qua hạn |
+| Bể | Kèo đã hủy |
+
+- Kèo của tôi: nhãn + "Còn thiếu N người · chốt 20:00 hôm nay".
+- Chi tiết kèo: nhãn + chi tiết dưới thanh số chỗ.
+- Khám phá: chỉ thêm nhãn "Có nguy cơ bể".
+
 ## Để sau
 
-- Nhãn tình trạng kèo (Đã chốt / Đang tìm người / Có nguy cơ bể / Bể).
 - Tìm kèo cùng giờ, Theo dõi kèo.
 - Nhắc trước hạn chốt bằng thông báo trên máy.
 - Hàng chờ cho kèo đủ người.

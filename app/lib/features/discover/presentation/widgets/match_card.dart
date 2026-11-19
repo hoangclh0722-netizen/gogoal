@@ -123,6 +123,12 @@ class MatchCard extends StatelessWidget {
                                 background: closed ? AppColors.border : AppColors.primarySoft,
                                 foreground: closed ? AppColors.muted : AppColors.primaryDark,
                               ),
+                              if (match.health(DateTime.now()) == MatchHealth.atRisk && !expired)
+                                const _Pill(
+                                  'Có nguy cơ bể',
+                                  background: Color(0xFFFFEDD5),
+                                  foreground: Color(0xFFC2410C),
+                                ),
                             ],
                           ),
                           const SizedBox(height: 12),
