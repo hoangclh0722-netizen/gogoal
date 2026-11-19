@@ -89,3 +89,47 @@ class Match {
     return const Eligible();
   }
 }
+
+class VenueOption {
+  const VenueOption({required this.id, required this.venue, required this.geo});
+
+  final String id;
+  final Venue venue;
+  final GeoPoint geo;
+}
+
+/// Dữ liệu chủ kèo nhập ở màn Tạo kèo.
+class MatchDraft {
+  const MatchDraft({
+    required this.title,
+    required this.sportId,
+    required this.format,
+    required this.playersTotal,
+    required this.slotsNeeded,
+    required this.levelMin,
+    required this.levelMax,
+    required this.startAt,
+    required this.endAt,
+    required this.venue,
+    required this.costTotal,
+    required this.autoApprove,
+    this.note,
+  });
+
+  final String title;
+  final String sportId;
+  final String format;
+  final int playersTotal;
+  final int slotsNeeded;
+  final int levelMin;
+  final int levelMax;
+  final DateTime startAt;
+  final DateTime endAt;
+  final VenueOption venue;
+  final int costTotal;
+  final bool autoApprove;
+  final String? note;
+
+  // BR02: làm tròn lên nghìn đồng
+  int get costPerPerson => (costTotal / playersTotal / 1000).ceil() * 1000;
+}

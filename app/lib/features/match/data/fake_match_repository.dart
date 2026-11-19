@@ -28,6 +28,19 @@ class FakeMatchRepository implements MatchRepository {
   @override
   Future<void> cancel(String id, String reason) => Future<void>.delayed(const Duration(milliseconds: 800));
 
+  @override
+  Future<List<VenueOption>> venues(String sportId) async => [
+        for (final m in _seed().where((m) => m.sportId == sportId))
+          VenueOption(id: m.id, venue: m.venue, geo: m.geo),
+      ];
+
+  @override
+  String newId() => 'm1';
+
+  @override
+  Future<void> create(String id, MatchDraft draft, {required String hostId, required Host host}) =>
+      Future<void>.delayed(const Duration(milliseconds: 800));
+
   DateTime _at(int dayOffset, int hour, [int minute = 0]) {
     final t = DateTime(_now.year, _now.month, _now.day + dayOffset, hour, minute);
     return t.isAfter(_now) ? t : _now.add(Duration(hours: 1 + hour % 3));

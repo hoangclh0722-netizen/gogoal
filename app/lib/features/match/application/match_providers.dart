@@ -29,6 +29,10 @@ final matchProvider = StreamProvider.family<Match?, String>(
   (ref, id) => ref.watch(matchRepositoryProvider).watchMatch(id),
 );
 
+final venuesProvider = FutureProvider.family<List<VenueOption>, String>(
+  (ref, sportId) => ref.watch(matchRepositoryProvider).venues(sportId),
+);
+
 final membersProvider = StreamProvider.family<List<Member>, String>(
   (ref, matchId) => ref.watch(participantRepositoryProvider).watchMembers(matchId),
 );

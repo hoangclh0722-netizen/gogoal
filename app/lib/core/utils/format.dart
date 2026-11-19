@@ -24,6 +24,10 @@ String formatMatchTime(DateTime t, DateTime now) {
   return '$hm ${_weekdays[t.weekday - 1]}, ${t.day}/${t.month}';
 }
 
+String formatDate(DateTime d) => '${_weekdays[d.weekday - 1]}, ${d.day}/${d.month}';
+
+String formatHm(DateTime t) => _hm(t);
+
 /// "Thứ 4, 12/11 · 19:00 – 20:30"
 String formatTimeRange(DateTime start, DateTime end) =>
     '${_weekdays[start.weekday - 1]}, ${start.day}/${start.month} · ${_hm(start)} – ${_hm(end)}';

@@ -7,6 +7,7 @@ import '../../features/auth/presentation/auth_flow.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/discover/presentation/home_screen.dart';
+import '../../features/match/presentation/create_match_screen.dart';
 import '../../features/match/presentation/manage_match_screen.dart';
 import '../../features/match/presentation/match_detail_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
@@ -25,6 +26,7 @@ abstract final class Routes {
   static const profile = '/profile';
   static const profileSetup = '/profile/setup';
   static const comingSoon = '/soon';
+  static const createMatch = '/match/new';
   static String match(String id) => '/match/$id';
   static String manage(String id) => '/match/$id/manage';
 }
@@ -38,6 +40,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.home, builder: (_, _) => const HomeScreen()),
       GoRoute(path: Routes.login, builder: (_, _) => const LoginScreen()),
       GoRoute(path: Routes.register, builder: (_, _) => const RegisterScreen()),
+      GoRoute(path: Routes.createMatch, builder: (_, _) => const CreateMatchScreen()),
       GoRoute(
         path: '/match/:id',
         builder: (_, state) => MatchDetailScreen(matchId: state.pathParameters['id']!),
