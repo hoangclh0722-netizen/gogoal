@@ -87,6 +87,16 @@ service cloud.firestore {
         allow read, write: if signedIn() && uid == me();
       }
 
+      // Kèo đang theo dõi: không chiếm chỗ, chỉ chính chủ thấy
+      match /watching/{matchId} {
+        allow read, delete: if signedIn() && uid == me();
+        allow create: if signedIn() && uid == me()
+          && request.resource.data.keys().hasOnly(['matchId', 'matchStartAt', 'createdAt'])
+          && request.resource.data.matchId == matchId
+          && request.resource.data.matchStartAt is timestamp
+          && request.resource.data.createdAt == request.time;
+      }
+
       match /notifications/{id} {
         allow read, delete: if signedIn() && uid == me();
         allow update: if signedIn() && uid == me() && changedOnly(['read']);

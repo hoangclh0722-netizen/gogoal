@@ -176,7 +176,7 @@ class MatchDraft {
   int get costPerPerson => (costTotal / playersTotal / 1000).ceil() * 1000;
 }
 
-enum MyRole { host, approved, pending }
+enum MyRole { host, approved, pending, watching }
 
 /// Một dòng trong "Kèo của tôi": kèo kèm vai trò của mình trong kèo.
 class MyMatch {

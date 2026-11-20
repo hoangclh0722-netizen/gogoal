@@ -36,6 +36,16 @@ class FakeMatchRepository implements MatchRepository {
       Future<void>.delayed(const Duration(milliseconds: 800));
 
   @override
+  Stream<bool> watchIsWatching(String uid, String matchId) => Stream.value(false);
+
+  @override
+  Future<void> setWatching(String uid, Match match, bool on) async {}
+
+  @override
+  Future<List<Match>> sameTime(Match match) async =>
+      _seed().where((m) => m.id != match.id && m.sportId == match.sportId && !m.isFull).toList();
+
+  @override
   Future<List<MyMatch>> myMatches(String uid) async => [
         for (final m in _seed().take(3)) MyMatch(m, MyRole.approved),
       ];

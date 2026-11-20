@@ -12,8 +12,16 @@ abstract interface class MatchRepository {
   /// Chốt kèo thì các yêu cầu đang chờ bị từ chối cùng lúc; mở lại thì chỉ đổi cờ.
   Future<void> setLocked(String id, bool locked);
 
-  /// Kèo mình tạo và kèo mình đã vào hoặc đang chờ duyệt.
+  /// Kèo mình tạo, đã vào, đang chờ duyệt và đang theo dõi.
   Future<List<MyMatch>> myMatches(String uid);
+
+  Stream<bool> watchIsWatching(String uid, String matchId);
+
+  /// Theo dõi kèo không chiếm chỗ, chỉ lưu ở hồ sơ riêng của người chơi.
+  Future<void> setWatching(String uid, Match match, bool on);
+
+  /// Kèo cùng môn, bắt đầu lệch không quá 1 giờ, còn nhận người.
+  Future<List<Match>> sameTime(Match match);
 
   Future<List<VenueOption>> venues(String sportId);
 

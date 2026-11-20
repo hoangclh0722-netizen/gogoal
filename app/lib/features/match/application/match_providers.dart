@@ -35,6 +35,20 @@ final myMatchesProvider = FutureProvider.autoDispose<List<MyMatch>>((ref) {
   return ref.watch(matchRepositoryProvider).myMatches(uid);
 });
 
+final isWatchingProvider = StreamProvider.family<bool, String>((ref, matchId) {
+  final uid = ref.watch(authStateProvider.select((s) => s.value?.uid));
+  if (uid == null) return Stream.value(false);
+  return ref.watch(matchRepositoryProvider).watchIsWatching(uid, matchId);
+});
+
+/// Khóa bằng record để không tải lại mỗi lần kèo gốc cập nhật.
+final sameTimeProvider =
+    FutureProvider.autoDispose.family<List<Match>, ({String id, String sportId, DateTime startAt})>((ref, key) {
+  final probe = ref.read(matchProvider(key.id)).value;
+  if (probe == null) return const [];
+  return ref.watch(matchRepositoryProvider).sameTime(probe);
+});
+
 final venuesProvider = FutureProvider.family<List<VenueOption>, String>(
   (ref, sportId) => ref.watch(matchRepositoryProvider).venues(sportId),
 );

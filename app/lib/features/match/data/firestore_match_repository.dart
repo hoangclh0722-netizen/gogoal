@@ -69,7 +69,58 @@ class FirestoreMatchRepository implements MatchRepository {
     for (final d in docs) {
       if (d != null && d.exists) result.add(MyMatch(_toMatch(d), roles[d.id]!));
     }
+
+    final have = result.map((m) => m.match.id).toSet();
+    final watched = await _db.collection('users').doc(uid).collection('watching').get();
+    final extra = await Future.wait(watched.docs.where((w) => !have.contains(w.id)).map((w) async {
+      try {
+        return await _db.collection('matches').doc(w.id).get();
+      } on FirebaseException {
+        return null;
+      }
+    }));
+    for (final d in extra) {
+      if (d != null && d.exists && d.data()!['status'] != 'hidden') result.add(MyMatch(_toMatch(d), MyRole.watching));
+    }
     return result;
+  }
+
+  DocumentReference<Map<String, dynamic>> _watchRef(String uid, String matchId) =>
+      _db.collection('users').doc(uid).collection('watching').doc(matchId);
+
+  @override
+  Stream<bool> watchIsWatching(String uid, String matchId) => _watchRef(uid, matchId).snapshots().map((d) => d.exists);
+
+  @override
+  Future<void> setWatching(String uid, Match match, bool on) {
+    final ref = _watchRef(uid, match.id);
+    final write = on
+        ? ref.set({
+            'matchId': match.id,
+            'matchStartAt': Timestamp.fromDate(match.startAt),
+            'createdAt': FieldValue.serverTimestamp(),
+          })
+        : ref.delete();
+    return write.timeout(const Duration(seconds: 10));
+  }
+
+  @override
+  Future<List<Match>> sameTime(Match m) async {
+    const window = Duration(hours: 1);
+    final snap = await _db
+        .collection('matches')
+        .where('status', isEqualTo: 'active')
+        .where('sportId', isEqualTo: m.sportId)
+        .where('startAt', isGreaterThanOrEqualTo: Timestamp.fromDate(m.startAt.subtract(window)))
+        .where('startAt', isLessThanOrEqualTo: Timestamp.fromDate(m.startAt.add(window)))
+        .orderBy('startAt')
+        .limit(20)
+        .get();
+    final now = DateTime.now();
+    return snap.docs
+        .map(_toMatch)
+        .where((x) => x.id != m.id && !x.isFull && !x.locked && !x.deadlinePassed(now) && x.startAt.isAfter(now))
+        .toList();
   }
 
   @override

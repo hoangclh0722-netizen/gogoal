@@ -132,6 +132,7 @@ class _Detail extends ConsumerWidget {
                     ]),
                     const SizedBox(height: 12),
                     _SlotsCard(match: match),
+                    _SameTime(match: match),
                     const SizedBox(height: 12),
                     _Card(children: [
                       Row(
@@ -174,14 +175,39 @@ class _Detail extends ConsumerWidget {
   }
 }
 
-class _Header extends StatelessWidget {
+class _Header extends ConsumerWidget {
   const _Header({required this.match, required this.sport});
 
   final Match match;
   final Sport sport;
 
+  Future<void> _toggleWatch(BuildContext context, WidgetRef ref, String uid, bool on) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(matchRepositoryProvider).setWatching(uid, match, on);
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text(on ? 'Đã theo dõi, xem ở Kèo của tôi' : 'Đã bỏ theo dõi'),
+        ));
+    } catch (_) {
+      messenger.showSnackBar(const SnackBar(content: Text('Không kết nối được, thử lại')));
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final uid = ref.watch(authStateProvider).value?.uid;
+    final myStatus = ref.watch(myParticipationProvider(match.id)).value;
+    // Chỉ người ngoài kèo mới cần theo dõi; trong kèo rồi hoặc là chủ kèo thì không
+    final canWatch = uid != null &&
+        uid != match.hostId &&
+        myStatus != ParticipantStatus.pending &&
+        myStatus != ParticipantStatus.approved &&
+        match.status == MatchStatus.active &&
+        match.startAt.isAfter(DateTime.now());
+    final watching = canWatch && (ref.watch(isWatchingProvider(match.id)).value ?? false);
+
     return Container(
       padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, 20),
       decoration: const BoxDecoration(
@@ -191,13 +217,29 @@ class _Header extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Material(
-            color: Colors.white.withValues(alpha: 0.2),
-            shape: const CircleBorder(),
-            child: IconButton(
-              onPressed: () => _back(context),
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Material(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: const CircleBorder(),
+                child: IconButton(
+                  onPressed: () => _back(context),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                ),
+              ),
+              if (canWatch)
+                Material(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: const CircleBorder(),
+                  child: IconButton(
+                    tooltip: watching ? 'Bỏ theo dõi' : 'Theo dõi kèo',
+                    onPressed: () => _toggleWatch(context, ref, uid, !watching),
+                    icon: Icon(watching ? Icons.star_rounded : Icons.star_border_rounded,
+                        color: watching ? const Color(0xFFFDE047) : Colors.white),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 10),
           Container(
@@ -226,6 +268,79 @@ class _Header extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Kèo đang ở có nguy cơ bể hoặc đã bể thì gợi ý kèo cùng giờ để chuyển sang.
+class _SameTime extends ConsumerWidget {
+  const _SameTime({required this.match});
+
+  final Match match;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final status = ref.watch(myParticipationProvider(match.id)).value;
+    final health = match.health(DateTime.now());
+    final inMatch = status == ParticipantStatus.pending || status == ParticipantStatus.approved;
+    if (!inMatch || (health != MatchHealth.atRisk && health != MatchHealth.cancelled)) {
+      return const SizedBox.shrink();
+    }
+    final origin = ref.watch(locationProvider).position;
+    final list = ref.watch(sameTimeProvider((id: match.id, sportId: match.sportId, startAt: match.startAt)));
+    final items = [...?list.value]
+      ..sort((a, b) => (a.distanceFrom(origin) ?? 0).compareTo(b.distanceFrom(origin) ?? 0));
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: _Card(children: [
+        Row(children: [
+          const Icon(Icons.swap_horiz_rounded, color: AppColors.primaryDark),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              health == MatchHealth.cancelled ? 'Kèo đã bể · tìm kèo khác cùng giờ' : 'Kèo có thể bể · kèo cùng giờ',
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ]),
+        if (list.isLoading)
+          const Center(child: Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator()))
+        else if (items.isEmpty)
+          const Text('Chưa có kèo nào cùng giờ', style: TextStyle(color: AppColors.muted))
+        else
+          for (final m in items.take(3))
+            InkWell(
+              onTap: () => context.push(Routes.match(m.id)),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(children: [
+                  SportIcon(Sport.fromId(m.sportId), size: 32),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(m.title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(
+                        [
+                          formatMatchTime(m.startAt, DateTime.now()),
+                          districtName(m.district),
+                          if (m.distanceFrom(origin) != null) formatDistance(m.distanceFrom(origin)!),
+                        ].join(' · '),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 13, color: AppColors.muted),
+                      ),
+                    ]),
+                  ),
+                  Text('Còn ${m.slotsLeft} chỗ',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primaryDark)),
+                  const Icon(Icons.chevron_right, color: AppColors.muted),
+                ]),
+              ),
+            ),
+      ]),
     );
   }
 }

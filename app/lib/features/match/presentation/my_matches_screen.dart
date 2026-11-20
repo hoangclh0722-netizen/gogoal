@@ -48,10 +48,16 @@ class _MyMatchesScreenState extends ConsumerState<MyMatchesScreen> {
     final async = ref.watch(myMatchesProvider);
     final now = DateTime.now();
     final all = async.value ?? const <MyMatch>[];
-    final upcoming = all.where((m) => m.match.endAt.isAfter(now)).toList()
+    bool isWatch(MyMatch m) => m.role == MyRole.watching;
+    final upcoming = all.where((m) => !isWatch(m) && m.match.endAt.isAfter(now)).toList()
       ..sort((a, b) => a.match.startAt.compareTo(b.match.startAt));
-    final past = all.where((m) => !m.match.endAt.isAfter(now)).toList()
+    final past = all.where((m) => !isWatch(m) && !m.match.endAt.isAfter(now)).toList()
       ..sort((a, b) => b.match.startAt.compareTo(a.match.startAt));
+    // Kèo theo dõi chỉ có ý nghĩa trước giờ đá
+    final watching = _past
+        ? const <MyMatch>[]
+        : (all.where((m) => isWatch(m) && m.match.startAt.isAfter(now)).toList()
+          ..sort((a, b) => a.match.startAt.compareTo(b.match.startAt)));
     final list = _past ? past : upcoming;
 
     return Scaffold(
@@ -94,20 +100,36 @@ class _MyMatchesScreenState extends ConsumerState<MyMatchesScreen> {
             child: RefreshIndicator(
               onRefresh: () => ref.refresh(myMatchesProvider.future),
               child: async.hasValue
-                  ? list.isEmpty
+                  ? list.isEmpty && watching.isEmpty
                       ? _Empty(
                           past: _past,
                           onFind: () => context.go(Routes.home),
                           onCreate: () => _open(Routes.createMatch),
                         )
-                      : ListView.separated(
+                      : ListView(
                           padding: const EdgeInsets.all(16),
-                          itemCount: list.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 12),
-                          itemBuilder: (_, i) => _MyMatchCard(
-                            item: list[i],
-                            onTap: () => _open(Routes.match(list[i].match.id)),
-                          ),
+                          children: [
+                            for (final m in list) ...[
+                              _MyMatchCard(item: m, onTap: () => _open(Routes.match(m.match.id))),
+                              const SizedBox(height: 12),
+                            ],
+                            if (watching.isNotEmpty) ...[
+                              Padding(
+                                padding: EdgeInsets.only(top: list.isEmpty ? 0 : 8, bottom: 10),
+                                child: const Row(children: [
+                                  Icon(Icons.star_rounded, size: 18, color: AppColors.tennis),
+                                  SizedBox(width: 6),
+                                  Text('Đang theo dõi', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                                  SizedBox(width: 6),
+                                  Text('· không chiếm chỗ', style: TextStyle(fontSize: 13, color: AppColors.muted)),
+                                ]),
+                              ),
+                              for (final m in watching) ...[
+                                _MyMatchCard(item: m, onTap: () => _open(Routes.match(m.match.id))),
+                                const SizedBox(height: 12),
+                              ],
+                            ],
+                          ],
                         )
                   : async.hasError
                       ? ListView(children: [
@@ -180,6 +202,7 @@ class _MyMatchCard extends StatelessWidget {
             MyRole.host => ('Chủ kèo', const Color(0xFFFEF3C7), const Color(0xFFB45309)),
             MyRole.approved => ('Đã vào', AppColors.primarySoft, AppColors.primaryDark),
             MyRole.pending => ('Chờ duyệt', const Color(0xFFDBEAFE), const Color(0xFF1D4ED8)),
+            MyRole.watching => ('Theo dõi', const Color(0xFFF1F5F9), AppColors.muted),
           };
 
     return Opacity(
