@@ -33,7 +33,7 @@ class _MyMatchesScreenState extends ConsumerState<MyMatchesScreen> {
       case 'Tạo kèo':
         _open(Routes.createMatch);
       case 'Thông báo':
-        context.push(Routes.comingSoon, extra: title);
+        context.go(Routes.notifications);
     }
   }
 

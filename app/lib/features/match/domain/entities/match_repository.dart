@@ -7,10 +7,10 @@ abstract interface class MatchRepository {
   Stream<Match?> watchMatch(String id);
 
   /// Chủ kèo hủy kèo chưa bắt đầu. Phạt hủy muộn (BR08) để giai đoạn 2.
-  Future<void> cancel(String id, String reason);
+  Future<void> cancel(Match match, String reason);
 
   /// Chốt kèo thì các yêu cầu đang chờ bị từ chối cùng lúc; mở lại thì chỉ đổi cờ.
-  Future<void> setLocked(String id, bool locked);
+  Future<void> setLocked(Match match, bool locked);
 
   /// Kèo mình tạo, đã vào, đang chờ duyệt và đang theo dõi.
   Future<List<MyMatch>> myMatches(String uid);
@@ -30,6 +30,6 @@ abstract interface class MatchRepository {
 
   Future<void> create(String id, MatchDraft draft, {required String hostId, required Host host});
 
-  /// Chủ kèo sửa kèo chưa bắt đầu; [slotsFilled] để tính lại isFull. Môn không đổi được.
-  Future<void> update(String id, MatchDraft draft, {required int slotsFilled});
+  /// Chủ kèo sửa kèo chưa bắt đầu ([old] là bản trước khi sửa). Môn không đổi được.
+  Future<void> update(Match old, MatchDraft draft);
 }

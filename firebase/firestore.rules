@@ -100,8 +100,15 @@ service cloud.firestore {
       match /notifications/{id} {
         allow read, delete: if signedIn() && uid == me();
         allow update: if signedIn() && uid == me() && changedOnly(['read']);
-        allow create: if notBanned() && request.resource.data.actorId == me()
-          && request.resource.data.read == false;
+        allow create: if notBanned() && uid != me()
+          && request.resource.data.keys().hasOnly(['type', 'matchId', 'matchTitle', 'actorId', 'actorName', 'read', 'createdAt'])
+          && request.resource.data.type in ['join_requested', 'member_joined', 'join_approved', 'join_rejected', 'removed',
+                                            'member_left', 'match_cancelled', 'match_updated', 'match_locked']
+          && request.resource.data.actorId == me()
+          && request.resource.data.actorName is string && request.resource.data.actorName.size() <= 40
+          && request.resource.data.matchTitle is string && request.resource.data.matchTitle.size() <= 60
+          && request.resource.data.read == false
+          && request.resource.data.createdAt == request.time;
       }
     }
 

@@ -12,6 +12,7 @@ import '../../features/match/presentation/create_match_screen.dart';
 import '../../features/match/presentation/manage_match_screen.dart';
 import '../../features/match/presentation/match_detail_screen.dart';
 import '../../features/match/presentation/my_matches_screen.dart';
+import '../../features/notification/presentation/notifications_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/splash_screen.dart';
 import '../../features/profile/domain/user_profile.dart';
@@ -30,6 +31,7 @@ abstract final class Routes {
   static const comingSoon = '/soon';
   static const createMatch = '/match/new';
   static const myMatches = '/my-matches';
+  static const notifications = '/notifications';
   static String match(String id) => '/match/$id';
   static String manage(String id) => '/match/$id/manage';
   static String edit(String id) => '/match/$id/edit';
@@ -45,6 +47,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.login, builder: (_, _) => const LoginScreen()),
       GoRoute(path: Routes.register, builder: (_, _) => const RegisterScreen()),
       GoRoute(path: Routes.myMatches, builder: (_, _) => const MyMatchesScreen()),
+      GoRoute(path: Routes.notifications, builder: (_, _) => const NotificationsScreen()),
       GoRoute(path: Routes.createMatch, builder: (_, _) => const CreateMatchScreen()),
       GoRoute(
         path: '/match/:id',

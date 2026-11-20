@@ -1,14 +1,34 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart' hide GeoPoint;
 import 'package:cloud_firestore/cloud_firestore.dart' as fs show GeoPoint;
 
+import '../../notification/domain/app_notification.dart';
 import '../domain/entities/geo_point.dart';
 import '../domain/entities/match.dart';
 import '../domain/entities/match_repository.dart';
 
 class FirestoreMatchRepository implements MatchRepository {
-  FirestoreMatchRepository(this._db);
+  FirestoreMatchRepository(this._db, this._notifier);
 
   final FirebaseFirestore _db;
+  final NotificationRepository _notifier;
+
+  // Báo cho người trong kèo sau khi chủ kèo hủy/sửa/chốt; lỗi gửi không làm hỏng hành động chính
+  void _notifyMembers(Match m, NotificationType type, List<String> statuses) {
+    unawaited(() async {
+      final snap = await _db.collection('matches').doc(m.id).collection('participants').where('status', whereIn: statuses).get();
+      await _notifier.send(
+        to: snap.docs.map((d) => d.id),
+        type: type,
+        matchId: m.id,
+        matchTitle: m.title,
+        actorId: m.hostId,
+        actorName: m.host.displayName,
+      );
+    }()
+        .catchError((_) {}));
+  }
 
   @override
   Future<List<Match>> upcomingMatches({Duration within = const Duration(days: 7)}) async {
@@ -39,11 +59,14 @@ class FirestoreMatchRepository implements MatchRepository {
   }
 
   @override
-  Future<void> cancel(String id, String reason) => _db.collection('matches').doc(id).update({
-        'status': 'cancelled',
-        'cancelReason': reason,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }).timeout(const Duration(seconds: 10));
+  Future<void> cancel(Match match, String reason) async {
+    await _db.collection('matches').doc(match.id).update({
+      'status': 'cancelled',
+      'cancelReason': reason,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }).timeout(const Duration(seconds: 10));
+    _notifyMembers(match, NotificationType.matchCancelled, ['approved', 'pending']);
+  }
 
   @override
   Future<List<MyMatch>> myMatches(String uid) async {
@@ -160,8 +183,8 @@ class FirestoreMatchRepository implements MatchRepository {
   }
 
   @override
-  Future<void> setLocked(String id, bool locked) async {
-    final ref = _db.collection('matches').doc(id);
+  Future<void> setLocked(Match match, bool locked) async {
+    final ref = _db.collection('matches').doc(match.id);
     final batch = _db.batch()..update(ref, {'locked': locked, 'updatedAt': FieldValue.serverTimestamp()});
     if (locked) {
       final pending = await ref.collection('participants').where('status', isEqualTo: 'pending').get();
@@ -170,14 +193,18 @@ class FirestoreMatchRepository implements MatchRepository {
       }
     }
     await batch.commit().timeout(const Duration(seconds: 10));
+    if (locked) _notifyMembers(match, NotificationType.matchLocked, ['approved']);
   }
 
   @override
-  Future<void> update(String id, MatchDraft m, {required int slotsFilled}) =>
-      _db.collection('matches').doc(id).update({
-        ..._editable(m),
-        'isFull': slotsFilled >= m.slotsNeeded,
-      }).timeout(const Duration(seconds: 10));
+  Future<void> update(Match old, MatchDraft m) async {
+    await _db.collection('matches').doc(old.id).update({
+      ..._editable(m),
+      'isFull': old.slotsFilled >= m.slotsNeeded,
+    }).timeout(const Duration(seconds: 10));
+    final moved = old.startAt != m.startAt || old.endAt != m.endAt || old.venue.id != m.venue.id;
+    if (moved) _notifyMembers(old, NotificationType.matchUpdated, ['approved']);
+  }
 
   /// Các trường chủ kèo nhập, dùng chung cho tạo và sửa kèo.
   Map<String, Object?> _editable(MatchDraft m) {

@@ -283,7 +283,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
       _error = null;
     });
     try {
-      await ref.read(matchRepositoryProvider).update(m.id, _draft, slotsFilled: m.slotsFilled);
+      await ref.read(matchRepositoryProvider).update(m, _draft);
       if (mounted) context.pop(true);
     } catch (_) {
       if (mounted) setState(() => _error = 'Không lưu được thay đổi, thử lại');

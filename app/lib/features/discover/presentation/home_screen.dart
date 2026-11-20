@@ -26,6 +26,8 @@ class HomeScreen extends ConsumerWidget {
     if (title == 'Khám phá') return;
     if (title == 'Hồ sơ') {
       requireLogin(context, ref, () => context.go(Routes.profile));
+    } else if (title == 'Thông báo') {
+      requireLogin(context, ref, () => context.go(Routes.notifications));
     } else if (title == 'Kèo của tôi') {
       requireLogin(context, ref, () => context.go(Routes.myMatches));
     } else if (title == 'Tạo kèo') {

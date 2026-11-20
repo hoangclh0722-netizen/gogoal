@@ -62,6 +62,7 @@ class ProfileScreen extends ConsumerWidget {
     if (title == 'Hồ sơ') return;
     if (title == 'Khám phá') return context.go(Routes.home);
     if (title == 'Kèo của tôi') return context.go(Routes.myMatches);
+    if (title == 'Thông báo') return context.go(Routes.notifications);
     context.push(title == 'Tạo kèo' ? Routes.createMatch : Routes.comingSoon, extra: title);
   }
 

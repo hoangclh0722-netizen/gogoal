@@ -181,7 +181,7 @@ Chỉ chính chủ đọc/ghi được.
 
 | Trường | Kiểu | Mô tả |
 |---|---|---|
-| type | string | `join_requested`, `join_approved`, `join_rejected`, `member_joined`, `member_left`, `match_updated`, `match_cancelled`, `removed`, `rate_reminder` |
+| type | string | `join_requested`, `join_approved`, `join_rejected`, `member_joined`, `member_left`, `match_updated`, `match_cancelled`, `match_locked`, `removed`, `rate_reminder` |
 | matchId | string | |
 | actorId | string | Người gây ra sự kiện |
 | actorName | string | Bản sao để hiển thị nhanh |

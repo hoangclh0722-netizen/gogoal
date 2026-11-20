@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/firebase/firebase_setup.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../notification/application/notification_providers.dart';
 import '../data/fake_match_repository.dart';
 import '../data/firestore_match_repository.dart';
 import '../data/firestore_participant_repository.dart';
@@ -18,11 +19,13 @@ final matchRepositoryProvider = Provider<MatchRepository>((ref) {
       scenario: _scenario == 'offline' ? FakeScenario.offline : FakeScenario.normal,
     );
   }
-  return FirestoreMatchRepository(appFirestore);
+  return FirestoreMatchRepository(appFirestore, ref.watch(notificationRepositoryProvider));
 });
 
 final participantRepositoryProvider = Provider<ParticipantRepository>(
-  (ref) => _fake ? FakeParticipantRepository() : FirestoreParticipantRepository(appFirestore),
+  (ref) => _fake
+      ? FakeParticipantRepository()
+      : FirestoreParticipantRepository(appFirestore, ref.watch(notificationRepositoryProvider)),
 );
 
 final matchProvider = StreamProvider.family<Match?, String>(

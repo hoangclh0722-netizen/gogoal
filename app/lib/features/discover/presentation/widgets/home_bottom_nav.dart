@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../notification/application/notification_providers.dart';
 
-class HomeBottomNav extends StatelessWidget {
+class HomeBottomNav extends ConsumerWidget {
   const HomeBottomNav({super.key, required this.onTap, this.active = 'Khám phá'});
 
   final void Function(String title) onTap;
   final String active;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unread = ref.watch(unreadCountProvider).value ?? 0;
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -29,7 +32,13 @@ class HomeBottomNav extends StatelessWidget {
               ),
               Expanded(child: _CreateButton(onTap: () => onTap('Tạo kèo'))),
               Expanded(
-                child: _Item(icon: Icons.notifications_none, label: 'Thông báo', onTap: () => onTap('Thông báo')),
+                child: _Item(
+                  icon: Icons.notifications_none,
+                  label: 'Thông báo',
+                  badge: unread,
+                  active: active == 'Thông báo',
+                  onTap: () => onTap('Thông báo'),
+                ),
               ),
               Expanded(
                 child: _Item(icon: Icons.person_outline, label: 'Hồ sơ', active: active == 'Hồ sơ', onTap: () => onTap('Hồ sơ')),
@@ -43,11 +52,12 @@ class HomeBottomNav extends StatelessWidget {
 }
 
 class _Item extends StatelessWidget {
-  const _Item({required this.icon, required this.label, this.active = false, this.onTap});
+  const _Item({required this.icon, required this.label, this.active = false, this.badge = 0, this.onTap});
 
   final IconData icon;
   final String label;
   final bool active;
+  final int badge;
   final VoidCallback? onTap;
 
   @override
@@ -58,7 +68,12 @@ class _Item extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: color, size: 24),
+          Badge(
+            isLabelVisible: badge > 0,
+            label: Text(badge > 9 ? '9+' : '$badge'),
+            backgroundColor: AppColors.danger,
+            child: Icon(icon, color: color, size: 24),
+          ),
           const SizedBox(height: 2),
           Text(
             label,

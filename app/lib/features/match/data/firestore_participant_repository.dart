@@ -2,13 +2,22 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../notification/domain/app_notification.dart';
 import '../domain/entities/match.dart';
 import '../domain/entities/participant.dart';
 
 class FirestoreParticipantRepository implements ParticipantRepository {
-  FirestoreParticipantRepository(this._db);
+  FirestoreParticipantRepository(this._db, this._notifier);
 
   final FirebaseFirestore _db;
+  final NotificationRepository _notifier;
+
+  // Thông báo gửi kèm sau khi hành động đã xong; lỗi gửi không làm hỏng hành động chính
+  void _notify(Match m, NotificationType type, {required String to, required String actorId, required String actorName}) {
+    unawaited(_notifier
+        .send(to: [to], type: type, matchId: m.id, matchTitle: m.title, actorId: actorId, actorName: actorName)
+        .catchError((_) {}));
+  }
 
   @override
   Stream<ParticipantStatus?> watchMyStatus(String matchId, String uid) => _db
@@ -60,6 +69,7 @@ class FirestoreParticipantRepository implements ParticipantRepository {
     try {
       if (!match.autoApprove) {
         await ref.set(data).timeout(const Duration(seconds: 10));
+        _notify(match, NotificationType.joinRequested, to: match.hostId, actorId: uid, actorName: displayName);
         return;
       }
       // Hai người cùng giành chỗ cuối: transaction đọc lại số chỗ, người đến sau thấy đã đủ
@@ -75,6 +85,7 @@ class FirestoreParticipantRepository implements ParticipantRepository {
           'updatedAt': FieldValue.serverTimestamp(),
         });
       }).timeout(const Duration(seconds: 10));
+      _notify(match, NotificationType.memberJoined, to: match.hostId, actorId: uid, actorName: displayName);
     } on TimeoutException {
       throw const JoinException(JoinError.network);
     } on FirebaseException catch (e) {
@@ -88,6 +99,7 @@ class FirestoreParticipantRepository implements ParticipantRepository {
     final ref = matchRef.collection('participants').doc(uid);
     final left = {'status': 'left', 'updatedAt': FieldValue.serverTimestamp()};
     try {
+      final name = (await ref.get().timeout(const Duration(seconds: 10))).data()?['displayName'] as String? ?? '';
       if (current == ParticipantStatus.pending) {
         await ref.update(left).timeout(const Duration(seconds: 10));
         return;
@@ -101,6 +113,7 @@ class FirestoreParticipantRepository implements ParticipantRepository {
           'updatedAt': FieldValue.serverTimestamp(),
         });
       }).timeout(const Duration(seconds: 10));
+      _notify(match, NotificationType.memberLeft, to: match.hostId, actorId: uid, actorName: name);
     } on TimeoutException {
       throw const JoinException(JoinError.network);
     } on FirebaseException catch (e) {
@@ -149,12 +162,16 @@ class FirestoreParticipantRepository implements ParticipantRepository {
             'updatedAt': FieldValue.serverTimestamp(),
           });
         });
+        _notify(match, NotificationType.joinApproved, to: uid, actorId: match.hostId, actorName: match.host.displayName);
       });
 
   @override
-  Future<void> reject({required Match match, required String uid}) => _run(() => _db
-      .doc('matches/${match.id}/participants/$uid')
-      .update({'status': 'rejected', 'updatedAt': FieldValue.serverTimestamp()}));
+  Future<void> reject({required Match match, required String uid}) => _run(() async {
+        await _db
+            .doc('matches/${match.id}/participants/$uid')
+            .update({'status': 'rejected', 'updatedAt': FieldValue.serverTimestamp()});
+        _notify(match, NotificationType.joinRejected, to: uid, actorId: match.hostId, actorName: match.host.displayName);
+      });
 
   @override
   Future<void> remove({required Match match, required String uid}) => _run(() async {
@@ -171,6 +188,7 @@ class FirestoreParticipantRepository implements ParticipantRepository {
             'updatedAt': FieldValue.serverTimestamp(),
           });
         });
+        _notify(match, NotificationType.removed, to: uid, actorId: match.hostId, actorName: match.host.displayName);
       });
 
   Future<void> _run(Future<void> Function() action) async {

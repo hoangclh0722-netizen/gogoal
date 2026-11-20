@@ -62,7 +62,7 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
     if (!mounted) return;
     switch (choice) {
       case 'lock':
-        await ref.read(matchRepositoryProvider).setLocked(match.id, true);
+        await ref.read(matchRepositoryProvider).setLocked(match, true);
       case 'extend':
         await _edit(match);
       case 'cancel':
@@ -126,7 +126,7 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
       if (ok != true) return;
     }
     try {
-      await ref.read(matchRepositoryProvider).setLocked(match.id, !match.locked);
+      await ref.read(matchRepositoryProvider).setLocked(match, !match.locked);
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -668,7 +668,7 @@ class _CancelSheetState extends ConsumerState<_CancelSheet> {
       _error = null;
     });
     try {
-      await ref.read(matchRepositoryProvider).cancel(widget.match.id, _reason);
+      await ref.read(matchRepositoryProvider).cancel(widget.match, _reason);
       if (mounted) Navigator.of(context).pop(true);
     } catch (_) {
       if (mounted) {

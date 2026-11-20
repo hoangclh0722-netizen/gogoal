@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/logo_wordmark.dart';
 import '../../../auth/application/auth_providers.dart';
+import '../../../notification/application/notification_providers.dart';
 import '../../application/home_providers.dart';
 import '../../application/location_controller.dart';
 
@@ -23,6 +24,7 @@ class HomeHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final signedIn = ref.watch(signedInProvider);
     final located = ref.watch(locationProvider).granted;
+    final unread = ref.watch(unreadCountProvider).value ?? 0;
 
     return Container(
       padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 12, 16, 24),
@@ -50,7 +52,12 @@ class HomeHeader extends ConsumerWidget {
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.5),
                       ),
-                      child: const Icon(Icons.notifications_none, color: Colors.white, size: 22),
+                      child: Badge(
+                        isLabelVisible: unread > 0,
+                        label: Text(unread > 9 ? '9+' : '$unread'),
+                        backgroundColor: AppColors.accent,
+                        child: const Icon(Icons.notifications_none, color: Colors.white, size: 22),
+                      ),
                     ),
                   )
                 else
