@@ -678,6 +678,7 @@ class _ActionBar extends ConsumerWidget {
     if (ok != true) return;
     try {
       await ref.read(participantRepositoryProvider).leave(match: match, uid: uid, current: current);
+      ref.invalidate(myMatchesProvider);
       if (context.mounted) _toast(context, pending ? 'Đã hủy yêu cầu' : 'Bạn đã rời kèo');
     } on JoinException catch (e) {
       if (context.mounted) {
@@ -780,6 +781,7 @@ class _ActionBar extends ConsumerWidget {
           onPressed: () async {
             final ok = await showJoinSheet(context, match, profile.value!);
             if (ok == true && context.mounted) {
+              ref.invalidate(myMatchesProvider);
               _toast(context, match.autoApprove ? 'Bạn đã vào kèo' : 'Đã gửi yêu cầu, chờ chủ kèo duyệt');
             }
           },

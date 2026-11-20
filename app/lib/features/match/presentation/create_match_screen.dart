@@ -284,6 +284,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
     });
     try {
       await ref.read(matchRepositoryProvider).update(m, _draft);
+      ref.invalidate(myMatchesProvider);
       if (mounted) context.pop(true);
     } catch (_) {
       if (mounted) setState(() => _error = 'Không lưu được thay đổi, thử lại');
@@ -313,6 +314,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
         // Chưa có đánh giá thì lấy mức khởi điểm 4.0 như BR11
         host: Host(displayName: profile.displayName, rep: profile.reputation ?? 4.0, avatarUrl: profile.avatarUrl),
       );
+      ref.invalidate(myMatchesProvider);
       if (mounted) context.pushReplacement(Routes.match(id));
     } catch (_) {
       if (mounted) setState(() => _error = 'Không đăng được kèo, thử lại');

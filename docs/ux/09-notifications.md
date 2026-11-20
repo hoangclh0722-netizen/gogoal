@@ -16,7 +16,17 @@ Màn Thông báo (tab thứ tư): danh sách mới nhất trước (50 cái), ch
 
 Rules: chỉ tạo được 9 loại đã định nghĩa, `actorId` là chính mình, không gửi cho chính mình, không thêm trường lạ; người nhận chỉ đổi được `read`.
 
+## Nhắc giờ trên máy (local notification)
+
+Không cần server: mỗi khi danh sách "Kèo của tôi" thay đổi (mở app, xin vào, rời, tạo/sửa/hủy/chốt kèo) app hủy và hẹn lại toàn bộ nhắc bằng `flutter_local_notifications`, giờ Việt Nam.
+
+| Nhắc | Cho ai | Lúc |
+|---|---|---|
+| "Còn 2 tiếng nữa tới kèo" | Chủ kèo, thành viên đã được nhận | 2 giờ trước giờ đá |
+| "Sắp tới hạn chốt người" | Chủ kèo, kèo chưa chốt | 1 giờ trước hạn chốt |
+
+Bấm vào nhắc thì mở Chi tiết kèo. Android 13+ hỏi quyền gửi thông báo lần đầu.
+
 ## Để sau
 
 - Thông báo đẩy khi app đóng (cần server hoặc Cloud Functions).
-- Nhắc trước hạn chốt và trước giờ đá bằng thông báo trên máy.
