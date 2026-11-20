@@ -34,26 +34,24 @@ class Match {
     required this.playersTotal,
     required this.slotsNeeded,
     required this.slotsFilled,
-    required this.isFull,
     required this.levelMin,
     required this.levelMax,
     required this.startAt,
-    DateTime? endAt,
+    required this.endAt,
     required this.venue,
     required this.geo,
     required this.district,
     required this.costTotal,
     required this.costPerPerson,
     required this.host,
-    this.hostId = '',
+    required this.hostId,
     this.autoApprove = false,
     this.note,
     this.status = MatchStatus.active,
     this.locked = false,
     this.joinDeadline,
     int? slotsMin,
-  })  : endAt = endAt ?? startAt.add(const Duration(hours: 2)),
-        slotsMin = slotsMin ?? slotsNeeded;
+  }) : slotsMin = slotsMin ?? slotsNeeded;
 
   final String id;
   final String title;
@@ -62,7 +60,6 @@ class Match {
   final int playersTotal;
   final int slotsNeeded;
   final int slotsFilled;
-  final bool isFull;
   final int levelMin;
   final int levelMax;
   final DateTime startAt;
@@ -104,6 +101,9 @@ class Match {
   bool deadlinePassed(DateTime now) => joinDeadline != null && !now.isBefore(joinDeadline!);
 
   int get slotsLeft => slotsNeeded - slotsFilled;
+
+  /// Firestore vẫn lưu isFull để truy vấn "còn chỗ", còn trong app thì tính từ số chỗ.
+  bool get isFull => slotsFilled >= slotsNeeded;
 
   double? distanceFrom(GeoPoint? origin) => origin?.distanceTo(geo);
 

@@ -1,9 +1,11 @@
+import '../../../profile/domain/user_profile.dart';
 import 'match.dart';
 
 enum ParticipantStatus { pending, approved, rejected, left, removed }
 
-class Member {
-  const Member({required this.uid, required this.displayName, required this.level, this.avatarUrl});
+/// Phần chung của một người trong kèo, chép từ hồ sơ lúc xin vào.
+abstract class Participant {
+  const Participant({required this.uid, required this.displayName, required this.level, this.avatarUrl});
 
   final String uid;
   final String displayName;
@@ -11,7 +13,13 @@ class Member {
   final String? avatarUrl;
 }
 
-class JoinRequest extends Member {
+/// Người đã được nhận vào kèo.
+class Member extends Participant {
+  const Member({required super.uid, required super.displayName, required super.level, super.avatarUrl});
+}
+
+/// Yêu cầu đang chờ chủ kèo duyệt.
+class JoinRequest extends Participant {
   const JoinRequest({
     required super.uid,
     required super.displayName,
@@ -41,14 +49,7 @@ abstract interface class ParticipantRepository {
   Stream<List<Member>> watchMembers(String matchId);
 
   /// Kèo duyệt tay: tạo yêu cầu chờ duyệt. Kèo vào ngay: vào luôn và giữ một chỗ.
-  Future<void> requestJoin({
-    required Match match,
-    required String uid,
-    required String displayName,
-    required String? avatarUrl,
-    required int level,
-    String? message,
-  });
+  Future<void> requestJoin({required Match match, required UserProfile profile, String? message});
 
   /// Hủy yêu cầu đang chờ, hoặc rời kèo đã được nhận (trả lại một chỗ).
   Future<void> leave({required Match match, required String uid, required ParticipantStatus current});

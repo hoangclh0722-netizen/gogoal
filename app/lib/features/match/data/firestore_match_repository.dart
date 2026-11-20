@@ -271,11 +271,10 @@ class FirestoreMatchRepository implements MatchRepository {
       playersTotal: i('playersTotal'),
       slotsNeeded: i('slotsNeeded'),
       slotsFilled: i('slotsFilled'),
-      isFull: d['isFull'] as bool,
       levelMin: i('levelMin'),
       levelMax: i('levelMax'),
       startAt: (d['startAt'] as Timestamp).toDate(),
-      endAt: (d['endAt'] as Timestamp?)?.toDate(),
+      endAt: (d['endAt'] as Timestamp).toDate(),
       venue: Venue(
         name: venue['name'] as String,
         district: venue['district'] as String,

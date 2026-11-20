@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../notification/domain/app_notification.dart';
+import '../../profile/domain/user_profile.dart';
 import '../domain/entities/match.dart';
 import '../domain/entities/participant.dart';
 
@@ -41,14 +42,9 @@ class FirestoreParticipantRepository implements ParticipantRepository {
           }).toList());
 
   @override
-  Future<void> requestJoin({
-    required Match match,
-    required String uid,
-    required String displayName,
-    required String? avatarUrl,
-    required int level,
-    String? message,
-  }) async {
+  Future<void> requestJoin({required Match match, required UserProfile profile, String? message}) => _run(() async {
+    final uid = profile.uid;
+    final displayName = profile.displayName;
     final matchRef = _db.doc('matches/${match.id}');
     final ref = matchRef.collection('participants').doc(uid);
     final data = {
@@ -56,8 +52,8 @@ class FirestoreParticipantRepository implements ParticipantRepository {
       'matchId': match.id,
       'matchStartAt': Timestamp.fromDate(match.startAt),
       'displayName': displayName,
-      'avatarUrl': avatarUrl,
-      'level': level,
+      'avatarUrl': profile.avatarUrl,
+      'level': profile.sports[match.sportId]!,
       'status': match.autoApprove ? 'approved' : 'pending',
       'message': message,
       'paid': false,
@@ -66,60 +62,48 @@ class FirestoreParticipantRepository implements ParticipantRepository {
       'requestedAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     };
-    try {
-      if (!match.autoApprove) {
-        await ref.set(data).timeout(const Duration(seconds: 10));
-        _notify(match, NotificationType.joinRequested, to: match.hostId, actorId: uid, actorName: displayName);
-        return;
-      }
-      // Hai người cùng giành chỗ cuối: transaction đọc lại số chỗ, người đến sau thấy đã đủ
-      await _db.runTransaction((tx) async {
-        final d = (await tx.get(matchRef)).data()!;
-        final filled = (d['slotsFilled'] as num).toInt();
-        final needed = (d['slotsNeeded'] as num).toInt();
-        if (filled >= needed) throw const JoinException(JoinError.full);
-        tx.set(ref, data);
-        tx.update(matchRef, {
-          'slotsFilled': filled + 1,
-          'isFull': filled + 1 >= needed,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-      }).timeout(const Duration(seconds: 10));
-      _notify(match, NotificationType.memberJoined, to: match.hostId, actorId: uid, actorName: displayName);
-    } on TimeoutException {
-      throw const JoinException(JoinError.network);
-    } on FirebaseException catch (e) {
-      throw JoinException(e.code == 'unavailable' ? JoinError.network : JoinError.denied);
+    if (!match.autoApprove) {
+      await ref.set(data);
+      _notify(match, NotificationType.joinRequested, to: match.hostId, actorId: uid, actorName: displayName);
+      return;
     }
-  }
+    // Hai người cùng giành chỗ cuối: transaction đọc lại số chỗ, người đến sau thấy đã đủ
+    await _db.runTransaction((tx) async {
+      final d = (await tx.get(matchRef)).data()!;
+      final filled = (d['slotsFilled'] as num).toInt();
+      final needed = (d['slotsNeeded'] as num).toInt();
+      if (filled >= needed) throw const JoinException(JoinError.full);
+      tx.set(ref, data);
+      tx.update(matchRef, {
+        'slotsFilled': filled + 1,
+        'isFull': filled + 1 >= needed,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+    _notify(match, NotificationType.memberJoined, to: match.hostId, actorId: uid, actorName: displayName);
+  });
 
   @override
-  Future<void> leave({required Match match, required String uid, required ParticipantStatus current}) async {
+  Future<void> leave({required Match match, required String uid, required ParticipantStatus current}) => _run(() async {
     final matchRef = _db.doc('matches/${match.id}');
     final ref = matchRef.collection('participants').doc(uid);
     final left = {'status': 'left', 'updatedAt': FieldValue.serverTimestamp()};
-    try {
-      final name = (await ref.get().timeout(const Duration(seconds: 10))).data()?['displayName'] as String? ?? '';
-      if (current == ParticipantStatus.pending) {
-        await ref.update(left).timeout(const Duration(seconds: 10));
-        return;
-      }
-      await _db.runTransaction((tx) async {
-        final filled = ((await tx.get(matchRef)).data()!['slotsFilled'] as num).toInt();
-        tx.update(ref, left);
-        tx.update(matchRef, {
-          'slotsFilled': filled - 1,
-          'isFull': false,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-      }).timeout(const Duration(seconds: 10));
-      _notify(match, NotificationType.memberLeft, to: match.hostId, actorId: uid, actorName: name);
-    } on TimeoutException {
-      throw const JoinException(JoinError.network);
-    } on FirebaseException catch (e) {
-      throw JoinException(e.code == 'unavailable' ? JoinError.network : JoinError.denied);
+    final name = (await ref.get()).data()?['displayName'] as String? ?? '';
+    if (current == ParticipantStatus.pending) {
+      await ref.update(left);
+      return;
     }
-  }
+    await _db.runTransaction((tx) async {
+      final filled = ((await tx.get(matchRef)).data()!['slotsFilled'] as num).toInt();
+      tx.update(ref, left);
+      tx.update(matchRef, {
+        'slotsFilled': filled - 1,
+        'isFull': false,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+    _notify(match, NotificationType.memberLeft, to: match.hostId, actorId: uid, actorName: name);
+  });
 
   @override
   Stream<List<JoinRequest>> watchRequests(String matchId) => _db

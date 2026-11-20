@@ -51,10 +51,7 @@ class _JoinSheetState extends ConsumerState<JoinSheet> {
     try {
       await ref.read(participantRepositoryProvider).requestJoin(
             match: widget.match,
-            uid: user.uid,
-            displayName: widget.profile.displayName,
-            avatarUrl: widget.profile.avatarUrl,
-            level: widget.profile.sports[widget.match.sportId]!,
+            profile: widget.profile,
             message: text.isEmpty ? null : text,
           );
       if (mounted) Navigator.of(context).pop(true);
