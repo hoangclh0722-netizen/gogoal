@@ -50,7 +50,7 @@ class AppNotification {
       NotificationType.matchLocked => '$t đã chốt, hẹn gặp ở sân',
     };
   }
-}}
+}
 
 abstract interface class NotificationRepository {
   Stream<List<AppNotification>> watchMine(String uid);
