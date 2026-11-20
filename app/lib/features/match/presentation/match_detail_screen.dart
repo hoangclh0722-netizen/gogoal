@@ -94,6 +94,7 @@ class _Detail extends ConsumerWidget {
                       ),
                       const SizedBox(height: 12),
                     ],
+                    _OverlapBanner(match: match),
                     _Card(children: [
                       _InfoRow(
                         icon: Icons.calendar_today_outlined,
@@ -266,6 +267,103 @@ class _Header extends ConsumerWidget {
             '${match.autoApprove ? 'Vào ngay' : 'Chủ kèo duyệt'}',
             style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.w500),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Đã được nhận vào kèo này mà vẫn còn ở một kèo khác trùng giờ thì nhắc rời kèo kia để nhường chỗ.
+class _OverlapBanner extends ConsumerWidget {
+  const _OverlapBanner({required this.match});
+
+  final Match match;
+
+  Future<void> _leaveOther(BuildContext context, WidgetRef ref, String uid, MyMatch other) async {
+    final pending = other.role == MyRole.pending;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(pending ? 'Hủy yêu cầu ở “${other.match.title}”?' : 'Rời “${other.match.title}”?',
+            textAlign: TextAlign.center),
+        content: const Text('Chỗ đó sẽ được nhường cho người khác.', textAlign: TextAlign.center),
+        actions: [
+          Row(spacing: 10, children: [
+            Expanded(child: OutlinedButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Thôi'))),
+            Expanded(
+              child: FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(pending ? 'Hủy yêu cầu' : 'Rời kèo'),
+              ),
+            ),
+          ]),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await ref.read(participantRepositoryProvider).leave(
+            match: other.match,
+            uid: uid,
+            current: pending ? ParticipantStatus.pending : ParticipantStatus.approved,
+          );
+      ref.invalidate(myMatchesProvider);
+      if (context.mounted) _snack(context, 'Đã nhường chỗ ở “${other.match.title}”');
+    } on JoinException {
+      if (context.mounted) _snack(context, 'Không rời được, thử lại');
+    }
+  }
+
+  void _snack(BuildContext context, String text) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final uid = ref.watch(authStateProvider).value?.uid;
+    final mine = ref.watch(myParticipationProvider(match.id)).value;
+    if (uid == null || mine != ParticipantStatus.approved || !match.startAt.isAfter(DateTime.now())) {
+      return const SizedBox.shrink();
+    }
+    final others = (ref.watch(myMatchesProvider).value ?? const <MyMatch>[])
+        .where((o) =>
+            o.match.id != match.id &&
+            (o.role == MyRole.approved || o.role == MyRole.pending) &&
+            o.match.status == MatchStatus.active &&
+            o.match.startAt.isBefore(match.endAt) &&
+            match.startAt.isBefore(o.match.endAt))
+        .toList();
+    if (others.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        spacing: 8,
+        children: [
+          for (final o in others)
+            Container(
+              padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF3C7),
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              child: Row(children: [
+                const Icon(Icons.event_repeat_rounded, color: Color(0xFFB45309)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Bạn còn ${o.role == MyRole.pending ? 'đang chờ duyệt ở' : 'ở'} “${o.match.title}” cùng giờ. '
+                    'Nhường chỗ cho người khác nhé?',
+                    style: const TextStyle(fontSize: 13, color: Color(0xFF92400E), height: 1.35),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => _leaveOther(context, ref, uid, o),
+                  child: Text(o.role == MyRole.pending ? 'Hủy' : 'Rời kèo',
+                      style: const TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700)),
+                ),
+              ]),
+            ),
         ],
       ),
     );

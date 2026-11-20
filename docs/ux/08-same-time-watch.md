@@ -15,7 +15,10 @@ Mục tiêu: kèo đang chờ có dấu hiệu bể thì người chơi có sẵ
 - Mục "Kèo cùng giờ": tối đa 3 kèo cùng môn, giờ bắt đầu lệch không quá 1 tiếng, còn nhận người (chưa đủ, chưa chốt, chưa qua hạn chốt), gần mình nhất trước. Bấm để mở chi tiết, ở đó xin vào hoặc theo dõi.
 - Không có kèo nào thì hiện "Chưa có kèo nào cùng giờ".
 
+## Nhắc nhường chỗ kèo trùng giờ
+
+Chi tiết kèo B (mình đã được nhận, kèo chưa bắt đầu): nếu mình còn ở kèo A trùng giờ (đã vào hoặc đang chờ duyệt, kèo A chưa hủy) thì hiện dải vàng "Bạn còn ở “A” cùng giờ. Nhường chỗ cho người khác nhé?" kèm nút **Rời kèo** / **Hủy** (có hộp xác nhận). Rời xong dải tự mất.
+
 ## Để sau
 
-- Được nhận vào kèo B thì nhắc rời kèo A cùng giờ.
 - Thông báo khi kèo đang theo dõi sắp đủ người hoặc kèo chính có nguy cơ bể.
