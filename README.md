@@ -37,7 +37,8 @@ The project is built in vertical slices: each feature goes through UX, UI, datab
 - [x] Firestore security rules for users, venues, games and join requests
 - [x] Email and Google sign-in with Firebase Auth (Auth Emulator in development)
 - [x] Profile setup (display name, district, sports and skill levels) and profile screen
-- [ ] Facebook sign-in and password reset
+- [x] Password reset by email link
+- [ ] Facebook sign-in
 - [ ] Bank account setup for paid games
 - [ ] Game details, create game, join and approve requests
 - [ ] VietQR payment code for approved members

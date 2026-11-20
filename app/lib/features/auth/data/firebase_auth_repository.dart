@@ -48,6 +48,17 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> sendEmailVerification() async => _auth.currentUser?.sendEmailVerification();
 
   @override
+  Future<void> sendPasswordReset(String email) async {
+    try {
+      await _auth.setLanguageCode('vi');
+      await _auth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') return;
+      throw AuthException(_map(e.code));
+    }
+  }
+
+  @override
   Future<void> signOut() async {
     if (_googleReady) await GoogleSignIn.instance.signOut();
     await _auth.signOut();

@@ -105,7 +105,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () => context.push(Routes.comingSoon, extra: 'Quên mật khẩu'),
+                onPressed: () => context.push(Routes.forgotPassword, extra: _email.text.trim()),
                 child: const Text('Quên mật khẩu?',
                     style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w600)),
               ),

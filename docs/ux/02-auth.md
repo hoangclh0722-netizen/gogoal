@@ -7,7 +7,7 @@ Khách bấm Xin vào / Tạo kèo / Thông báo / Hồ sơ → Đăng nhập.
 - Đăng nhập thành công, hồ sơ đã đủ → quay lại đúng hành động vừa bấm.
 - Lần đầu (chưa có hồ sơ) → Hoàn thành hồ sơ 2 bước → quay lại hành động.
 - Đăng nhập → "Chưa có tài khoản? Đăng ký" → Đăng ký → Hoàn thành hồ sơ.
-- Quên mật khẩu: **để sau**. Tạm thời bấm "Quên mật khẩu" hiện "Sắp có". Firebase chỉ hỗ trợ gửi link đặt lại; muốn dùng mã OTP như nhiều app khác thì cần server riêng, sẽ cân nhắc ở giai đoạn sau.
+- Quên mật khẩu: bấm "Quên mật khẩu?" ở màn đăng nhập → nhập email (điền sẵn email đã gõ) → "Gửi link đặt lại" → màn "Đã gửi email". Firebase gửi link đặt lại qua email (tiếng Việt). Email chưa đăng ký cũng báo đã gửi để không lộ tài khoản. Nút "Gửi lại" chờ 60 giây. Mã OTP thay cho link cần server riêng, để sau.
 
 ## Cách đăng nhập
 - Email + mật khẩu, Google.

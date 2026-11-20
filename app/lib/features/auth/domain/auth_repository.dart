@@ -15,5 +15,8 @@ abstract interface class AuthRepository {
   Future<AppUser> register(String email, String password);
   Future<AppUser> signInWithGoogle();
   Future<void> sendEmailVerification();
+
+  /// Gửi link đặt lại mật khẩu. Email chưa đăng ký cũng coi như gửi xong để không lộ tài khoản.
+  Future<void> sendPasswordReset(String email);
   Future<void> signOut();
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/application/auth_providers.dart';
 import '../../features/auth/presentation/auth_flow.dart';
+import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/discover/presentation/home_screen.dart';
@@ -26,6 +27,7 @@ abstract final class Routes {
   static const home = '/home';
   static const login = '/login';
   static const register = '/register';
+  static const forgotPassword = '/forgot-password';
   static const profile = '/profile';
   static const profileSetup = '/profile/setup';
   static const comingSoon = '/soon';
@@ -46,6 +48,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.home, builder: (_, _) => const HomeScreen()),
       GoRoute(path: Routes.login, builder: (_, _) => const LoginScreen()),
       GoRoute(path: Routes.register, builder: (_, _) => const RegisterScreen()),
+      GoRoute(
+        path: Routes.forgotPassword,
+        builder: (_, state) => ForgotPasswordScreen(email: state.extra as String?),
+      ),
       GoRoute(path: Routes.myMatches, builder: (_, _) => const MyMatchesScreen()),
       GoRoute(path: Routes.notifications, builder: (_, _) => const NotificationsScreen()),
       GoRoute(path: Routes.createMatch, builder: (_, _) => const CreateMatchScreen()),
