@@ -718,10 +718,22 @@ class _ActionBar extends ConsumerWidget {
         showPrice = false;
         note = const _Status(Icons.workspace_premium_outlined, AppColors.warning, 'Kèo của bạn');
         final waiting = ref.watch(requestsProvider(match.id)).value?.length ?? 0;
-        main = AppButton(
-          label: waiting > 0 ? 'Quản lý kèo · $waiting chờ duyệt' : 'Quản lý kèo',
-          onPressed: () => context.push(Routes.manage(match.id)),
-        );
+        main = Row(spacing: 10, children: [
+          Expanded(
+            child: AppButton(
+              label: 'Chat',
+              kind: AppButtonKind.outline,
+              onPressed: () => context.push(Routes.chat(match.id)),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: AppButton(
+              label: waiting > 0 ? 'Quản lý · $waiting chờ' : 'Quản lý kèo',
+              onPressed: () => context.push(Routes.manage(match.id)),
+            ),
+          ),
+        ]);
       case AlreadyRequested(status: ParticipantStatus.pending):
         showPrice = false;
         note = const _Status(Icons.schedule, AppColors.warning, 'Đang chờ chủ kèo duyệt');
@@ -741,7 +753,14 @@ class _ActionBar extends ConsumerWidget {
                 // Tiền sân người chơi tự giải quyết ngoài app, tạm ẩn Thanh toán (UC10)
                 if (_showPayment)
                   Expanded(child: AppButton(label: 'Thanh toán', kind: AppButtonKind.outline, height: 48, onPressed: soon)),
-                Expanded(child: AppButton(label: 'Chat', kind: AppButtonKind.outline, height: 48, onPressed: soon)),
+                Expanded(
+                  child: AppButton(
+                    label: 'Chat',
+                    kind: AppButtonKind.outline,
+                    height: 48,
+                    onPressed: () => context.push(Routes.chat(match.id)),
+                  ),
+                ),
               ],
             ),
             TextButton(

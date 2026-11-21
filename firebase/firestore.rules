@@ -271,6 +271,25 @@ service cloud.firestore {
                  == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled - 1));
       }
 
+      // Chat trong kèo (UC13): chỉ chủ kèo và thành viên đã được nhận; mở tới 24 giờ sau giờ kết thúc
+      match /messages/{messageId} {
+        function inMatch() {
+          return get(/databases/$(db)/documents/matches/$(matchId)).data.hostId == me()
+            || (exists(/databases/$(db)/documents/matches/$(matchId)/participants/$(me()))
+              && get(/databases/$(db)/documents/matches/$(matchId)/participants/$(me())).data.status == 'approved');
+        }
+        allow read: if signedIn() && inMatch();
+        allow create: if notBanned() && inMatch()
+          && request.time < get(/databases/$(db)/documents/matches/$(matchId)).data.endAt + duration.value(24, 'h')
+          && request.resource.data.keys().hasOnly(['senderId', 'senderName', 'text', 'createdAt'])
+          && request.resource.data.senderId == me()
+          && request.resource.data.senderName == userDoc(me()).displayName
+          && request.resource.data.text is string
+          && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 1000
+          && request.resource.data.createdAt == request.time;
+        allow update, delete: if false;
+      }
+
       match /private/payment {
         allow read: if signedIn() && (
           get(/databases/$(db)/documents/matches/$(matchId)).data.hostId == me()

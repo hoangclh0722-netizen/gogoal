@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/application/auth_providers.dart';
 import '../../features/auth/presentation/auth_flow.dart';
+import '../../features/chat/presentation/chat_screen.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
@@ -36,6 +37,7 @@ abstract final class Routes {
   static const notifications = '/notifications';
   static String match(String id) => '/match/$id';
   static String manage(String id) => '/match/$id/manage';
+  static String chat(String id) => '/match/$id/chat';
   static String edit(String id) => '/match/$id/edit';
 }
 
@@ -58,6 +60,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/match/:id',
         builder: (_, state) => MatchDetailScreen(matchId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/match/:id/chat',
+        builder: (_, state) => ChatScreen(matchId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/match/:id/manage',
