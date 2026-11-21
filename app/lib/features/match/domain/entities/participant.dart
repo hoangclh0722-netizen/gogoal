@@ -64,4 +64,7 @@ abstract interface class ParticipantRepository {
 
   /// Chủ kèo mời thành viên ra: participant → removed và trả lại một chỗ.
   Future<void> remove({required Match match, required String uid});
+
+  /// Chủ kèo điểm danh (UC14): [present] là uid → có mặt hay không, cho mọi thành viên đã được nhận.
+  Future<void> takeAttendance({required Match match, required Map<String, bool> present});
 }

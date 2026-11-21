@@ -69,6 +69,16 @@ class MatchReminders {
         body: '${m.title} lúc ${formatHm(m.startAt)} tại ${m.venue.name}',
         matchId: m.id,
       );
+      if (item.role == MyRole.host && m.attendanceTakenAt == null) {
+        await _at(
+          id: 100000 + i,
+          when: m.endAt,
+          now: now,
+          title: 'Điểm danh trận vừa rồi',
+          body: '${m.title}: đánh dấu ai vắng trong 24 giờ để tính uy tín',
+          matchId: m.id,
+        );
+      }
       final deadline = m.joinDeadline;
       if (item.role == MyRole.host && deadline != null && !m.locked) {
         await _at(

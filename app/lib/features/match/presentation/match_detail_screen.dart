@@ -736,12 +736,16 @@ class _ActionBar extends ConsumerWidget {
         ]);
       case AlreadyRequested(status: ParticipantStatus.pending):
         showPrice = false;
-        note = const _Status(Icons.schedule, AppColors.warning, 'Đang chờ chủ kèo duyệt');
-        main = AppButton(
-          label: 'Hủy yêu cầu',
-          kind: AppButtonKind.outline,
-          onPressed: () => _leave(context, ref, user.uid, ParticipantStatus.pending),
-        );
+        final started = !match.startAt.isAfter(DateTime.now());
+        note = _Status(Icons.schedule, AppColors.warning,
+            started ? 'Kèo đã bắt đầu, chủ kèo chưa duyệt yêu cầu' : 'Đang chờ chủ kèo duyệt');
+        main = started
+            ? null
+            : AppButton(
+                label: 'Hủy yêu cầu',
+                kind: AppButtonKind.outline,
+                onPressed: () => _leave(context, ref, user.uid, ParticipantStatus.pending),
+              );
       case AlreadyRequested(status: ParticipantStatus.approved):
         showPrice = false;
         note = const _Status(Icons.check_circle_outline, AppColors.primaryDark, 'Bạn đã ở trong kèo');
@@ -763,6 +767,8 @@ class _ActionBar extends ConsumerWidget {
                 ),
               ],
             ),
+            // Kèo đã bắt đầu thì không rời được nữa (rules cũng chặn)
+            if (match.startAt.isAfter(DateTime.now()))
             TextButton(
               onPressed: () => _leave(context, ref, user.uid, ParticipantStatus.approved),
               child: const Text('Rời kèo',

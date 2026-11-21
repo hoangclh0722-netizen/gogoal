@@ -27,6 +27,25 @@ service cloud.firestore {
         && (u.profileCompleted != true || u.sports.size() >= 1);
     }
 
+    // Chỉ tăng đúng 1 ở một trường thống kê
+    function statInc(key) {
+      return request.resource.data.stats.diff(resource.data.stats).affectedKeys().hasOnly([key])
+        && request.resource.data.stats[key] == resource.data.stats.get(key, 0) + 1;
+    }
+
+    // Điểm danh (UC14): chủ kèo cộng 1 trận / 1 lần vắng cho người trong kèo [m] trong cùng batch ghi attendanceTakenAt
+    function attendanceStat(uid, m) {
+      let before = get(/databases/$(db)/documents/matches/$(m)).data;
+      let p = /databases/$(db)/documents/matches/$(m)/participants/$(uid);
+      return before.hostId == me()
+        && before.get('attendanceTakenAt', null) == null
+        && getAfter(/databases/$(db)/documents/matches/$(m)).data.attendanceTakenAt != null
+        && (uid == before.hostId
+          ? statInc('matchesPlayed')
+          : (get(p).data.status == 'approved' && get(p).data.attended == null
+            && (getAfter(p).data.attended == true ? statInc('matchesPlayed') : statInc('noShows'))));
+    }
+
     function joinShapeOk(p) {
       return p.keys().hasOnly(['uid', 'matchId', 'matchStartAt', 'displayName', 'avatarUrl', 'level', 'status',
                                'message', 'paid', 'paidConfirmed', 'attended', 'requestedAt', 'updatedAt'])
@@ -82,6 +101,10 @@ service cloud.firestore {
         && changedOnly(['displayName', 'avatarUrl', 'district', 'bio', 'sports', 'profileCompleted', 'updatedAt'])
         && profileOk(request.resource.data);
       allow update: if isAdmin() && changedOnly(['banned', 'updatedAt']);
+      allow update: if signedIn()
+        && changedOnly(['stats', 'statsMatch', 'updatedAt'])
+        && request.resource.data.statsMatch is string
+        && attendanceStat(uid, request.resource.data.statsMatch);
 
       match /private/{doc} {
         allow read, write: if signedIn() && uid == me();
@@ -210,6 +233,15 @@ service cloud.firestore {
         && get(/databases/$(db)/documents/matches/$(matchId)/participants/$(request.resource.data.changedMember)).data.status == 'approved'
         && getAfter(/databases/$(db)/documents/matches/$(matchId)/participants/$(request.resource.data.changedMember)).data.status == 'removed';
 
+      // Chủ kèo điểm danh một lần, trong 24 giờ sau giờ kết thúc (BR09)
+      allow update: if notBanned() && resource.data.hostId == me()
+        && resource.data.status == 'active'
+        && request.time > resource.data.endAt
+        && request.time < resource.data.endAt + duration.value(24, 'h')
+        && resource.data.get('attendanceTakenAt', null) == null
+        && changedOnly(['attendanceTakenAt', 'updatedAt'])
+        && request.resource.data.attendanceTakenAt == request.time;
+
       allow update: if isAdmin() && changedOnly(['status', 'updatedAt'])
         && request.resource.data.status in ['active', 'hidden', 'cancelled'];
 
@@ -255,6 +287,15 @@ service cloud.firestore {
             || (resource.data.status == 'approved'
               && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled
                  == get(/databases/$(db)/documents/matches/$(matchId)).data.slotsFilled - 1));
+
+        // Điểm danh: thành viên đã được nhận đổi attended một lần, cùng batch với attendanceTakenAt của kèo
+        allow update: if signedIn()
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.hostId == me()
+          && resource.data.status == 'approved' && resource.data.attended == null
+          && changedOnly(['attended', 'updatedAt'])
+          && request.resource.data.attended is bool
+          && get(/databases/$(db)/documents/matches/$(matchId)).data.get('attendanceTakenAt', null) == null
+          && getAfter(/databases/$(db)/documents/matches/$(matchId)).data.attendanceTakenAt != null;
 
         // Chủ kèo từ chối hoặc nhận yêu cầu đang chờ, mời thành viên ra (UC07); nhận/mời ra phải đổi số chỗ cùng batch
         allow update: if notBanned()

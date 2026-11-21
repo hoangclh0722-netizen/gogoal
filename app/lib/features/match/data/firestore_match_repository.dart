@@ -297,6 +297,7 @@ class FirestoreMatchRepository implements MatchRepository {
       locked: d['locked'] as bool? ?? false,
       joinDeadline: (d['joinDeadline'] as Timestamp?)?.toDate(),
       slotsMin: (d['slotsMin'] as num?)?.toInt(),
+      attendanceTakenAt: (d['attendanceTakenAt'] as Timestamp?)?.toDate(),
     );
   }
 }

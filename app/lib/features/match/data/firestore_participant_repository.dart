@@ -175,6 +175,24 @@ class FirestoreParticipantRepository implements ParticipantRepository {
         _notify(match, NotificationType.removed, to: uid, actorId: match.hostId, actorName: match.host.displayName);
       });
 
+  @override
+  Future<void> takeAttendance({required Match match, required Map<String, bool> present}) => _run(() {
+        final matchRef = _db.doc('matches/${match.id}');
+        final batch = _db.batch()
+          ..update(matchRef, {'attendanceTakenAt': FieldValue.serverTimestamp(), 'updatedAt': FieldValue.serverTimestamp()})
+          // Chủ kèo cũng được tính một trận đã chơi
+          ..update(_db.doc('users/${match.hostId}'), {'stats.matchesPlayed': FieldValue.increment(1), 'statsMatch': match.id});
+        for (final MapEntry(key: uid, value: here) in present.entries) {
+          batch
+            ..update(matchRef.collection('participants').doc(uid), {'attended': here, 'updatedAt': FieldValue.serverTimestamp()})
+            ..update(_db.doc('users/$uid'), {
+              here ? 'stats.matchesPlayed' : 'stats.noShows': FieldValue.increment(1),
+              'statsMatch': match.id,
+            });
+        }
+        return batch.commit();
+      });
+
   Future<void> _run(Future<void> Function() action) async {
     try {
       await action().timeout(const Duration(seconds: 10));

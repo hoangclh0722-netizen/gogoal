@@ -92,6 +92,29 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
     }
   }
 
+  Future<void> _attendance(Match match, List<Member> members) async {
+    final present = await showModalBottomSheet<Map<String, bool>>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: Colors.white,
+      builder: (_) => _AttendanceSheet(members: members),
+    );
+    if (present == null || !mounted) return;
+    try {
+      await ref.read(participantRepositoryProvider).takeAttendance(match: match, present: present);
+      if (!mounted) return;
+      final absent = present.values.where((v) => !v).length;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(absent == 0 ? 'Đã điểm danh, mọi người đều có mặt' : 'Đã điểm danh, $absent người vắng'),
+      ));
+    } on JoinException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Không điểm danh được, có thể đã quá 24 giờ hoặc đã điểm danh')));
+    }
+  }
+
   Future<void> _lock(Match match, int waiting) async {
     if (!match.locked) {
       final ok = await showDialog<bool>(
@@ -213,6 +236,14 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: _LockBar(match: match, onTap: () => _lock(match, requests.value?.length ?? 0)),
             ),
+          if (match.canTakeAttendance(DateTime.now()) || match.attendanceTakenAt != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: _AttendanceBar(
+                done: match.attendanceTakenAt != null,
+                onTap: () => _attendance(match, members),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: _Tabs(
@@ -325,6 +356,136 @@ class _Header extends StatelessWidget {
             style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.w500),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AttendanceBar extends StatelessWidget {
+  const _AttendanceBar({required this.done, required this.onTap});
+
+  final bool done;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+      decoration: BoxDecoration(
+        color: done ? const Color(0xFFF1F5F9) : const Color(0xFFFEF3C7),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Row(children: [
+        Icon(done ? Icons.fact_check_outlined : Icons.how_to_reg_outlined,
+            color: done ? AppColors.ink : const Color(0xFFB45309), size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(done ? 'Đã điểm danh' : 'Trận đã xong · điểm danh',
+                style: TextStyle(fontWeight: FontWeight.w700, color: done ? AppColors.ink : const Color(0xFF92400E))),
+            Text(done ? 'Số trận và lần vắng đã được cộng vào uy tín' : 'Trong 24 giờ, đánh dấu ai vắng để tính uy tín',
+                style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+          ]),
+        ),
+        if (!done) FilledButton(onPressed: onTap, child: const Text('Điểm danh')),
+      ]),
+    );
+  }
+}
+
+/// Mặc định ai cũng có mặt, bấm để đổi sang vắng. Trả về uid → có mặt.
+class _AttendanceSheet extends StatefulWidget {
+  const _AttendanceSheet({required this.members});
+
+  final List<Member> members;
+
+  @override
+  State<_AttendanceSheet> createState() => _AttendanceSheetState();
+}
+
+class _AttendanceSheetState extends State<_AttendanceSheet> {
+  late final Map<String, bool> _present = {for (final m in widget.members) m.uid: true};
+
+  Future<void> _confirm() async {
+    final absent = _present.values.where((v) => !v).length;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xác nhận điểm danh?', textAlign: TextAlign.center),
+        content: Text(
+          absent == 0
+              ? 'Mọi người đều có mặt. Điểm danh xong không sửa lại được.'
+              : '$absent người bị tính vắng, uy tín của họ sẽ giảm. Điểm danh xong không sửa lại được.',
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          Row(spacing: 10, children: [
+            Expanded(child: OutlinedButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Xem lại'))),
+            Expanded(child: FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Xác nhận'))),
+          ]),
+        ],
+      ),
+    );
+    if (ok == true && mounted) Navigator.of(context).pop(_present);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Điểm danh', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            const Text('Bấm vào người vắng mặt. Người không bị đánh dấu được tính có mặt.',
+                style: TextStyle(color: AppColors.muted)),
+            const SizedBox(height: 12),
+            if (widget.members.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Text('Kèo không có thành viên nào qua app, chỉ cộng một trận cho bạn.',
+                    style: TextStyle(color: AppColors.muted)),
+              ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final m in widget.members)
+                    Semantics(
+                      button: true,
+                      selected: _present[m.uid]!,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: ProfileAvatar(photoUrl: m.avatarUrl, name: m.displayName, radius: 20),
+                        title: Text(m.displayName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        trailing: _present[m.uid]!
+                            ? const Chip(
+                                label: Text('Có mặt'),
+                                backgroundColor: AppColors.primarySoft,
+                                labelStyle: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w700),
+                              )
+                            : const Chip(
+                                label: Text('Vắng'),
+                                backgroundColor: Color(0xFFFEE2E2),
+                                labelStyle: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700),
+                              ),
+                        onTap: () => setState(() => _present[m.uid] = !_present[m.uid]!),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+              onPressed: _confirm,
+              child: const Text('Xác nhận điểm danh'),
+            ),
+          ],
+        ),
       ),
     );
   }

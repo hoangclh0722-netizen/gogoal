@@ -51,6 +51,7 @@ class Match {
     this.locked = false,
     this.joinDeadline,
     int? slotsMin,
+    this.attendanceTakenAt,
   }) : slotsMin = slotsMin ?? slotsNeeded;
 
   final String id;
@@ -98,6 +99,16 @@ class Match {
     return cutoff.difference(now) < warnBefore ? MatchHealth.atRisk : MatchHealth.recruiting;
   }
 
+  /// Thời điểm chủ kèo điểm danh; null là chưa điểm danh.
+  final DateTime? attendanceTakenAt;
+
+  /// BR09: chủ kèo điểm danh trong 24 giờ sau giờ kết thúc, một lần.
+  bool canTakeAttendance(DateTime now) =>
+      status == MatchStatus.active &&
+      attendanceTakenAt == null &&
+      now.isAfter(endAt) &&
+      now.isBefore(endAt.add(const Duration(hours: 24)));
+
   bool deadlinePassed(DateTime now) => joinDeadline != null && !now.isBefore(joinDeadline!);
 
   int get slotsLeft => slotsNeeded - slotsFilled;
@@ -115,9 +126,10 @@ class Match {
     required DateTime now,
   }) {
     if (status == MatchStatus.cancelled) return const MatchCancelled();
-    if (!startAt.isAfter(now)) return const MatchStarted();
+    // Chủ kèo và người đã trong kèo vẫn cần thao tác sau giờ đá (chat, điểm danh, đánh giá)
     if (hostId == uid) return const IsHost();
     if (myStatus != null) return AlreadyRequested(myStatus);
+    if (!startAt.isAfter(now)) return const MatchStarted();
     if (locked) return const MatchLocked();
     if (deadlinePassed(now)) return const DeadlinePassed();
     if (isFull) return const MatchFull();
