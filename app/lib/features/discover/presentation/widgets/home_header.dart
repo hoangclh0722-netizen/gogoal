@@ -14,11 +14,13 @@ class HomeHeader extends ConsumerWidget {
     required this.onNotifications,
     required this.onLogin,
     required this.onFilter,
+    this.searchFocus,
   });
 
   final VoidCallback onNotifications;
   final VoidCallback onLogin;
   final VoidCallback onFilter;
+  final FocusNode? searchFocus;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -103,6 +105,7 @@ class HomeHeader extends ConsumerWidget {
                 child: SizedBox(
                   height: 48,
                   child: TextField(
+                    focusNode: searchFocus,
                     onChanged: ref.read(filterProvider.notifier).setQuery,
                     textInputAction: TextInputAction.search,
                     decoration: const InputDecoration(
@@ -146,6 +149,98 @@ class HomeHeader extends ConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Thanh mảnh dính trên cùng khi đã lướt qua header: logo (về đầu trang), ô tìm kiếm, chuông.
+class HomeCompactBar extends ConsumerWidget {
+  const HomeCompactBar({super.key, required this.onTop, required this.onSearch, required this.onNotifications, required this.onLogin});
+
+  final VoidCallback onTop;
+  final VoidCallback onSearch;
+  final VoidCallback onNotifications;
+  final VoidCallback onLogin;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final signedIn = ref.watch(signedInProvider);
+    final unread = ref.watch(unreadCountProvider).value ?? 0;
+    final query = ref.watch(filterProvider.select((f) => f.query));
+
+    return Material(
+      color: AppColors.primaryDark,
+      elevation: 3,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(8, MediaQuery.paddingOf(context).top + 4, 8, 8),
+        child: Row(
+          children: [
+            Semantics(
+              button: true,
+              label: 'Về đầu trang',
+              excludeSemantics: true,
+              child: InkWell(
+                onTap: onTop,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                child: const SizedBox(
+                  height: 48,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: Center(child: LogoWordmark(size: 18)),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Semantics(
+                button: true,
+                label: 'Tìm kèo',
+                excludeSemantics: true,
+                child: InkWell(
+                  onTap: onSearch,
+                  borderRadius: BorderRadius.circular(24),
+                  child: Container(
+                    height: 40,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+                    child: Row(children: [
+                      const Icon(Icons.search, color: AppColors.muted, size: 20),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          query.isEmpty ? 'Tìm theo sân, quận…' : query,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 14, color: query.isEmpty ? AppColors.muted : AppColors.ink),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            if (signedIn)
+              IconButton(
+                tooltip: 'Thông báo',
+                onPressed: onNotifications,
+                icon: Badge(
+                  isLabelVisible: unread > 0,
+                  label: Text(unread > 9 ? '9+' : '$unread'),
+                  backgroundColor: AppColors.accentDark,
+                  child: const Icon(Icons.notifications_none, color: Colors.white),
+                ),
+              )
+            else
+              TextButton(
+                onPressed: onLogin,
+                style: TextButton.styleFrom(foregroundColor: Colors.white),
+                child: const Text('Đăng nhập', style: TextStyle(fontWeight: FontWeight.w700)),
+              ),
+          ],
+        ),
       ),
     );
   }

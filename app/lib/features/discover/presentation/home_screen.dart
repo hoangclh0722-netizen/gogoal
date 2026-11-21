@@ -13,8 +13,45 @@ import 'widgets/home_states.dart';
 import 'widgets/match_card.dart';
 import 'widgets/match_skeleton.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  // Lướt quá phần header xanh (logo, vị trí, ô tìm kiếm) thì hiện thanh thu gọn
+  static const _compactAfter = 150.0;
+  final _scroll = ScrollController();
+  final _searchFocus = FocusNode();
+  bool _compact = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(() {
+      final compact = _scroll.offset > _compactAfter;
+      if (compact != _compact) setState(() => _compact = compact);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    _searchFocus.dispose();
+    super.dispose();
+  }
+
+  Future<void> _toTop() async {
+    if (!_scroll.hasClients) return;
+    await _scroll.animateTo(0, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+  }
+
+  Future<void> _search() async {
+    await _toTop();
+    if (mounted) _searchFocus.requestFocus();
+  }
 
   void _toast(BuildContext context, String message) {
     ScaffoldMessenger.of(context)
@@ -23,7 +60,10 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _openLocked(BuildContext context, WidgetRef ref, String title) {
-    if (title == 'Khám phá') return;
+    if (title == 'Khám phá') {
+      _toTop();
+      return;
+    }
     if (title == 'Hồ sơ') {
       requireLogin(context, ref, () => context.go(Routes.profile));
     } else if (title == 'Thông báo') {
@@ -38,7 +78,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final matches = ref.watch(visibleMatchesProvider);
     final location = ref.watch(locationProvider);
     final filter = ref.watch(filterProvider);
@@ -48,10 +88,13 @@ class HomeScreen extends ConsumerWidget {
       bottomNavigationBar: HomeBottomNav(
         onTap: (title) => _openLocked(context, ref, title),
       ),
-      body: RefreshIndicator(
+      body: Stack(
+        children: [
+          RefreshIndicator(
         onRefresh: () async => ref.refresh(loadedMatchesProvider.future),
         edgeOffset: 120,
         child: CustomScrollView(
+          controller: _scroll,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
@@ -59,6 +102,7 @@ class HomeScreen extends ConsumerWidget {
                 onNotifications: () => _openLocked(context, ref, 'Thông báo'),
                 onLogin: () => context.push(Routes.login),
                 onFilter: () => _toast(context, 'Bộ lọc nâng cao sẽ có ở bước sau'),
+                searchFocus: _searchFocus,
               ),
             ),
             const SliverToBoxAdapter(child: HomeFilters()),
@@ -129,8 +173,29 @@ class HomeScreen extends ConsumerWidget {
                 ];
               },
             ),
-          ],
+                    ],
         ),
+      ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              ignoring: !_compact,
+              child: AnimatedSlide(
+                offset: _compact ? Offset.zero : const Offset(0, -1),
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                child: HomeCompactBar(
+                  onTop: _toTop,
+                  onSearch: _search,
+                  onNotifications: () => _openLocked(context, ref, 'Thông báo'),
+                  onLogin: () => context.push(Routes.login),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

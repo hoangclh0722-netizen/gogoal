@@ -29,11 +29,14 @@ Thẻ kèo: môn + tên, khoảng cách, giờ + quận, trình độ, tiền/ng
 | Từ chối vị trí | Thanh nhắc trên danh sách | [Bật vị trí] |
 | Hết danh sách | "Bạn đã xem hết" | – |
 
+## Header thu gọn khi lướt
+
+Lướt xuống quá phần header xanh thì một thanh mảnh trượt xuống, dính trên cùng:
+- Logo GoGoal: bấm thì cuộn về đầu trang. Bấm tab Khám phá khi đang ở Khám phá cũng cuộn về đầu.
+- Ô tìm kiếm thu nhỏ (hiện chữ đang tìm nếu có): bấm thì cuộn về đầu và mở bàn phím ở ô tìm kiếm thật.
+- Chuông thông báo kèm số chưa đọc (khách thấy nút Đăng nhập).
+Lướt ngược lên đầu thì thanh trượt đi, header lớn hiện lại.
+
 ## Để sau
 
-- **Header thu gọn khi lướt:** lướt xuống danh sách thì header xanh co lại thành một thanh mảnh dính trên cùng, luôn thấy:
-  - Logo GoGoal: bấm thì cuộn về đầu trang (ở tab khác thì về Khám phá).
-  - Ô tìm kiếm thu nhỏ (hoặc icon kính lúp, bấm thì mở ô tìm).
-  - Chuông thông báo kèm số chưa đọc.
-  - Lướt ngược lên thì header mở rộng lại như cũ. Làm bằng `SliverAppBar` (pinned + floating) để không phải tự tính vị trí cuộn.
-  - Cân nhắc giữ luôn hàng chip môn dưới thanh mảnh để đổi môn nhanh, nếu không làm thanh quá dày.
+- Giữ hàng chip môn dưới thanh thu gọn để đổi môn nhanh, nếu không làm thanh quá dày.
