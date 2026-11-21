@@ -38,11 +38,15 @@ The project is built in vertical slices: each feature goes through UX, UI, datab
 - [x] Email and Google sign-in with Firebase Auth (Auth Emulator in development)
 - [x] Profile setup (display name, district, sports and skill levels) and profile screen
 - [x] Password reset by email link
+- [x] Game details, join requests (manual approval or instant join), leave or cancel a request
+- [x] Create and edit games: format, slots, minimum players, join deadline, venue, level range, cost per person
+- [x] Host tools: approve, reject or remove members, lock the game, cancel with a reason
+- [x] My games: upcoming and past games, watched games, game health labels
+- [x] Same-time suggestions when a game might fall through, reminder to free an overlapping slot
+- [x] In-app notifications and local reminders before kick-off and the join deadline
+- [x] Brand identity: app icon, splash screen, Noto sport icons
 - [ ] Facebook sign-in
-- [ ] Bank account setup for paid games
-- [ ] Game details, create game, join and approve requests
-- [ ] VietQR payment code for approved members
-- [ ] My games and in-app notifications
+- [ ] ~~Bank account and VietQR payment~~ (paused: players settle costs themselves)
 
 **Phase 2**
 
