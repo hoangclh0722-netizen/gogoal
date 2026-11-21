@@ -78,7 +78,7 @@ class _Item extends StatelessWidget {
           Text(
             label,
             maxLines: 1,
-            style: TextStyle(fontSize: 11, fontWeight: active ? FontWeight.w700 : FontWeight.w500, color: color),
+            style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.w700 : FontWeight.w500, color: color),
           ),
         ],
       ),
@@ -99,8 +99,9 @@ class _CreateButton extends StatelessWidget {
       children: [
         Positioned(
           top: -18,
-          child: GestureDetector(
+          child: InkWell(
             onTap: onTap,
+            customBorder: const StadiumBorder(),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -108,12 +109,12 @@ class _CreateButton extends StatelessWidget {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: AppColors.accent,
+                    color: AppColors.accentDark,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 4),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.accent.withValues(alpha: 0.4),
+                        color: AppColors.accentDark.withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -123,7 +124,7 @@ class _CreateButton extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 const Text('Tạo kèo',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.muted)),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.muted)),
               ],
             ),
           ),

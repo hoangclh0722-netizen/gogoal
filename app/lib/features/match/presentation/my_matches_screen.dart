@@ -161,10 +161,14 @@ class _Segment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: GestureDetector(
+      child: Semantics(
+        button: true,
+        selected: selected,
+        child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(9),
         child: Container(
-          height: 38,
+          height: 44,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Colors.white : Colors.transparent,
@@ -177,6 +181,7 @@ class _Segment extends StatelessWidget {
                 color: selected ? AppColors.primaryDark : Colors.white,
               )),
         ),
+      ),
       ),
     );
   }

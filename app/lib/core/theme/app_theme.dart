@@ -6,8 +6,8 @@ import 'app_colors.dart';
 ThemeData buildAppTheme() {
   final scheme = ColorScheme.fromSeed(
     seedColor: AppColors.primary,
-    primary: AppColors.primary,
-    secondary: AppColors.accent,
+    primary: AppColors.primaryDark,
+    secondary: AppColors.accentDark,
     surface: AppColors.surface,
     error: AppColors.danger,
   );
@@ -17,7 +17,7 @@ ThemeData buildAppTheme() {
   );
   final inputBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(AppRadius.md),
-    borderSide: const BorderSide(color: AppColors.border),
+    borderSide: const BorderSide(color: AppColors.outline),
   );
 
   return ThemeData(
@@ -33,7 +33,7 @@ ThemeData buildAppTheme() {
       border: inputBorder,
       enabledBorder: inputBorder,
       focusedBorder: inputBorder.copyWith(
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        borderSide: const BorderSide(color: AppColors.primaryDark, width: 1.5),
       ),
       errorBorder: inputBorder.copyWith(borderSide: const BorderSide(color: AppColors.danger)),
       focusedErrorBorder:

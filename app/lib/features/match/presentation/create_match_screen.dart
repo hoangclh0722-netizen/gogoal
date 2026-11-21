@@ -342,7 +342,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
         children: [
           _Section(title: 'Môn & thể thức', children: [
             const _Label('Môn'),
-            Wrap(spacing: 8, runSpacing: 8, children: [
+            Wrap(spacing: 8, children: [
               for (final s in Sport.all)
                 if (!_editing || s.id == _sportId)
                   _Chip(label: s.displayName, color: s.color, selected: s.id == _sportId, onTap: () => _pickSport(s.id)),
@@ -350,7 +350,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
             if (_editing)
               const Text('Không đổi môn khi sửa kèo', style: TextStyle(fontSize: 12, color: AppColors.muted)),
             const _Label('Thể thức'),
-            Wrap(spacing: 8, runSpacing: 8, children: [
+            Wrap(spacing: 8, children: [
               for (final f in _formatOptions)
                 _Chip(
                   label: '${f.label} · ${f.players} người',
@@ -424,7 +424,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
             if (timeError != null)
               Text(timeError, style: const TextStyle(fontSize: 13, color: AppColors.danger, fontWeight: FontWeight.w500)),
             const _Label('Thời lượng'),
-            Wrap(spacing: 8, runSpacing: 8, children: [
+            Wrap(spacing: 8, children: [
               for (final d in ({..._durations, _duration}.toList()..sort()))
                 _Chip(
                   label: '${d % 60 == 0 ? d ~/ 60 : (d / 60).toString().replaceAll('.', ',')} giờ',
@@ -434,7 +434,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
             ]),
             Text('Kết thúc lúc ${formatHm(end)}', style: const TextStyle(fontSize: 13, color: AppColors.muted)),
             const _Label('Hạn chốt người'),
-            Wrap(spacing: 8, runSpacing: 8, children: [
+            Wrap(spacing: 8, children: [
               for (final (mode, label) in [
                 (_Deadline.twoHours, '2 giờ trước'),
                 (_Deadline.evening, 'Tối hôm trước'),
@@ -602,16 +602,21 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = color ?? AppColors.primary;
-    return InkWell(
+    final accent = color ?? AppColors.primaryDark;
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(99),
-      child: Container(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: selected && color == null ? AppColors.primarySoft : Colors.white,
           borderRadius: BorderRadius.circular(99),
-          border: Border.all(color: selected ? accent : AppColors.border, width: selected ? 2 : 1),
+          border: Border.all(color: selected ? accent : AppColors.outline, width: selected ? 2 : 1),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           if (color != null) ...[CircleAvatar(radius: 4, backgroundColor: color), const SizedBox(width: 6)],
@@ -622,6 +627,8 @@ class _Chip extends StatelessWidget {
                 color: selected && color == null ? AppColors.primaryDark : AppColors.ink,
               )),
         ]),
+      ),
+      ),
       ),
     );
   }
@@ -643,12 +650,12 @@ class _Stepper extends StatelessWidget {
         border: Border.all(color: AppColors.border),
       ),
       child: Row(children: [
-        IconButton(onPressed: onMinus, icon: const Icon(Icons.remove), color: AppColors.primaryDark),
+        IconButton(onPressed: onMinus, tooltip: 'Bớt', icon: const Icon(Icons.remove), color: AppColors.primaryDark),
         SizedBox(
           width: 28,
           child: Text('$value', textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
         ),
-        IconButton(onPressed: onPlus, icon: const Icon(Icons.add), color: AppColors.primaryDark),
+        IconButton(onPressed: onPlus, tooltip: 'Thêm', icon: const Icon(Icons.add), color: AppColors.primaryDark),
       ]),
     );
   }

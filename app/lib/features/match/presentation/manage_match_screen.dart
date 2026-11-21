@@ -286,6 +286,7 @@ class _Header extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.2),
                 shape: const CircleBorder(),
                 child: IconButton(
+                  tooltip: 'Quay lại',
                   onPressed: () => context.canPop() ? context.pop() : context.go(Routes.home),
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                 ),
@@ -300,7 +301,6 @@ class _Header extends StatelessWidget {
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    visualDensity: VisualDensity.compact,
                   ),
                   child: const Text('Sửa', style: TextStyle(fontWeight: FontWeight.w600)),
                 ),
@@ -312,7 +312,6 @@ class _Header extends StatelessWidget {
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    visualDensity: VisualDensity.compact,
                   ),
                   child: const Text('Hủy kèo', style: TextStyle(fontWeight: FontWeight.w600)),
                 ),
@@ -399,10 +398,14 @@ class _Tabs extends StatelessWidget {
         children: [
           for (var i = 0; i < 2; i++)
             Expanded(
-              child: GestureDetector(
+              child: Semantics(
+                button: true,
+                selected: i == index,
+                child: InkWell(
                 onTap: () => onChanged(i),
+                borderRadius: BorderRadius.circular(9),
                 child: Container(
-                  height: 38,
+                  height: 44,
                   decoration: BoxDecoration(
                     color: i == index ? Colors.white : Colors.transparent,
                     borderRadius: BorderRadius.circular(9),
@@ -419,7 +422,7 @@ class _Tabs extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                         decoration: BoxDecoration(
-                          color: i == index ? AppColors.accent : const Color(0xFFCBD5E1),
+                          color: i == index ? AppColors.accentDark : AppColors.muted,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text('${counts[i]}',
@@ -428,6 +431,7 @@ class _Tabs extends StatelessWidget {
                     ],
                   ),
                 ),
+              ),
               ),
             ),
         ],
@@ -605,7 +609,7 @@ class _MemberTile extends StatelessWidget {
         if (onRemove != null)
           TextButton(
             onPressed: onRemove,
-            style: TextButton.styleFrom(foregroundColor: AppColors.danger, visualDensity: VisualDensity.compact),
+            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
             child: const Text('Mời ra', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
       ],

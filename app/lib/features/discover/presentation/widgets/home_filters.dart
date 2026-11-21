@@ -32,8 +32,8 @@ class HomeFilters extends ConsumerWidget {
             children: [
               _SportChip(
                 label: 'Tất cả',
-                icon: Icon(Icons.apps, color: filter.sportId == null ? Colors.white : AppColors.primary, size: 24),
-                color: AppColors.primary,
+                icon: Icon(Icons.apps, color: filter.sportId == null ? Colors.white : AppColors.primaryDark, size: 24),
+                color: AppColors.primaryDark,
                 selected: filter.sportId == null,
                 onTap: () => controller.setSport(null),
               ),
@@ -50,7 +50,7 @@ class HomeFilters extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 36,
+          height: 48,
           child: ListView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -135,16 +135,21 @@ class _TimeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
-      child: Container(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: selected ? AppColors.primarySoft : Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: selected ? AppColors.primary : AppColors.border),
+          border: Border.all(color: selected ? AppColors.primaryDark : AppColors.outline),
         ),
         child: Text(
           label,
@@ -154,6 +159,8 @@ class _TimeChip extends StatelessWidget {
             color: selected ? AppColors.primaryDark : AppColors.muted,
           ),
         ),
+      ),
+      ),
       ),
     );
   }

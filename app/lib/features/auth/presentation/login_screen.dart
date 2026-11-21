@@ -93,6 +93,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               decoration: InputDecoration(
                 hintText: 'Mật khẩu',
                 suffixIcon: IconButton(
+                  tooltip: _hidePassword ? 'Hiện mật khẩu' : 'Ẩn mật khẩu',
                   onPressed: () => setState(() => _hidePassword = !_hidePassword),
                   icon: Icon(
                     _hidePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -118,10 +119,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text('Chưa có tài khoản?', style: TextStyle(color: AppColors.muted)),
-                GestureDetector(
+                InkWell(
                   onTap: _openRegister,
+                  borderRadius: BorderRadius.circular(8),
                   child: const Padding(
-                    padding: EdgeInsets.all(6),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
                     child: Text('Đăng ký',
                         style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w700)),
                   ),

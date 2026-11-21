@@ -32,7 +32,7 @@ class AppButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           minimumSize: size,
           foregroundColor: AppColors.primaryDark,
-          side: const BorderSide(color: AppColors.primary, width: 1.5),
+          side: const BorderSide(color: AppColors.primaryDark, width: 1.5),
           shape: shape,
           textStyle: textStyle,
         ),
@@ -43,7 +43,7 @@ class AppButton extends StatelessWidget {
       onPressed: onPressed,
       style: FilledButton.styleFrom(
         minimumSize: size,
-        backgroundColor: kind == AppButtonKind.accent ? AppColors.accent : AppColors.primary,
+        backgroundColor: kind == AppButtonKind.accent ? AppColors.accentDark : AppColors.primaryDark,
         foregroundColor: Colors.white,
         disabledBackgroundColor: AppColors.border,
         disabledForegroundColor: AppColors.muted,

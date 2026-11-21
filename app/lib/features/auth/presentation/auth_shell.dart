@@ -13,7 +13,7 @@ class AuthShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.primaryDark,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -23,6 +23,7 @@ class AuthShell extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
+                    tooltip: 'Quay lại',
                     onPressed: () => Navigator.of(context).maybePop(),
                     icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
                   ),

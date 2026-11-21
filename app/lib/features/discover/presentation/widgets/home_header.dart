@@ -55,7 +55,7 @@ class HomeHeader extends ConsumerWidget {
                       child: Badge(
                         isLabelVisible: unread > 0,
                         label: Text(unread > 9 ? '9+' : '$unread'),
-                        backgroundColor: AppColors.accent,
+                        backgroundColor: AppColors.accentDark,
                         child: const Icon(Icons.notifications_none, color: Colors.white, size: 22),
                       ),
                     ),
@@ -127,7 +127,7 @@ class HomeHeader extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Material(
-                color: AppColors.primary,
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 child: InkWell(
                   onTap: onFilter,

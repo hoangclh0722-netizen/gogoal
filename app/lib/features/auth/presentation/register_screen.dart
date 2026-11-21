@@ -91,6 +91,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               decoration: InputDecoration(
                 hintText: 'Mật khẩu',
                 suffixIcon: IconButton(
+                  tooltip: _hidePassword ? 'Hiện mật khẩu' : 'Ẩn mật khẩu',
                   onPressed: () => setState(() => _hidePassword = !_hidePassword),
                   icon: Icon(
                     _hidePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -116,7 +117,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 children: [
                   Checkbox(
                     value: _agreed,
-                    activeColor: AppColors.primary,
+                    activeColor: AppColors.primaryDark,
                     onChanged: (v) => setState(() {
                       _agreed = v ?? false;
                       _showAgreeError = false;
@@ -142,10 +143,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text('Đã có tài khoản?', style: TextStyle(color: AppColors.muted)),
-                GestureDetector(
+                InkWell(
                   onTap: () => context.pop(),
+                  borderRadius: BorderRadius.circular(8),
                   child: const Padding(
-                    padding: EdgeInsets.all(6),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
                     child: Text('Đăng nhập',
                         style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w700)),
                   ),

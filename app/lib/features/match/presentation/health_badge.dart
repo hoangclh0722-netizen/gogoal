@@ -11,7 +11,7 @@ class HealthBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, bg, fg) = switch (health) {
-      MatchHealth.confirmed => ('Đã chốt', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
+      MatchHealth.confirmed => ('Đã chốt', const Color(0xFFDCFCE7), const Color(0xFF15803D)),
       MatchHealth.recruiting => ('Đang tìm người', const Color(0xFFFEF9C3), const Color(0xFFA16207)),
       MatchHealth.atRisk => ('Có nguy cơ bể', const Color(0xFFFFEDD5), const Color(0xFFC2410C)),
       MatchHealth.cancelled => ('Bể', const Color(0xFFFEE2E2), const Color(0xFFB91C1C)),

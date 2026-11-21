@@ -120,7 +120,6 @@ class _Detail extends ConsumerWidget {
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.primaryDark,
                             side: const BorderSide(color: AppColors.primaryDark, width: 1.5),
-                            visualDensity: VisualDensity.compact,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
                           ),
                         ),
@@ -225,6 +224,7 @@ class _Header extends ConsumerWidget {
                 color: Colors.white.withValues(alpha: 0.2),
                 shape: const CircleBorder(),
                 child: IconButton(
+                  tooltip: 'Quay lại',
                   onPressed: () => _back(context),
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                 ),
@@ -857,7 +857,7 @@ class _Message extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: IconButton(onPressed: () => _back(context), icon: const Icon(Icons.arrow_back)),
+            child: IconButton(tooltip: 'Quay lại', onPressed: () => _back(context), icon: const Icon(Icons.arrow_back)),
           ),
           Expanded(
             child: Center(

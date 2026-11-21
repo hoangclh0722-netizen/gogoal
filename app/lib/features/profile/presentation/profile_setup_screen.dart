@@ -127,7 +127,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 padding: const EdgeInsets.fromLTRB(4, 4, 16, 0),
                 child: Row(
                   children: [
-                    IconButton(onPressed: _back, icon: const Icon(Icons.arrow_back_ios_new, size: 20)),
+                    IconButton(onPressed: _back, tooltip: 'Quay lại', icon: const Icon(Icons.arrow_back_ios_new, size: 20)),
                     Text('Bước ${_step + 1}/2',
                         style: const TextStyle(color: AppColors.muted, fontWeight: FontWeight.w600)),
                   ],
@@ -321,10 +321,14 @@ class _LevelPicker extends StatelessWidget {
         children: [
           for (var i = 0; i < skillLevels.length; i++)
             Expanded(
-              child: GestureDetector(
+              child: Semantics(
+                button: true,
+                selected: value == i + 1,
+                child: InkWell(
                 onTap: () => onChanged(i + 1),
+                borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  height: 36,
+                  height: 44,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: value == i + 1 ? Colors.white : Colors.transparent,
@@ -340,6 +344,7 @@ class _LevelPicker extends StatelessWidget {
                     ),
                   ),
                 ),
+              ),
               ),
             ),
         ],
