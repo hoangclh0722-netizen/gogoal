@@ -51,8 +51,8 @@ The project is built in vertical slices: each feature goes through UX, UI, datab
 **Phase 2**
 
 - [ ] Map of nearby games
-- [ ] Game chat
-- [ ] Attendance, ratings and reputation score
+- [x] Game chat
+- [x] Attendance, ratings, reputation score and public player profiles
 - [ ] Reports and a minimal admin panel
 
 ## Tech stack
