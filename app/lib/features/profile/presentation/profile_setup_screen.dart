@@ -316,7 +316,7 @@ class _LevelPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: AppColors.neutralSoft, borderRadius: BorderRadius.circular(10)),
       child: Row(
         children: [
           for (var i = 0; i < skillLevels.length; i++)

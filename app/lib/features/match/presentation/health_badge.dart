@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format.dart';
 import '../domain/entities/match.dart';
 
@@ -11,10 +12,10 @@ class HealthBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, bg, fg) = switch (health) {
-      MatchHealth.confirmed => ('Đã chốt', const Color(0xFFDCFCE7), const Color(0xFF15803D)),
+      MatchHealth.confirmed => ('Đã chốt', AppColors.primarySoft, AppColors.primaryDark),
       MatchHealth.recruiting => ('Đang tìm người', const Color(0xFFFEF9C3), const Color(0xFFA16207)),
-      MatchHealth.atRisk => ('Có nguy cơ bể', const Color(0xFFFFEDD5), const Color(0xFFC2410C)),
-      MatchHealth.cancelled => ('Bể', const Color(0xFFFEE2E2), const Color(0xFFB91C1C)),
+      MatchHealth.atRisk => ('Có nguy cơ bể', AppColors.accentSoft, AppColors.accentDark),
+      MatchHealth.cancelled => ('Bể', AppColors.dangerSoft, AppColors.dangerInk),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),

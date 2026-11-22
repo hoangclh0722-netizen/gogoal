@@ -97,17 +97,17 @@ class LocationBanner extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFFEF3C7),
+        color: AppColors.warningSoft,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: const Color(0xFFFDE68A)),
+        border: Border.all(color: AppColors.warningBorder),
       ),
       child: Row(
         children: [
-          const Icon(Icons.location_off_outlined, size: 20, color: Color(0xFFB45309)),
+          const Icon(Icons.location_off_outlined, size: 20, color: AppColors.warningInk),
           const SizedBox(width: 8),
           const Expanded(
             child: Text('Bật vị trí để xem kèo gần bạn',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF78350F))),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.warningText)),
           ),
           TextButton(
             onPressed: onEnable,

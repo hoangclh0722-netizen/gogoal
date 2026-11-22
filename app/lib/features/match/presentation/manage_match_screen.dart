@@ -22,7 +22,7 @@ class ManageMatchScreen extends ConsumerStatefulWidget {
 }
 
 class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
-  int _tab = 0;
+  int? _tab;
   bool _asked = false;
 
   // Qua hạn chốt mà chưa đủ số tối thiểu thì hỏi chủ kèo một lần mỗi lần mở màn này
@@ -33,8 +33,8 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
       builder: (context) => AlertDialog(
         icon: const CircleAvatar(
           radius: 28,
-          backgroundColor: Color(0xFFFEF3C7),
-          child: Icon(Icons.error_outline, color: Color(0xFFB45309)),
+          backgroundColor: AppColors.warningSoft,
+          child: Icon(Icons.error_outline, color: AppColors.warningInk),
         ),
         title: const Text('Kèo chưa đủ người', textAlign: TextAlign.center),
         content: Text(
@@ -166,7 +166,7 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
       builder: (context) => AlertDialog(
         icon: const CircleAvatar(
           radius: 28,
-          backgroundColor: Color(0xFFFEE2E2),
+          backgroundColor: AppColors.dangerSoft,
           child: Icon(Icons.person_remove_outlined, color: AppColors.danger),
         ),
         title: Text('Mời ${member.displayName} ra khỏi kèo?', textAlign: TextAlign.center),
@@ -223,6 +223,9 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) => _askAfterDeadline(match));
     }
 
+    // Kèo đã bắt đầu thì không còn duyệt ai, mở sẵn tab thành viên
+    final tab = _tab ?? (editable ? 0 : 1);
+
     return Scaffold(
       body: Column(
         children: [
@@ -247,13 +250,13 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: _Tabs(
-              index: _tab,
+              index: tab,
               counts: [requests.value?.length ?? 0, members.length + 1],
               onChanged: (i) => setState(() => _tab = i),
             ),
           ),
           Expanded(
-            child: _tab == 0
+            child: tab == 0
                 ? requests.when(
                     loading: () => const Center(child: CircularProgressIndicator()),
                     error: (_, _) => const Center(child: Text('Không kết nối được, thử lại')),
@@ -373,17 +376,17 @@ class _AttendanceBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
       decoration: BoxDecoration(
-        color: done ? const Color(0xFFF1F5F9) : const Color(0xFFFEF3C7),
+        color: done ? AppColors.neutralSoft : AppColors.warningSoft,
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
       child: Row(children: [
         Icon(done ? Icons.fact_check_outlined : Icons.how_to_reg_outlined,
-            color: done ? AppColors.ink : const Color(0xFFB45309), size: 20),
+            color: done ? AppColors.ink : AppColors.warningInk, size: 20),
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(done ? 'Đã điểm danh' : 'Trận đã xong · điểm danh',
-                style: TextStyle(fontWeight: FontWeight.w700, color: done ? AppColors.ink : const Color(0xFF92400E))),
+                style: TextStyle(fontWeight: FontWeight.w700, color: done ? AppColors.ink : AppColors.warningText)),
             Text(done ? 'Số trận và lần vắng đã được cộng vào uy tín' : 'Trong 24 giờ, đánh dấu ai vắng để tính uy tín',
                 style: const TextStyle(fontSize: 12, color: AppColors.muted)),
           ]),
@@ -470,7 +473,7 @@ class _AttendanceSheetState extends State<_AttendanceSheet> {
                               )
                             : const Chip(
                                 label: Text('Vắng'),
-                                backgroundColor: Color(0xFFFEE2E2),
+                                backgroundColor: AppColors.dangerSoft,
                                 labelStyle: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700),
                               ),
                         onTap: () => setState(() => _present[m.uid] = !_present[m.uid]!),
@@ -504,7 +507,7 @@ class _LockBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
       decoration: BoxDecoration(
-        color: locked ? const Color(0xFFF1F5F9) : AppColors.primarySoft,
+        color: locked ? AppColors.neutralSoft : AppColors.primarySoft,
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
       child: Row(
@@ -812,11 +815,11 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = host ? const Color(0xFFB45309) : AppColors.primaryDark;
+    final fg = host ? AppColors.warningInk : AppColors.primaryDark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: host ? const Color(0xFFFEF3C7) : AppColors.primarySoft,
+        color: host ? AppColors.warningSoft : AppColors.primarySoft,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(

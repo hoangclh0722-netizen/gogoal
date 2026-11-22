@@ -13,6 +13,7 @@ import '../../auth/presentation/auth_flow.dart';
 import '../../discover/application/location_controller.dart';
 import '../../profile/application/profile_providers.dart';
 import '../../profile/presentation/profile_avatar.dart';
+import '../../rating/application/rating_providers.dart';
 import '../../sport/domain/sport.dart';
 import '../../sport/presentation/sport_style.dart';
 import '../application/match_providers.dart';
@@ -56,6 +57,19 @@ class MatchDetailScreen extends ConsumerWidget {
 
 void _back(BuildContext context) => context.canPop() ? context.pop() : context.go(Routes.home);
 
+// Còn ít nhất một người có mặt mà mình chưa chấm (mình cũng phải có mặt)
+bool _hasOneToRate(WidgetRef ref, Match match, String uid) {
+  final members = ref.watch(membersProvider(match.id)).value;
+  final rated = ref.watch(ratedByProvider((matchId: match.id, uid: uid))).value;
+  if (members == null || rated == null) return false;
+  if (uid != match.hostId && !members.any((m) => m.uid == uid && m.attended == true)) return false;
+  return [
+    if (match.hostId != uid) match.hostId,
+    for (final m in members)
+      if (m.uid != uid && m.attended == true) m.uid,
+  ].any((u) => !rated.contains(u));
+}
+
 class _Detail extends ConsumerWidget {
   const _Detail({required this.match});
 
@@ -86,7 +100,7 @@ class _Detail extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFEE2E2),
+                          color: AppColors.dangerSoft,
                           borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
                         child: const Text('Kèo đã bị hủy',
@@ -348,17 +362,17 @@ class _OverlapBanner extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF3C7),
+                color: AppColors.warningSoft,
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Row(children: [
-                const Icon(Icons.event_repeat_rounded, color: Color(0xFFB45309)),
+                const Icon(Icons.event_repeat_rounded, color: AppColors.warningInk),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Bạn còn ${o.role == MyRole.pending ? 'đang chờ duyệt ở' : 'ở'} “${o.match.title}” cùng giờ. '
                     'Nhường chỗ cho người khác nhé?',
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF92400E), height: 1.35),
+                    style: const TextStyle(fontSize: 13, color: AppColors.warningText, height: 1.35),
                   ),
                 ),
                 TextButton(
@@ -614,7 +628,7 @@ class _MemberRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = isHost ? const Color(0xFFB45309) : AppColors.primaryDark;
+    final fg = isHost ? AppColors.warningInk : AppColors.primaryDark;
     return InkWell(
       onTap: () => context.push(Routes.user(uid)),
       child: Padding(
@@ -630,7 +644,7 @@ class _MemberRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: isHost ? const Color(0xFFFEF3C7) : AppColors.primarySoft,
+                color: isHost ? AppColors.warningSoft : AppColors.primarySoft,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -664,7 +678,7 @@ class _ActionBar extends ConsumerWidget {
       builder: (context) => AlertDialog(
         icon: CircleAvatar(
           radius: 28,
-          backgroundColor: const Color(0xFFFEE2E2),
+          backgroundColor: AppColors.dangerSoft,
           child: Icon(pending ? Icons.cancel_outlined : Icons.logout, color: AppColors.danger),
         ),
         title: Text(pending ? 'Hủy yêu cầu tham gia?' : 'Rời khỏi kèo này?', textAlign: TextAlign.center),
@@ -835,13 +849,16 @@ class _ActionBar extends ConsumerWidget {
     // Sau trận (đã điểm danh, trong 48 giờ) chủ kèo và thành viên được mời đánh giá đồng đội
     final inMatch = eligibility is IsHost ||
         (eligibility is AlreadyRequested && eligibility.status == ParticipantStatus.approved);
-    if (inMatch && match.canRate(DateTime.now())) {
+    if (inMatch && user != null && match.canRate(DateTime.now()) && _hasOneToRate(ref, match, user.uid)) {
       final rest = main;
       main = Column(spacing: 10, children: [
         AppButton(
           label: 'GG! Đánh giá đồng đội',
           kind: AppButtonKind.accent,
-          onPressed: () => context.push(Routes.rate(match.id)),
+          onPressed: () async {
+            await context.push(Routes.rate(match.id));
+            ref.invalidate(ratedByProvider((matchId: match.id, uid: user.uid)));
+          },
         ),
         ?rest,
       ]);

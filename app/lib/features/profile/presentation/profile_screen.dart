@@ -29,7 +29,7 @@ class ProfileScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         icon: const CircleAvatar(
           radius: 28,
-          backgroundColor: Color(0xFFFEE2E2),
+          backgroundColor: AppColors.dangerSoft,
           child: Icon(Icons.logout, color: AppColors.danger),
         ),
         title: const Text('Đăng xuất khỏi GoGoal?', textAlign: TextAlign.center),
@@ -178,16 +178,16 @@ class _VerifyBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFFEF3C7),
+        color: AppColors.warningSoft,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.warning),
       ),
       child: Row(
         children: [
-          const Icon(Icons.mail_outline, color: Color(0xFFB45309), size: 20),
+          const Icon(Icons.mail_outline, color: AppColors.warningInk, size: 20),
           const SizedBox(width: 10),
           const Expanded(
-            child: Text('Chưa xác minh email', style: TextStyle(color: Color(0xFF92400E), fontWeight: FontWeight.w500)),
+            child: Text('Chưa xác minh email', style: TextStyle(color: AppColors.warningText, fontWeight: FontWeight.w500)),
           ),
           TextButton(
             onPressed: onResend,

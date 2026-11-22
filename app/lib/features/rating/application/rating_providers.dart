@@ -9,3 +9,7 @@ final ratingRepositoryProvider = Provider<RatingRepository>((ref) => FirestoreRa
 final tagCountsProvider = FutureProvider.autoDispose.family<Map<RatingTag, int>, String>(
   (ref, uid) => ref.watch(ratingRepositoryProvider).tagCounts(uid),
 );
+
+final ratedByProvider = FutureProvider.autoDispose.family<Set<String>, ({String matchId, String uid})>(
+  (ref, key) => ref.watch(ratingRepositoryProvider).ratedBy(key.matchId, key.uid),
+);

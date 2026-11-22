@@ -202,12 +202,12 @@ class _MyMatchCard extends StatelessWidget {
     final health = m.health(now);
     final detail = healthDetail(m, now);
     final (label, bg, fg) = cancelled
-        ? ('Đã hủy', const Color(0xFFFEE2E2), const Color(0xFFB91C1C))
+        ? ('Đã hủy', AppColors.dangerSoft, AppColors.dangerInk)
         : switch (item.role) {
-            MyRole.host => ('Chủ kèo', const Color(0xFFFEF3C7), const Color(0xFFB45309)),
+            MyRole.host => ('Chủ kèo', AppColors.warningSoft, AppColors.warningInk),
             MyRole.approved => ('Đã vào', AppColors.primarySoft, AppColors.primaryDark),
-            MyRole.pending => ('Chờ duyệt', const Color(0xFFDBEAFE), const Color(0xFF1D4ED8)),
-            MyRole.watching => ('Theo dõi', const Color(0xFFF1F5F9), AppColors.muted),
+            MyRole.pending => ('Chờ duyệt', AppColors.infoSoft, AppColors.info),
+            MyRole.watching => ('Theo dõi', AppColors.neutralSoft, AppColors.muted),
           };
 
     return Opacity(

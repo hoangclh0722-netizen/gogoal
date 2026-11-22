@@ -110,8 +110,8 @@ class MatchCard extends StatelessWidget {
                             children: [
                               _Pill(
                                 formatLevelRange(match.levelMin, match.levelMax),
-                                background: const Color(0xFFDBEAFE),
-                                foreground: const Color(0xFF1D4ED8),
+                                background: AppColors.infoSoft,
+                                foreground: AppColors.info,
                               ),
                               _Pill(
                                 match.locked
@@ -127,8 +127,8 @@ class MatchCard extends StatelessWidget {
                               if (match.health(DateTime.now()) == MatchHealth.atRisk && !expired)
                                 const _Pill(
                                   'Có nguy cơ bể',
-                                  background: Color(0xFFFFEDD5),
-                                  foreground: Color(0xFFC2410C),
+                                  background: AppColors.accentSoft,
+                                  foreground: AppColors.accentDark,
                                 ),
                             ],
                           ),
