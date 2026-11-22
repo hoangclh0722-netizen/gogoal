@@ -102,9 +102,9 @@ class ProfileScreen extends ConsumerWidget {
                       }),
                       const SizedBox(height: 10),
                     ],
-                    _ReputationCard(profile: p),
+                    ReputationCard(profile: p),
                     const SizedBox(height: 10),
-                    _SportsCard(sports: p.sports),
+                    SportsCard(sports: p.sports),
                     const SizedBox(height: 10),
                     AppButton(
                       label: 'Sửa hồ sơ',
@@ -199,8 +199,8 @@ class _VerifyBanner extends StatelessWidget {
   }
 }
 
-class _Card extends StatelessWidget {
-  const _Card({required this.children});
+class ProfileCard extends StatelessWidget {
+  const ProfileCard({super.key, required this.children});
 
   final List<Widget> children;
 
@@ -218,15 +218,15 @@ class _Card extends StatelessWidget {
   }
 }
 
-class _ReputationCard extends StatelessWidget {
-  const _ReputationCard({required this.profile});
+class ReputationCard extends StatelessWidget {
+  const ReputationCard({super.key, required this.profile});
 
   final UserProfile profile;
 
   @override
   Widget build(BuildContext context) {
     final rep = profile.reputation;
-    return _Card(
+    return ProfileCard(
       children: [
         Row(
           children: [
@@ -240,6 +240,24 @@ class _ReputationCard extends StatelessWidget {
                 )),
           ],
         ),
+        if (profile.reliability case final r?) ...[
+          const SizedBox(height: 8),
+          Row(children: [
+            const Expanded(child: Text('Độ tin cậy', style: TextStyle(color: AppColors.muted))),
+            Text('${(r * 100).round()}% có mặt',
+                style: TextStyle(fontWeight: FontWeight.w700, color: r >= 0.9 ? AppColors.primaryDark : AppColors.ink)),
+          ]),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: r,
+              minHeight: 6,
+              color: AppColors.primaryDark,
+              backgroundColor: AppColors.background,
+            ),
+          ),
+        ],
         const SizedBox(height: 10),
         Row(
           children: [
@@ -278,14 +296,14 @@ class _Stat extends StatelessWidget {
   }
 }
 
-class _SportsCard extends StatelessWidget {
-  const _SportsCard({required this.sports});
+class SportsCard extends StatelessWidget {
+  const SportsCard({super.key, required this.sports});
 
   final Map<String, int> sports;
 
   @override
   Widget build(BuildContext context) {
-    return _Card(
+    return ProfileCard(
       children: [
         const Text('Môn chơi', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
         for (final s in Sport.all.where((s) => sports.containsKey(s.id))) ...[

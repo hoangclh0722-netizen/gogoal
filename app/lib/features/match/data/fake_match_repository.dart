@@ -52,6 +52,9 @@ class FakeMatchRepository implements MatchRepository {
       ];
 
   @override
+  Future<({int hosted, int cancelled})> hostedStats(String uid) async => (hosted: 0, cancelled: 0);
+
+  @override
   Future<List<VenueOption>> venues(String sportId) async => [
         for (final m in _seed().where((m) => m.sportId == sportId))
           VenueOption(id: m.id, venue: m.venue, geo: m.geo),

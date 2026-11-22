@@ -135,25 +135,29 @@ class _Detail extends ConsumerWidget {
                     _SameTime(match: match),
                     const SizedBox(height: 12),
                     _Card(children: [
-                      Row(
-                        children: [
-                          ProfileAvatar(photoUrl: match.host.avatarUrl, name: match.host.displayName, radius: 22),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(match.host.displayName,
-                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-                                const Text('Chủ kèo', style: TextStyle(fontSize: 12, color: AppColors.muted)),
-                              ],
+                      InkWell(
+                        onTap: () => requireLogin(context, ref, () => context.push(Routes.user(match.hostId))),
+                        child: Row(
+                          children: [
+                            ProfileAvatar(photoUrl: match.host.avatarUrl, name: match.host.displayName, radius: 22),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(match.host.displayName,
+                                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                                  const Text('Chủ kèo', style: TextStyle(fontSize: 12, color: AppColors.muted)),
+                                ],
+                              ),
                             ),
-                          ),
-                          const Icon(Icons.star_rounded, size: 18, color: AppColors.tennis),
-                          const SizedBox(width: 4),
-                          Text(match.host.rep.toStringAsFixed(1),
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
-                        ],
+                            const Icon(Icons.star_rounded, size: 18, color: AppColors.tennis),
+                            const SizedBox(width: 4),
+                            Text(match.host.rep.toStringAsFixed(1),
+                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                            const Icon(Icons.chevron_right, color: AppColors.muted),
+                          ],
+                        ),
                       ),
                     ]),
                     if (match.note != null) ...[
@@ -550,6 +554,7 @@ class _SlotsCard extends ConsumerWidget {
         ]),
       if (members != null) ...[
         _MemberRow(
+          uid: match.hostId,
           name: match.host.displayName,
           avatarUrl: match.host.avatarUrl,
           isMe: uid == match.hostId,
@@ -557,7 +562,13 @@ class _SlotsCard extends ConsumerWidget {
           isHost: true,
         ),
         for (final m in members)
-          _MemberRow(name: m.displayName, avatarUrl: m.avatarUrl, isMe: m.uid == uid, tag: skillLevels[m.level - 1]),
+          _MemberRow(
+            uid: m.uid,
+            name: m.displayName,
+            avatarUrl: m.avatarUrl,
+            isMe: m.uid == uid,
+            tag: skillLevels[m.level - 1],
+          ),
       ] else
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -586,6 +597,7 @@ class _SlotsCard extends ConsumerWidget {
 
 class _MemberRow extends StatelessWidget {
   const _MemberRow({
+    required this.uid,
     required this.name,
     required this.avatarUrl,
     required this.isMe,
@@ -593,6 +605,7 @@ class _MemberRow extends StatelessWidget {
     this.isHost = false,
   });
 
+  final String uid;
   final String name;
   final String? avatarUrl;
   final bool isMe;
@@ -602,29 +615,35 @@ class _MemberRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fg = isHost ? const Color(0xFFB45309) : AppColors.primaryDark;
-    return Row(
-      children: [
-        ProfileAvatar(photoUrl: avatarUrl, name: name, radius: 16),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(isMe ? '$name (bạn)' : name,
-              maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+    return InkWell(
+      onTap: () => context.push(Routes.user(uid)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          children: [
+            ProfileAvatar(photoUrl: avatarUrl, name: name, radius: 16),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(isMe ? '$name (bạn)' : name,
+                  maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: isHost ? const Color(0xFFFEF3C7) : AppColors.primarySoft,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isHost) ...[Icon(Icons.workspace_premium_outlined, size: 13, color: fg), const SizedBox(width: 3)],
+                  Text(tag, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg)),
+                ],
+              ),
+            ),
+          ],
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: isHost ? const Color(0xFFFEF3C7) : AppColors.primarySoft,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (isHost) ...[Icon(Icons.workspace_premium_outlined, size: 13, color: fg), const SizedBox(width: 3)],
-              Text(tag, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg)),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

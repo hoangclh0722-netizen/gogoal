@@ -32,6 +32,12 @@ class UserProfile {
     return raw.clamp(1, 5).toDouble();
   }
 
+  /// Tỉ lệ có mặt trong các trận đã điểm danh, null khi chưa có trận nào.
+  double? get reliability {
+    final total = matchesPlayed + noShows;
+    return total == 0 ? null : matchesPlayed / total;
+  }
+
   String get initials => initialsOf(displayName);
 
   UserProfile copyWith({String? displayName, String? district, Map<String, int>? sports}) => UserProfile(

@@ -21,6 +21,7 @@ import '../../features/profile/domain/user_profile.dart';
 import '../../features/rating/presentation/rate_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/profile/presentation/profile_setup_screen.dart';
+import '../../features/profile/presentation/public_profile_screen.dart';
 import '../widgets/coming_soon_screen.dart';
 
 abstract final class Routes {
@@ -41,6 +42,7 @@ abstract final class Routes {
   static String chat(String id) => '/match/$id/chat';
   static String rate(String id) => '/match/$id/rate';
   static String edit(String id) => '/match/$id/edit';
+  static String user(String uid) => '/user/$uid';
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -80,6 +82,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) => CreateMatchScreen(initial: state.extra as Match),
       ),
       GoRoute(path: Routes.profile, builder: (_, _) => const ProfileScreen()),
+      GoRoute(
+        path: '/user/:uid',
+        builder: (_, state) => PublicProfileScreen(uid: state.pathParameters['uid']!),
+      ),
       GoRoute(
         path: Routes.profileSetup,
         builder: (_, state) => ProfileSetupScreen(initial: state.extra as UserProfile?),

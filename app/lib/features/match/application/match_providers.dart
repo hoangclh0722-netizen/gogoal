@@ -69,3 +69,7 @@ final myParticipationProvider = StreamProvider.family<ParticipantStatus?, String
   if (user == null) return Stream.value(null);
   return ref.watch(participantRepositoryProvider).watchMyStatus(matchId, user.uid);
 });
+
+final hostedStatsProvider = FutureProvider.autoDispose.family<({int hosted, int cancelled}), String>(
+  (ref, uid) => ref.watch(matchRepositoryProvider).hostedStats(uid),
+);

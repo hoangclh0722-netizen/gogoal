@@ -276,6 +276,7 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
                           _MemberTile(name: '${match.host.displayName} (bạn)', avatarUrl: match.host.avatarUrl, tag: 'Chủ kèo', isHost: true),
                           for (final m in members)
                             _MemberTile(
+                              onTap: () => context.push(Routes.user(m.uid)),
                               name: m.displayName,
                               avatarUrl: m.avatarUrl,
                               tag: skillLevels[m.level - 1],
@@ -665,7 +666,14 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
     return _Card(children: [
       Row(
         children: [
-          ProfileAvatar(photoUrl: r.avatarUrl, name: r.displayName, radius: 22),
+          InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () => context.push(Routes.user(r.uid)),
+            child: Tooltip(
+              message: 'Xem hồ sơ',
+              child: ProfileAvatar(photoUrl: r.avatarUrl, name: r.displayName, radius: 22),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -748,23 +756,41 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
 }
 
 class _MemberTile extends StatelessWidget {
-  const _MemberTile({required this.name, required this.avatarUrl, required this.tag, this.isHost = false, this.onRemove});
+  const _MemberTile({
+    required this.name,
+    required this.avatarUrl,
+    required this.tag,
+    this.isHost = false,
+    this.onRemove,
+    this.onTap,
+  });
 
   final String name;
   final String? avatarUrl;
   final String tag;
   final bool isHost;
   final VoidCallback? onRemove;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        ProfileAvatar(photoUrl: avatarUrl, name: name, radius: 18),
-        const SizedBox(width: 10),
         Expanded(
-          child: Text(name,
-              maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(children: [
+                ProfileAvatar(photoUrl: avatarUrl, name: name, radius: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(name,
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+                ),
+              ]),
+            ),
+          ),
         ),
         _Tag(tag, host: isHost),
         if (onRemove != null)

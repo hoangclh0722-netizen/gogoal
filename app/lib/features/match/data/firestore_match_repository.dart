@@ -69,6 +69,17 @@ class FirestoreMatchRepository implements MatchRepository {
   }
 
   @override
+  Future<({int hosted, int cancelled})> hostedStats(String uid) async {
+    final mine = _db.collection('matches').where('hostId', isEqualTo: uid);
+    // Rules không cho đọc kèo bị ẩn nên phải lọc status ngay trong truy vấn
+    final [hosted, cancelled] = await Future.wait([
+      mine.where('status', whereIn: ['active', 'cancelled']).count().get(),
+      mine.where('status', isEqualTo: 'cancelled').count().get(),
+    ]);
+    return (hosted: hosted.count ?? 0, cancelled: cancelled.count ?? 0);
+  }
+
+  @override
   Future<List<MyMatch>> myMatches(String uid) async {
     final hosted = _db.collection('matches').where('hostId', isEqualTo: uid).get();
     final joined = _db.collectionGroup('participants').where('uid', isEqualTo: uid).get();

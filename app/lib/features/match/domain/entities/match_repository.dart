@@ -23,6 +23,9 @@ abstract interface class MatchRepository {
   /// Kèo cùng môn, bắt đầu lệch không quá 1 giờ, còn nhận người.
   Future<List<Match>> sameTime(Match match);
 
+  /// Số kèo đã tạo (không tính kèo bị ẩn) và số kèo đã hủy, để hiện ở hồ sơ công khai.
+  Future<({int hosted, int cancelled})> hostedStats(String uid);
+
   Future<List<VenueOption>> venues(String sportId);
 
   /// Id sinh trước để bấm "thử lại" sau khi mất mạng không tạo ra hai kèo.
