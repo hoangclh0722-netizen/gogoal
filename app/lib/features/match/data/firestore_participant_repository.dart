@@ -38,6 +38,7 @@ class FirestoreParticipantRepository implements ParticipantRepository {
               displayName: p['displayName'] as String,
               level: (p['level'] as num).toInt(),
               avatarUrl: p['avatarUrl'] as String?,
+              attended: p['attended'] as bool?,
             );
           }).toList());
 

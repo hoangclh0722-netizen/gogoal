@@ -813,6 +813,21 @@ class _ActionBar extends ConsumerWidget {
         );
     }
 
+    // Sau trận (đã điểm danh, trong 48 giờ) chủ kèo và thành viên được mời đánh giá đồng đội
+    final inMatch = eligibility is IsHost ||
+        (eligibility is AlreadyRequested && eligibility.status == ParticipantStatus.approved);
+    if (inMatch && match.canRate(DateTime.now())) {
+      final rest = main;
+      main = Column(spacing: 10, children: [
+        AppButton(
+          label: 'GG! Đánh giá đồng đội',
+          kind: AppButtonKind.accent,
+          onPressed: () => context.push(Routes.rate(match.id)),
+        ),
+        ?rest,
+      ]);
+    }
+
     return Container(
       padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + MediaQuery.of(context).padding.bottom),
       decoration: const BoxDecoration(

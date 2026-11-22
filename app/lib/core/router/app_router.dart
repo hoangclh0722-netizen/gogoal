@@ -18,6 +18,7 @@ import '../../features/notification/presentation/notifications_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/splash_screen.dart';
 import '../../features/profile/domain/user_profile.dart';
+import '../../features/rating/presentation/rate_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/profile/presentation/profile_setup_screen.dart';
 import '../widgets/coming_soon_screen.dart';
@@ -38,6 +39,7 @@ abstract final class Routes {
   static String match(String id) => '/match/$id';
   static String manage(String id) => '/match/$id/manage';
   static String chat(String id) => '/match/$id/chat';
+  static String rate(String id) => '/match/$id/rate';
   static String edit(String id) => '/match/$id/edit';
 }
 
@@ -60,6 +62,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/match/:id',
         builder: (_, state) => MatchDetailScreen(matchId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/match/:id/rate',
+        builder: (_, state) => RateScreen(matchId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/match/:id/chat',

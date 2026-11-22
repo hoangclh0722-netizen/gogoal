@@ -46,6 +46,23 @@ service cloud.firestore {
             && (getAfter(p).data.attended == true ? statInc('matchesPlayed') : statInc('noShows'))));
     }
 
+    // Có mặt trong kèo [m]: chủ kèo, hoặc thành viên được điểm danh có mặt
+    function presentIn(m, uid) {
+      return get(/databases/$(db)/documents/matches/$(m)).data.hostId == uid
+        || (exists(/databases/$(db)/documents/matches/$(m)/participants/$(uid))
+          && get(/databases/$(db)/documents/matches/$(m)/participants/$(uid)).data.get('attended', null) == true);
+    }
+
+    // Đánh giá (UC15): người chấm cộng sao cho người được chấm trong cùng batch tạo ratings/[rid]
+    function ratingStat(uid, rid) {
+      let r = getAfter(/databases/$(db)/documents/ratings/$(rid)).data;
+      return !exists(/databases/$(db)/documents/ratings/$(rid))
+        && r.fromUid == me() && r.toUid == uid
+        && request.resource.data.stats.diff(resource.data.stats).affectedKeys().hasOnly(['ratingSum', 'ratingCount'])
+        && request.resource.data.stats.ratingCount == resource.data.stats.get('ratingCount', 0) + 1
+        && request.resource.data.stats.ratingSum == resource.data.stats.get('ratingSum', 0) + r.stars;
+    }
+
     function joinShapeOk(p) {
       return p.keys().hasOnly(['uid', 'matchId', 'matchStartAt', 'displayName', 'avatarUrl', 'level', 'status',
                                'message', 'paid', 'paidConfirmed', 'attended', 'requestedAt', 'updatedAt'])
@@ -79,6 +96,28 @@ service cloud.firestore {
         && (m.note == null || m.note.size() <= 500);
     }
 
+    // Đánh giá người chơi (BR10): trong 48 giờ sau giờ kết thúc, đã điểm danh, người chấm và người được chấm đều có mặt,
+    // mỗi người chấm mỗi người một lần mỗi kèo (id cố định), không sửa không xóa
+    match /ratings/{ratingId} {
+      allow read: if signedIn();
+      allow create: if notBanned()
+        && request.resource.data.keys().hasOnly(['matchId', 'fromUid', 'toUid', 'stars', 'tags', 'createdAt'])
+        && request.resource.data.fromUid == me()
+        && request.resource.data.toUid != me()
+        && ratingId == request.resource.data.matchId + '_' + me() + '_' + request.resource.data.toUid
+        && request.resource.data.stars is int && request.resource.data.stars >= 1 && request.resource.data.stars <= 5
+        && request.resource.data.tags is list && request.resource.data.tags.size() <= 4
+        && request.resource.data.tags.hasOnly(['on_time', 'fair_play', 'friendly', 'skilled'])
+        && request.resource.data.createdAt == request.time
+        && get(/databases/$(db)/documents/matches/$(request.resource.data.matchId)).data.status == 'active'
+        && get(/databases/$(db)/documents/matches/$(request.resource.data.matchId)).data.get('attendanceTakenAt', null) != null
+        && request.time > get(/databases/$(db)/documents/matches/$(request.resource.data.matchId)).data.endAt
+        && request.time < get(/databases/$(db)/documents/matches/$(request.resource.data.matchId)).data.endAt + duration.value(48, 'h')
+        && presentIn(request.resource.data.matchId, me())
+        && presentIn(request.resource.data.matchId, request.resource.data.toUid);
+      allow update, delete: if false;
+    }
+
     match /venues/{venueId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -101,6 +140,10 @@ service cloud.firestore {
         && changedOnly(['displayName', 'avatarUrl', 'district', 'bio', 'sports', 'profileCompleted', 'updatedAt'])
         && profileOk(request.resource.data);
       allow update: if isAdmin() && changedOnly(['banned', 'updatedAt']);
+      allow update: if notBanned() && uid != me()
+        && changedOnly(['stats', 'statsRating', 'updatedAt'])
+        && request.resource.data.statsRating is string
+        && ratingStat(uid, request.resource.data.statsRating);
       allow update: if signedIn()
         && changedOnly(['stats', 'statsMatch', 'updatedAt'])
         && request.resource.data.statsMatch is string

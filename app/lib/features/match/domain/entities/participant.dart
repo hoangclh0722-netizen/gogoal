@@ -15,7 +15,10 @@ abstract class Participant {
 
 /// Người đã được nhận vào kèo.
 class Member extends Participant {
-  const Member({required super.uid, required super.displayName, required super.level, super.avatarUrl});
+  const Member({required super.uid, required super.displayName, required super.level, super.avatarUrl, this.attended});
+
+  /// null là chưa điểm danh.
+  final bool? attended;
 }
 
 /// Yêu cầu đang chờ chủ kèo duyệt.

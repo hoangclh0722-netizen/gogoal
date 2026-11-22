@@ -109,6 +109,13 @@ class Match {
       now.isAfter(endAt) &&
       now.isBefore(endAt.add(const Duration(hours: 24)));
 
+  /// BR10: đánh giá mở trong 48 giờ sau giờ kết thúc, sau khi đã điểm danh.
+  bool canRate(DateTime now) =>
+      status == MatchStatus.active &&
+      attendanceTakenAt != null &&
+      now.isAfter(endAt) &&
+      now.isBefore(endAt.add(const Duration(hours: 48)));
+
   bool deadlinePassed(DateTime now) => joinDeadline != null && !now.isBefore(joinDeadline!);
 
   int get slotsLeft => slotsNeeded - slotsFilled;
