@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/district.dart';
 import '../../../core/utils/format.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_card.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../auth/presentation/auth_flow.dart';
 import '../../discover/application/location_controller.dart';
@@ -109,7 +110,7 @@ class _Detail extends ConsumerWidget {
                       const SizedBox(height: 12),
                     ],
                     _OverlapBanner(match: match),
-                    _Card(children: [
+                    AppCard(children: [
                       _InfoRow(
                         icon: Icons.calendar_today_outlined,
                         label: 'Thời gian',
@@ -148,7 +149,7 @@ class _Detail extends ConsumerWidget {
                     _SlotsCard(match: match),
                     _SameTime(match: match),
                     const SizedBox(height: 12),
-                    _Card(children: [
+                    AppCard(children: [
                       InkWell(
                         onTap: () => requireLogin(context, ref, () => context.push(Routes.user(match.hostId))),
                         child: Row(
@@ -176,7 +177,7 @@ class _Detail extends ConsumerWidget {
                     ]),
                     if (match.note != null) ...[
                       const SizedBox(height: 12),
-                      _Card(children: [
+                      AppCard(children: [
                         const Text('Ghi chú của chủ kèo', style: TextStyle(fontWeight: FontWeight.w700)),
                         Text(match.note!, style: const TextStyle(color: AppColors.muted, height: 1.4)),
                       ]),
@@ -409,7 +410,7 @@ class _SameTime extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.only(top: 12),
-      child: _Card(children: [
+      child: AppCard(children: [
         Row(children: [
           const Icon(Icons.swap_horiz_rounded, color: AppColors.primaryDark),
           const SizedBox(width: 8),
@@ -457,29 +458,6 @@ class _SameTime extends ConsumerWidget {
               ),
             ),
       ]),
-    );
-  }
-}
-
-class _Card extends StatelessWidget {
-  const _Card({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: 12,
-        children: children,
-      ),
     );
   }
 }
@@ -532,7 +510,7 @@ class _SlotsCard extends ConsumerWidget {
         (uid == match.hostId || ref.watch(myParticipationProvider(match.id)).value == ParticipantStatus.approved);
     final members = insider ? ref.watch(membersProvider(match.id)).value : null;
 
-    return _Card(children: [
+    return AppCard(children: [
       Row(
         children: [
           Expanded(

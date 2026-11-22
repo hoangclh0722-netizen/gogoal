@@ -15,6 +15,8 @@ ThemeData buildAppTheme() {
     bodyColor: AppColors.ink,
     displayColor: AppColors.ink,
   );
+  final buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md));
+  const buttonText = TextStyle(fontSize: 15, fontWeight: FontWeight.w600);
   final inputBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(AppRadius.md),
     borderSide: const BorderSide(color: AppColors.outline),
@@ -25,6 +27,22 @@ ThemeData buildAppTheme() {
     colorScheme: scheme,
     scaffoldBackgroundColor: AppColors.background,
     textTheme: text,
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.surface,
+      surfaceTintColor: AppColors.surface,
+      foregroundColor: AppColors.ink,
+      shape: const Border(bottom: BorderSide(color: AppColors.border)),
+    ),
+    dialogTheme: const DialogThemeData(backgroundColor: AppColors.surface),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(shape: buttonShape, textStyle: buttonText),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(shape: buttonShape, textStyle: buttonText),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(textStyle: buttonText),
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.surface,

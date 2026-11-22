@@ -333,9 +333,6 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(_editing ? 'Sửa kèo' : 'Tạo kèo', style: const TextStyle(fontWeight: FontWeight.w700)),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        shape: const Border(bottom: BorderSide(color: AppColors.border)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

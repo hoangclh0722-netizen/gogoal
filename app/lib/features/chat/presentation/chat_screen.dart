@@ -64,9 +64,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        shape: const Border(bottom: BorderSide(color: AppColors.border)),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

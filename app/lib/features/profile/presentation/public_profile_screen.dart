@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/district.dart';
+import '../../../core/widgets/app_card.dart';
 import '../../match/application/match_providers.dart';
 import '../../rating/application/rating_providers.dart';
 import '../application/profile_providers.dart';
@@ -27,6 +28,7 @@ class PublicProfileScreen extends ConsumerWidget {
         backgroundColor: AppColors.primaryDark,
         foregroundColor: Colors.white,
         surfaceTintColor: AppColors.primaryDark,
+        shape: const Border(),
         title: const Text('Hồ sơ người chơi', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: profile.when(
@@ -60,7 +62,7 @@ class PublicProfileScreen extends ConsumerWidget {
               ReputationCard(profile: p),
               if (top.isNotEmpty) ...[
                 const SizedBox(height: 10),
-                ProfileCard(children: [
+                AppCard(spacing: 0, children: [
                   const Text('Được khen', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 8),
                   Wrap(spacing: 8, runSpacing: 8, children: [

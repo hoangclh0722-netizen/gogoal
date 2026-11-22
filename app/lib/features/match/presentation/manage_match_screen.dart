@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format.dart';
+import '../../../core/widgets/app_card.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../profile/application/profile_providers.dart';
 import '../../profile/presentation/profile_avatar.dart';
@@ -274,9 +275,9 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
                 : ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      _Card(
+                      AppCard(
                         children: [
-                          _MemberTile(name: '${match.host.displayName} (bạn)', avatarUrl: match.host.avatarUrl, tag: 'Chủ kèo', isHost: true),
+                          _MemberTile(name: match.host.displayName, avatarUrl: match.host.avatarUrl, tag: 'Chủ kèo', isHost: true),
                           for (final m in members)
                             _MemberTile(
                               onTap: () => context.push(Routes.user(m.uid)),
@@ -605,25 +606,6 @@ class _Tabs extends StatelessWidget {
   }
 }
 
-class _Card extends StatelessWidget {
-  const _Card({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 12, children: children),
-    );
-  }
-}
-
 class _RequestCard extends ConsumerStatefulWidget {
   const _RequestCard({required this.match, required this.request, required this.editable});
 
@@ -666,7 +648,7 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
     final rep = ref.watch(profileProvider(r.uid)).value?.reputation;
     final full = widget.match.isFull;
 
-    return _Card(children: [
+    return AppCard(children: [
       Row(
         children: [
           InkWell(
@@ -788,7 +770,7 @@ class _MemberTile extends StatelessWidget {
                 ProfileAvatar(photoUrl: avatarUrl, name: name, radius: 18),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(name,
+                  child: Text(isHost ? '$name (bạn)' : name,
                       maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
                 ),
               ]),

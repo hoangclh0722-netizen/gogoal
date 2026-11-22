@@ -135,9 +135,6 @@ class _RateScreenState extends ConsumerState<RateScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('GG! Đánh giá đồng đội', style: TextStyle(fontWeight: FontWeight.w700)),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        shape: const Border(bottom: BorderSide(color: AppColors.border)),
       ),
       body: body,
     );
