@@ -99,7 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           slivers: [
             SliverToBoxAdapter(
               child: HomeHeader(
-                onNotifications: () => _openLocked(context, ref, 'Thông báo'),
+                onSettings: () => context.push(Routes.settings),
                 onLogin: () => context.push(Routes.login),
                 onFilter: () => _toast(context, 'Bộ lọc nâng cao sẽ có ở bước sau'),
                 searchFocus: _searchFocus,
@@ -189,7 +189,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: HomeCompactBar(
                   onTop: _toTop,
                   onSearch: _search,
-                  onNotifications: () => _openLocked(context, ref, 'Thông báo'),
+                  onSettings: () => context.push(Routes.settings),
                   onLogin: () => context.push(Routes.login),
                 ),
               ),

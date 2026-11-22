@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../profile/application/profile_providers.dart';
 import '../application/auth_providers.dart';
 import '../domain/auth_repository.dart';
@@ -25,4 +26,39 @@ Future<bool> ensureProfile(BuildContext context, WidgetRef ref) async {
   if (profile != null) return true;
   if (!context.mounted) return false;
   return await context.push<bool>(Routes.profileSetup) == true;
+}
+
+Future<void> confirmSignOut(BuildContext context, WidgetRef ref) async {
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      icon: const CircleAvatar(
+        radius: 28,
+        backgroundColor: AppColors.dangerSoft,
+        child: Icon(Icons.logout, color: AppColors.danger),
+      ),
+      title: const Text('Đăng xuất khỏi GoGoal?', textAlign: TextAlign.center),
+      content: const Text('Bạn sẽ cần đăng nhập lại để xin vào hoặc tạo kèo.', textAlign: TextAlign.center),
+      actions: [
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Hủy')),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Đăng xuất'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+  if (ok != true) return;
+  await ref.read(authRepositoryProvider).signOut();
+  if (context.mounted) context.go(Routes.home);
 }

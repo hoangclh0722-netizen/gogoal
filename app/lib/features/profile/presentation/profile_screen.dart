@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/district.dart';
 import '../../../core/utils/format.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_card.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../auth/presentation/auth_flow.dart';
 import '../../discover/presentation/widgets/home_bottom_nav.dart';
@@ -22,41 +23,6 @@ class ProfileScreen extends ConsumerWidget {
   void _toast(BuildContext context, String message) => ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(message)));
-
-  Future<void> _signOut(BuildContext context, WidgetRef ref) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        icon: const CircleAvatar(
-          radius: 28,
-          backgroundColor: AppColors.dangerSoft,
-          child: Icon(Icons.logout, color: AppColors.danger),
-        ),
-        title: const Text('Đăng xuất khỏi GoGoal?', textAlign: TextAlign.center),
-        content: const Text('Bạn sẽ cần đăng nhập lại để xin vào hoặc tạo kèo.', textAlign: TextAlign.center),
-        actions: [
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Hủy')),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Đăng xuất'),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-    if (ok != true) return;
-    await ref.read(authRepositoryProvider).signOut();
-    if (context.mounted) context.go(Routes.home);
-  }
 
   void _onTab(BuildContext context, String title) {
     if (title == 'Hồ sơ') return;
@@ -113,7 +79,7 @@ class ProfileScreen extends ConsumerWidget {
                       onPressed: () => context.push(Routes.profileSetup, extra: p),
                     ),
                     TextButton(
-                      onPressed: () => _signOut(context, ref),
+                      onPressed: () => confirmSignOut(context, ref),
                       child: const Text('Đăng xuất',
                           style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w600, fontSize: 15)),
                     ),
@@ -199,25 +165,6 @@ class _VerifyBanner extends StatelessWidget {
   }
 }
 
-class ProfileCard extends StatelessWidget {
-  const ProfileCard({super.key, required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
-    );
-  }
-}
-
 class ReputationCard extends StatelessWidget {
   const ReputationCard({super.key, required this.profile});
 
@@ -226,7 +173,8 @@ class ReputationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rep = profile.reputation;
-    return ProfileCard(
+    return AppCard(
+      spacing: 0,
       children: [
         Row(
           children: [
@@ -303,7 +251,8 @@ class SportsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProfileCard(
+    return AppCard(
+      spacing: 0,
       children: [
         const Text('Môn chơi', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
         for (final s in Sport.all.where((s) => sports.containsKey(s.id))) ...[

@@ -6,6 +6,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../../../core/router/app_router.dart';
 import '../../../core/utils/format.dart';
+import '../../settings/application/settings_controller.dart';
 import '../domain/entities/match.dart';
 import 'match_providers.dart';
 
@@ -117,9 +118,10 @@ class MatchReminders {
 /// Đặt ở gốc app: theo dõi "Kèo của tôi" và hẹn lại nhắc giờ khi danh sách đổi.
 final matchRemindersProvider = Provider<void>((ref) {
   if (kIsWeb) return;
+  final on = ref.watch(remindersOnProvider);
   final reminders = MatchReminders((id) => ref.read(routerProvider).push(Routes.match(id)));
   ref.listen(myMatchesProvider, (_, next) {
     final mine = next.value;
-    if (mine != null) reminders.sync(mine).catchError((_) {});
+    if (mine != null) reminders.sync(on ? mine : const []).catchError((_) {});
   }, fireImmediately: true);
 });

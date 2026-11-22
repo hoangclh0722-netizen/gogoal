@@ -4,20 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/logo_wordmark.dart';
 import '../../../auth/application/auth_providers.dart';
-import '../../../notification/application/notification_providers.dart';
 import '../../application/home_providers.dart';
 import '../../application/location_controller.dart';
 
 class HomeHeader extends ConsumerWidget {
   const HomeHeader({
     super.key,
-    required this.onNotifications,
+    required this.onSettings,
     required this.onLogin,
     required this.onFilter,
     this.searchFocus,
   });
 
-  final VoidCallback onNotifications;
+  final VoidCallback onSettings;
   final VoidCallback onLogin;
   final VoidCallback onFilter;
   final FocusNode? searchFocus;
@@ -26,7 +25,6 @@ class HomeHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final signedIn = ref.watch(signedInProvider);
     final located = ref.watch(locationProvider).granted;
-    final unread = ref.watch(unreadCountProvider).value ?? 0;
 
     return Container(
       padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 12, 16, 24),
@@ -44,21 +42,19 @@ class HomeHeader extends ConsumerWidget {
               children: [
                 const LogoWordmark(size: 24),
                 if (signedIn)
-                  InkWell(
-                    onTap: onNotifications,
-                    customBorder: const CircleBorder(),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.5),
-                      ),
-                      child: Badge(
-                        isLabelVisible: unread > 0,
-                        label: Text(unread > 9 ? '9+' : '$unread'),
-                        backgroundColor: AppColors.accentDark,
-                        child: const Icon(Icons.notifications_none, color: Colors.white, size: 22),
+                  Tooltip(
+                    message: 'Cài đặt',
+                    child: InkWell(
+                      onTap: onSettings,
+                      customBorder: const CircleBorder(),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.5),
+                        ),
+                        child: const Icon(Icons.settings_outlined, color: Colors.white, size: 22),
                       ),
                     ),
                   )
@@ -156,17 +152,16 @@ class HomeHeader extends ConsumerWidget {
 
 /// Thanh mảnh dính trên cùng khi đã lướt qua header: logo (về đầu trang), ô tìm kiếm, chuông.
 class HomeCompactBar extends ConsumerWidget {
-  const HomeCompactBar({super.key, required this.onTop, required this.onSearch, required this.onNotifications, required this.onLogin});
+  const HomeCompactBar({super.key, required this.onTop, required this.onSearch, required this.onSettings, required this.onLogin});
 
   final VoidCallback onTop;
   final VoidCallback onSearch;
-  final VoidCallback onNotifications;
+  final VoidCallback onSettings;
   final VoidCallback onLogin;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final signedIn = ref.watch(signedInProvider);
-    final unread = ref.watch(unreadCountProvider).value ?? 0;
     final query = ref.watch(filterProvider.select((f) => f.query));
 
     return Material(
@@ -224,14 +219,9 @@ class HomeCompactBar extends ConsumerWidget {
             const SizedBox(width: 4),
             if (signedIn)
               IconButton(
-                tooltip: 'Thông báo',
-                onPressed: onNotifications,
-                icon: Badge(
-                  isLabelVisible: unread > 0,
-                  label: Text(unread > 9 ? '9+' : '$unread'),
-                  backgroundColor: AppColors.accentDark,
-                  child: const Icon(Icons.notifications_none, color: Colors.white),
-                ),
+                tooltip: 'Cài đặt',
+                onPressed: onSettings,
+                icon: const Icon(Icons.settings_outlined, color: Colors.white),
               )
             else
               TextButton(

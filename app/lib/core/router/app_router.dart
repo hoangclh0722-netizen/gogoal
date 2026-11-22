@@ -22,6 +22,7 @@ import '../../features/rating/presentation/rate_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/profile/presentation/profile_setup_screen.dart';
 import '../../features/profile/presentation/public_profile_screen.dart';
+import '../../features/settings/presentation/settings_screen.dart';
 import '../widgets/coming_soon_screen.dart';
 
 abstract final class Routes {
@@ -37,6 +38,7 @@ abstract final class Routes {
   static const createMatch = '/match/new';
   static const myMatches = '/my-matches';
   static const notifications = '/notifications';
+  static const settings = '/settings';
   static String match(String id) => '/match/$id';
   static String manage(String id) => '/match/$id/manage';
   static String chat(String id) => '/match/$id/chat';
@@ -60,6 +62,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: Routes.myMatches, builder: (_, _) => const MyMatchesScreen()),
       GoRoute(path: Routes.notifications, builder: (_, _) => const NotificationsScreen()),
+      GoRoute(path: Routes.settings, builder: (_, _) => const SettingsScreen()),
       GoRoute(path: Routes.createMatch, builder: (_, _) => const CreateMatchScreen()),
       GoRoute(
         path: '/match/:id',

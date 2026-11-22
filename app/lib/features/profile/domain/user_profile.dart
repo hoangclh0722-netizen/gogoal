@@ -56,7 +56,8 @@ class UserProfile {
 }
 
 String initialsOf(String name) {
-  final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+  final letter = RegExp(r'^\p{L}', unicode: true);
+  final parts = name.trim().split(RegExp(r'\s+')).where(letter.hasMatch).toList();
   if (parts.isEmpty) return '?';
   final first = parts.first[0];
   return (parts.length > 1 ? first + parts.last[0] : first).toUpperCase();
