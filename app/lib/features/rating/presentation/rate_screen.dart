@@ -97,8 +97,8 @@ class _RateScreenState extends ConsumerState<RateScreen> {
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (_, i) {
                 if (i == 0) {
-                  return const Text('Chấm sao cho đồng đội đã đá cùng bạn. Người nào không muốn chấm thì bỏ qua.',
-                      style: TextStyle(color: AppColors.muted));
+                  return Text('Chấm sao cho đồng đội đã đá cùng bạn. Người nào không muốn chấm thì bỏ qua.',
+                      style: TextStyle(color: context.colors.muted));
                 }
                 final t = targets[i - 1];
                 return _TargetCard(
@@ -117,9 +117,9 @@ class _RateScreenState extends ConsumerState<RateScreen> {
           ),
           Container(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + MediaQuery.paddingOf(context).bottom),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: AppColors.border)),
+            decoration: BoxDecoration(
+              color: context.colors.surface,
+              border: Border(top: BorderSide(color: context.colors.border)),
             ),
             child: FilledButton(
               style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
@@ -132,7 +132,7 @@ class _RateScreenState extends ConsumerState<RateScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('GG! Đánh giá đồng đội', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
@@ -161,9 +161,9 @@ class _TargetCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +172,7 @@ class _TargetCard extends StatelessWidget {
             ProfileAvatar(photoUrl: target.avatarUrl, name: target.name, radius: 20),
             const SizedBox(width: 10),
             Expanded(child: Text(target.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-            if (target.isHost) const Text('Chủ kèo', style: TextStyle(fontSize: 12, color: AppColors.muted)),
+            if (target.isHost) Text('Chủ kèo', style: TextStyle(fontSize: 12, color: context.colors.muted)),
           ]),
           const SizedBox(height: 6),
           Row(children: [
@@ -181,7 +181,7 @@ class _TargetCard extends StatelessWidget {
                 tooltip: '$s sao',
                 onPressed: () => onStars(s == stars ? 0 : s),
                 icon: Icon(s <= stars ? Icons.star_rounded : Icons.star_outline_rounded,
-                    size: 32, color: s <= stars ? const Color(0xFFD97706) : AppColors.outline),
+                    size: 32, color: s <= stars ? const Color(0xFFD97706) : context.colors.outline),
               ),
           ]),
           Wrap(spacing: 8, children: [
@@ -207,7 +207,7 @@ class _Info extends StatelessWidget {
   Widget build(BuildContext context) => Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
-          child: Text(text, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.muted, height: 1.4)),
+          child: Text(text, textAlign: TextAlign.center, style: TextStyle(color: context.colors.muted, height: 1.4)),
         ),
       );
 }

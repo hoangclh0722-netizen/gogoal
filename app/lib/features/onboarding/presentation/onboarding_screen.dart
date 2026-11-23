@@ -56,7 +56,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -64,7 +64,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: _finish,
-                child: const Text('Bỏ qua', style: TextStyle(color: AppColors.muted, fontSize: 15)),
+                child: Text('Bỏ qua', style: TextStyle(color: context.colors.muted, fontSize: 15)),
               ),
             ),
             Expanded(
@@ -85,7 +85,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     width: i == _index ? 24 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: i == _index ? AppColors.primary : AppColors.border,
+                      color: i == _index ? AppColors.primary : context.colors.border,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -136,7 +136,7 @@ class _PageContent extends StatelessWidget {
                 Text(
                   page.body,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 15, color: AppColors.muted, height: 1.5),
+                  style: TextStyle(fontSize: 15, color: context.colors.muted, height: 1.5),
                 ),
               ],
             ),

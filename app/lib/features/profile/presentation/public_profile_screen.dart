@@ -23,20 +23,20 @@ class PublicProfileScreen extends ConsumerWidget {
     final hosted = ref.watch(hostedStatsProvider(uid)).value;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
+        backgroundColor: context.colors.primaryDark,
         foregroundColor: Colors.white,
-        surfaceTintColor: AppColors.primaryDark,
+        surfaceTintColor: context.colors.primaryDark,
         shape: const Border(),
         title: const Text('Hồ sơ người chơi', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: profile.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) => const Center(child: Text('Không tải được hồ sơ', style: TextStyle(color: AppColors.muted))),
+        error: (_, _) => Center(child: Text('Không tải được hồ sơ', style: TextStyle(color: context.colors.muted))),
         data: (p) {
           if (p == null) {
-            return const Center(child: Text('Người chơi này không còn trên GoGoal', style: TextStyle(color: AppColors.muted)));
+            return Center(child: Text('Người chơi này không còn trên GoGoal', style: TextStyle(color: context.colors.muted)));
           }
           final top = [...?tags?.entries.where((e) => e.value > 0)]..sort((a, b) => b.value.compareTo(a.value));
           return ListView(
@@ -47,14 +47,14 @@ class PublicProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(p.displayName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 2),
-                Text('${districtName(p.district)} · TP.HCM', style: const TextStyle(color: AppColors.muted)),
+                Text('${districtName(p.district)} · TP.HCM', style: TextStyle(color: context.colors.muted)),
                 if (hosted != null && hosted.hosted > 0) ...[
                   const SizedBox(height: 6),
                   Text(
                     hosted.cancelled == 0
                         ? 'Đã tổ chức ${hosted.hosted} kèo'
                         : 'Đã tổ chức ${hosted.hosted} kèo · hủy ${hosted.cancelled}',
-                    style: const TextStyle(fontSize: 13, color: AppColors.muted),
+                    style: TextStyle(fontSize: 13, color: context.colors.muted),
                   ),
                 ],
               ]),
@@ -69,8 +69,8 @@ class PublicProfileScreen extends ConsumerWidget {
                     for (final e in top.take(3))
                       Chip(
                         label: Text('${e.key.label} · ${e.value}'),
-                        backgroundColor: AppColors.primarySoft,
-                        labelStyle: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w600),
+                        backgroundColor: context.colors.primarySoft,
+                        labelStyle: TextStyle(color: context.colors.primaryText, fontWeight: FontWeight.w600),
                         side: BorderSide.none,
                       ),
                   ]),

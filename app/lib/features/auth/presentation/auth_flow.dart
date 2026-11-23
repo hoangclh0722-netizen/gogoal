@@ -32,10 +32,10 @@ Future<void> confirmSignOut(BuildContext context, WidgetRef ref) async {
   final ok = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      icon: const CircleAvatar(
+      icon: CircleAvatar(
         radius: 28,
-        backgroundColor: AppColors.dangerSoft,
-        child: Icon(Icons.logout, color: AppColors.danger),
+        backgroundColor: context.colors.dangerSoft,
+        child: Icon(Icons.logout, color: context.colors.dangerText),
       ),
       title: const Text('Đăng xuất khỏi GoGoal?', textAlign: TextAlign.center),
       content: const Text('Bạn sẽ cần đăng nhập lại để xin vào hoặc tạo kèo.', textAlign: TextAlign.center),
@@ -48,7 +48,7 @@ Future<void> confirmSignOut(BuildContext context, WidgetRef ref) async {
             const SizedBox(width: 10),
             Expanded(
               child: FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                style: FilledButton.styleFrom(backgroundColor: context.colors.danger),
                 onPressed: () => Navigator.of(context).pop(true),
                 child: const Text('Đăng xuất'),
               ),

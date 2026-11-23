@@ -13,7 +13,7 @@ class AuthShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryDark,
+      backgroundColor: context.colors.primaryDark,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -36,8 +36,8 @@ class AuthShell extends StatelessWidget {
             Expanded(
               child: Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: context.colors.surface,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                 ),
                 child: SingleChildScrollView(
@@ -49,7 +49,7 @@ class AuthShell extends StatelessWidget {
                     children: [
                       Text(title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 4),
-                      Text(subtitle, style: const TextStyle(fontSize: 15, color: AppColors.muted)),
+                      Text(subtitle, style: TextStyle(fontSize: 15, color: context.colors.muted)),
                       const SizedBox(height: 24),
                       child,
                     ],
@@ -76,9 +76,9 @@ class SocialButtons extends StatelessWidget {
       children: [
         _SocialButton(
           label: 'Tiếp tục với Google',
-          background: Colors.white,
-          foreground: AppColors.ink,
-          border: AppColors.border,
+          background: context.colors.surface,
+          foreground: context.colors.ink,
+          border: context.colors.border,
           mark: const Text('G',
               style: TextStyle(color: Color(0xFF4285F4), fontSize: 20, fontWeight: FontWeight.w800)),
           onPressed: onGoogle,
@@ -92,14 +92,14 @@ class SocialButtons extends StatelessWidget {
           onPressed: onFacebook,
         ),
         const SizedBox(height: 20),
-        const Row(
+        Row(
           children: [
-            Expanded(child: Divider(color: AppColors.border)),
+            Expanded(child: Divider(color: context.colors.border)),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Text('hoặc', style: TextStyle(color: AppColors.muted, fontSize: 13)),
+              child: Text('hoặc', style: TextStyle(color: context.colors.muted, fontSize: 13)),
             ),
-            Expanded(child: Divider(color: AppColors.border)),
+            Expanded(child: Divider(color: context.colors.border)),
           ],
         ),
       ],
@@ -178,9 +178,9 @@ class AuthErrorText extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.error_outline, color: AppColors.danger, size: 18),
+          Icon(Icons.error_outline, color: context.colors.dangerText, size: 18),
           const SizedBox(width: 6),
-          Expanded(child: Text(message, style: const TextStyle(color: AppColors.danger, fontSize: 13))),
+          Expanded(child: Text(message, style: TextStyle(color: context.colors.dangerText, fontSize: 13))),
         ],
       ),
     );

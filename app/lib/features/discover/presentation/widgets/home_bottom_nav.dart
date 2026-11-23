@@ -14,9 +14,9 @@ class HomeBottomNav extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unread = ref.watch(unreadCountProvider).value ?? 0;
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: context.colors.surface,
+        border: Border(top: BorderSide(color: context.colors.border)),
       ),
       child: SafeArea(
         top: false,
@@ -62,7 +62,7 @@ class _Item extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? AppColors.primaryDark : AppColors.muted;
+    final color = active ? context.colors.primaryText : context.colors.muted;
     return InkWell(
       onTap: onTap,
       child: Column(
@@ -71,7 +71,7 @@ class _Item extends StatelessWidget {
           Badge(
             isLabelVisible: badge > 0,
             label: Text(badge > 9 ? '9+' : '$badge'),
-            backgroundColor: AppColors.danger,
+            backgroundColor: context.colors.danger,
             child: Icon(icon, color: color, size: 24),
           ),
           const SizedBox(height: 2),
@@ -109,12 +109,12 @@ class _CreateButton extends StatelessWidget {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: AppColors.accentDark,
+                    color: context.colors.accentDark,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 4),
+                    border: Border.all(color: context.colors.surface, width: 4),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.accentDark.withValues(alpha: 0.4),
+                        color: context.colors.accentDark.withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -123,8 +123,8 @@ class _CreateButton extends StatelessWidget {
                   child: const Icon(Icons.add, color: Colors.white, size: 30),
                 ),
                 const SizedBox(height: 2),
-                const Text('Tạo kèo',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.muted)),
+                Text('Tạo kèo',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: context.colors.muted)),
               ],
             ),
           ),

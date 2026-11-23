@@ -15,14 +15,14 @@ class ProfileAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: radius,
-      backgroundColor: onGreen ? Colors.white : AppColors.primaryDark,
+      backgroundColor: onGreen ? Colors.white : context.colors.primaryDark,
       foregroundImage: photoUrl != null ? NetworkImage(photoUrl!) : null,
       child: Text(
         initialsOf(name),
         style: TextStyle(
           fontSize: radius * 0.7,
           fontWeight: FontWeight.w700,
-          color: onGreen ? AppColors.primaryDark : Colors.white,
+          color: onGreen ? context.colors.primaryDark : Colors.white,
         ),
       ),
     );

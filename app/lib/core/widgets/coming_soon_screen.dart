@@ -10,9 +10,9 @@ class ComingSoonScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title), backgroundColor: AppColors.background),
-      body: const Center(
-        child: Text('Màn hình này sẽ có ở bước sau', style: TextStyle(color: AppColors.muted)),
+      appBar: AppBar(title: Text(title), backgroundColor: context.colors.background),
+      body: Center(
+        child: Text('Màn hình này sẽ có ở bước sau', style: TextStyle(color: context.colors.muted)),
       ),
     );
   }

@@ -21,8 +21,8 @@ class EmptyView extends StatelessWidget {
           const Text('Chưa có kèo nào gần bạn',
               textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          const Text('Thử đổi bộ lọc hoặc tạo kèo mới',
-              textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: AppColors.muted)),
+          Text('Thử đổi bộ lọc hoặc tạo kèo mới',
+              textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: context.colors.muted)),
           const SizedBox(height: 24),
           AppButton(label: 'Tạo kèo', kind: AppButtonKind.accent, onPressed: onCreate),
           if (onClear != null) ...[
@@ -49,9 +49,9 @@ class _BallAndPin extends StatelessWidget {
           Container(
             width: 96,
             height: 96,
-            decoration: const BoxDecoration(color: AppColors.primarySoft, shape: BoxShape.circle),
+            decoration: BoxDecoration(color: context.colors.primarySoft, shape: BoxShape.circle),
           ),
-          const Positioned(left: 8, bottom: 8, child: Icon(Icons.sports_soccer, size: 48, color: AppColors.primaryDark)),
+          Positioned(left: 8, bottom: 8, child: Icon(Icons.sports_soccer, size: 48, color: context.colors.primaryText)),
           const Positioned(right: 10, top: 0, child: Icon(Icons.location_on_outlined, size: 52, color: AppColors.accent)),
         ],
       ),
@@ -71,13 +71,13 @@ class OfflineView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.cloud_off_outlined, size: 64, color: AppColors.muted),
+          Icon(Icons.cloud_off_outlined, size: 64, color: context.colors.muted),
           const SizedBox(height: 16),
           const Text('Không kết nối được',
               textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          const Text('Kiểm tra mạng rồi thử lại nhé',
-              textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: AppColors.muted)),
+          Text('Kiểm tra mạng rồi thử lại nhé',
+              textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: context.colors.muted)),
           const SizedBox(height: 24),
           AppButton(label: 'Thử lại', kind: AppButtonKind.outline, expand: false, onPressed: onRetry),
         ],
@@ -97,22 +97,22 @@ class LocationBanner extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
       decoration: BoxDecoration(
-        color: AppColors.warningSoft,
+        color: context.colors.warningSoft,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.warningBorder),
+        border: Border.all(color: context.colors.warningBorder),
       ),
       child: Row(
         children: [
-          const Icon(Icons.location_off_outlined, size: 20, color: AppColors.warningInk),
+          Icon(Icons.location_off_outlined, size: 20, color: context.colors.warningInk),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: Text('Bật vị trí để xem kèo gần bạn',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.warningText)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: context.colors.warningText)),
           ),
           TextButton(
             onPressed: onEnable,
-            child: const Text('Bật vị trí',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primaryDark)),
+            child: Text('Bật vị trí',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: context.colors.primaryText)),
           ),
         ],
       ),

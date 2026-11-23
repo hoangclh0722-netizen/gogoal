@@ -101,11 +101,11 @@ class _Detail extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.dangerSoft,
+                          color: context.colors.dangerSoft,
                           borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
-                        child: const Text('Kèo đã bị hủy',
-                            style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700)),
+                        child: Text('Kèo đã bị hủy',
+                            style: TextStyle(color: context.colors.dangerText, fontWeight: FontWeight.w700)),
                       ),
                       const SizedBox(height: 12),
                     ],
@@ -133,8 +133,8 @@ class _Detail extends ConsumerWidget {
                           icon: const Icon(Icons.near_me_outlined, size: 18),
                           label: const Text('Chỉ đường'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.primaryDark,
-                            side: const BorderSide(color: AppColors.primaryDark, width: 1.5),
+                            foregroundColor: context.colors.primaryText,
+                            side: BorderSide(color: context.colors.primaryText, width: 1.5),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
                           ),
                         ),
@@ -162,7 +162,7 @@ class _Detail extends ConsumerWidget {
                                 children: [
                                   Text(match.host.displayName,
                                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-                                  const Text('Chủ kèo', style: TextStyle(fontSize: 12, color: AppColors.muted)),
+                                  Text('Chủ kèo', style: TextStyle(fontSize: 12, color: context.colors.muted)),
                                 ],
                               ),
                             ),
@@ -170,7 +170,7 @@ class _Detail extends ConsumerWidget {
                             const SizedBox(width: 4),
                             Text(match.host.rep.toStringAsFixed(1),
                                 style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
-                            const Icon(Icons.chevron_right, color: AppColors.muted),
+                            Icon(Icons.chevron_right, color: context.colors.muted),
                           ],
                         ),
                       ),
@@ -179,7 +179,7 @@ class _Detail extends ConsumerWidget {
                       const SizedBox(height: 12),
                       AppCard(children: [
                         const Text('Ghi chú của chủ kèo', style: TextStyle(fontWeight: FontWeight.w700)),
-                        Text(match.note!, style: const TextStyle(color: AppColors.muted, height: 1.4)),
+                        Text(match.note!, style: TextStyle(color: context.colors.muted, height: 1.4)),
                       ]),
                     ],
                   ],
@@ -229,8 +229,8 @@ class _Header extends ConsumerWidget {
 
     return Container(
       padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, 20),
-      decoration: const BoxDecoration(
-        color: AppColors.primaryDark,
+      decoration: BoxDecoration(
+        color: context.colors.primaryDark,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
       child: Column(
@@ -311,7 +311,7 @@ class _OverlapBanner extends ConsumerWidget {
             Expanded(child: OutlinedButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Thôi'))),
             Expanded(
               child: FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                style: FilledButton.styleFrom(backgroundColor: context.colors.danger),
                 onPressed: () => Navigator.of(context).pop(true),
                 child: Text(pending ? 'Hủy yêu cầu' : 'Rời kèo'),
               ),
@@ -363,23 +363,23 @@ class _OverlapBanner extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
               decoration: BoxDecoration(
-                color: AppColors.warningSoft,
+                color: context.colors.warningSoft,
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Row(children: [
-                const Icon(Icons.event_repeat_rounded, color: AppColors.warningInk),
+                Icon(Icons.event_repeat_rounded, color: context.colors.warningInk),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Bạn còn ${o.role == MyRole.pending ? 'đang chờ duyệt ở' : 'ở'} “${o.match.title}” cùng giờ. '
                     'Nhường chỗ cho người khác nhé?',
-                    style: const TextStyle(fontSize: 13, color: AppColors.warningText, height: 1.35),
+                    style: TextStyle(fontSize: 13, color: context.colors.warningText, height: 1.35),
                   ),
                 ),
                 TextButton(
                   onPressed: () => _leaveOther(context, ref, uid, o),
                   child: Text(o.role == MyRole.pending ? 'Hủy' : 'Rời kèo',
-                      style: const TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700)),
+                      style: TextStyle(color: context.colors.dangerText, fontWeight: FontWeight.w700)),
                 ),
               ]),
             ),
@@ -412,7 +412,7 @@ class _SameTime extends ConsumerWidget {
       padding: const EdgeInsets.only(top: 12),
       child: AppCard(children: [
         Row(children: [
-          const Icon(Icons.swap_horiz_rounded, color: AppColors.primaryDark),
+          Icon(Icons.swap_horiz_rounded, color: context.colors.primaryText),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -424,7 +424,7 @@ class _SameTime extends ConsumerWidget {
         if (list.isLoading)
           const Center(child: Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator()))
         else if (items.isEmpty)
-          const Text('Chưa có kèo nào cùng giờ', style: TextStyle(color: AppColors.muted))
+          Text('Chưa có kèo nào cùng giờ', style: TextStyle(color: context.colors.muted))
         else
           for (final m in items.take(3))
             InkWell(
@@ -447,13 +447,13 @@ class _SameTime extends ConsumerWidget {
                         ].join(' · '),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 13, color: AppColors.muted),
+                        style: TextStyle(fontSize: 13, color: context.colors.muted),
                       ),
                     ]),
                   ),
                   Text('Còn ${m.slotsLeft} chỗ',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primaryDark)),
-                  const Icon(Icons.chevron_right, color: AppColors.muted),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.colors.primaryText)),
+                  Icon(Icons.chevron_right, color: context.colors.muted),
                 ]),
               ),
             ),
@@ -478,17 +478,17 @@ class _InfoRow extends StatelessWidget {
         Container(
           width: 36,
           height: 36,
-          decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, color: AppColors.primaryDark, size: 18),
+          decoration: BoxDecoration(color: context.colors.primarySoft, borderRadius: BorderRadius.circular(10)),
+          child: Icon(icon, color: context.colors.primaryText, size: 18),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+              Text(label, style: TextStyle(fontSize: 12, color: context.colors.muted)),
               Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
-              if (sub != null) Text(sub!, style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+              if (sub != null) Text(sub!, style: TextStyle(fontSize: 13, color: context.colors.muted)),
               if (below != null) ...[const SizedBox(height: 4), below!],
             ],
           ),
@@ -519,12 +519,12 @@ class _SlotsCard extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: match.isFull ? AppColors.muted : AppColors.ink,
+                color: match.isFull ? context.colors.muted : context.colors.ink,
               ),
             ),
           ),
           Text('Đã nhận ${match.slotsFilled}/${match.slotsNeeded}',
-              style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+              style: TextStyle(fontSize: 13, color: context.colors.muted)),
         ],
       ),
       ClipRRect(
@@ -533,7 +533,7 @@ class _SlotsCard extends ConsumerWidget {
           value: match.slotsFilled / match.slotsNeeded,
           minHeight: 8,
           color: AppColors.primary,
-          backgroundColor: AppColors.border,
+          backgroundColor: context.colors.border,
         ),
       ),
       if (match.health(DateTime.now()) case final h? when h != MatchHealth.cancelled)
@@ -541,7 +541,7 @@ class _SlotsCard extends ConsumerWidget {
           HealthBadge(h),
           if (healthDetail(match, DateTime.now()) case final d?) ...[
             const SizedBox(width: 8),
-            Expanded(child: Text(d, style: const TextStyle(fontSize: 13, color: AppColors.muted))),
+            Expanded(child: Text(d, style: TextStyle(fontSize: 13, color: context.colors.muted))),
           ],
         ]),
       if (members != null) ...[
@@ -564,10 +564,10 @@ class _SlotsCard extends ConsumerWidget {
       ] else
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(color: context.colors.background, borderRadius: BorderRadius.circular(10)),
           child: Row(
             children: [
-              const Icon(Icons.lock_outline, size: 18, color: AppColors.muted),
+              Icon(Icons.lock_outline, size: 18, color: context.colors.muted),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -575,8 +575,8 @@ class _SlotsCard extends ConsumerWidget {
                   children: [
                     Text('${match.slotsFilled + 1} người trong kèo',
                         style: const TextStyle(fontWeight: FontWeight.w600)),
-                    const Text('Chỉ thành viên trong kèo xem được danh sách',
-                        style: TextStyle(fontSize: 12, color: AppColors.muted)),
+                    Text('Chỉ thành viên trong kèo xem được danh sách',
+                        style: TextStyle(fontSize: 12, color: context.colors.muted)),
                   ],
                 ),
               ),
@@ -606,7 +606,7 @@ class _MemberRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = isHost ? AppColors.warningInk : AppColors.primaryDark;
+    final fg = isHost ? context.colors.warningInk : context.colors.primaryText;
     return InkWell(
       onTap: () => context.push(Routes.user(uid)),
       child: Padding(
@@ -622,7 +622,7 @@ class _MemberRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: isHost ? AppColors.warningSoft : AppColors.primarySoft,
+                color: isHost ? context.colors.warningSoft : context.colors.primarySoft,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -656,8 +656,8 @@ class _ActionBar extends ConsumerWidget {
       builder: (context) => AlertDialog(
         icon: CircleAvatar(
           radius: 28,
-          backgroundColor: AppColors.dangerSoft,
-          child: Icon(pending ? Icons.cancel_outlined : Icons.logout, color: AppColors.danger),
+          backgroundColor: context.colors.dangerSoft,
+          child: Icon(pending ? Icons.cancel_outlined : Icons.logout, color: context.colors.dangerText),
         ),
         title: Text(pending ? 'Hủy yêu cầu tham gia?' : 'Rời khỏi kèo này?', textAlign: TextAlign.center),
         content: Text(
@@ -676,7 +676,7 @@ class _ActionBar extends ConsumerWidget {
               ),
               Expanded(
                 child: FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                  style: FilledButton.styleFrom(backgroundColor: context.colors.danger),
                   onPressed: () => Navigator.of(context).pop(true),
                   child: Text(pending ? 'Hủy yêu cầu' : 'Rời kèo'),
                 ),
@@ -759,7 +759,7 @@ class _ActionBar extends ConsumerWidget {
               );
       case AlreadyRequested(status: ParticipantStatus.approved):
         showPrice = false;
-        note = const _Status(Icons.check_circle_outline, AppColors.primaryDark, 'Bạn đã ở trong kèo');
+        note = _Status(Icons.check_circle_outline, context.colors.primaryText, 'Bạn đã ở trong kèo');
         main = Column(
           children: [
             Row(
@@ -782,32 +782,32 @@ class _ActionBar extends ConsumerWidget {
             if (match.startAt.isAfter(DateTime.now()))
             TextButton(
               onPressed: () => _leave(context, ref, user.uid, ParticipantStatus.approved),
-              child: const Text('Rời kèo',
-                  style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w600, fontSize: 15)),
+              child: Text('Rời kèo',
+                  style: TextStyle(color: context.colors.dangerText, fontWeight: FontWeight.w600, fontSize: 15)),
             ),
           ],
         );
       case AlreadyRequested(:final status):
         showPrice = false;
-        note = _Status(Icons.info_outline, AppColors.muted, switch (status) {
+        note = _Status(Icons.info_outline, context.colors.muted, switch (status) {
           ParticipantStatus.rejected => 'Chủ kèo đã từ chối yêu cầu',
           ParticipantStatus.removed => 'Bạn đã bị mời ra khỏi kèo',
           _ => 'Bạn đã rời kèo',
         });
       case MatchLocked():
-        note = const _Status(Icons.lock_outline, AppColors.muted, 'Chủ kèo đã chốt, không nhận thêm người');
+        note = _Status(Icons.lock_outline, context.colors.muted, 'Chủ kèo đã chốt, không nhận thêm người');
         main = const AppButton(label: 'Kèo đã chốt', onPressed: null);
       case DeadlinePassed():
-        note = const _Status(Icons.timer_off_outlined, AppColors.muted, 'Đã qua hạn chốt, chờ chủ kèo quyết định');
+        note = _Status(Icons.timer_off_outlined, context.colors.muted, 'Đã qua hạn chốt, chờ chủ kèo quyết định');
         main = const AppButton(label: 'Hết hạn nhận người', onPressed: null);
       case MatchFull():
         main = const AppButton(label: 'Đã đủ người', onPressed: null);
       case SportNotInProfile():
-        note = _Status(Icons.info_outline, AppColors.muted,
+        note = _Status(Icons.info_outline, context.colors.muted,
             'Bạn chưa chọn môn ${Sport.fromId(match.sportId).displayName.toLowerCase()} trong hồ sơ');
         main = const AppButton(label: 'Xin vào', onPressed: null);
       case LevelMismatch(:final myLevel):
-        note = _Status(Icons.info_outline, AppColors.muted,
+        note = _Status(Icons.info_outline, context.colors.muted,
             'Kèo dành cho ${formatLevelRange(match.levelMin, match.levelMax)}, bạn đang là ${skillLevels[myLevel - 1]}');
         main = const AppButton(label: 'Xin vào', onPressed: null);
       case Eligible():
@@ -844,9 +844,9 @@ class _ActionBar extends ConsumerWidget {
 
     return Container(
       padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + MediaQuery.of(context).padding.bottom),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: context.colors.surface,
+        border: Border(top: BorderSide(color: context.colors.border)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -863,7 +863,7 @@ class _ActionBar extends ConsumerWidget {
                         children: [
                           Text(formatMoney(match.costPerPerson),
                               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-                          const Text('mỗi người', style: TextStyle(fontSize: 12, color: AppColors.muted)),
+                          Text('mỗi người', style: TextStyle(fontSize: 12, color: context.colors.muted)),
                         ],
                       ),
                       const SizedBox(width: 16),
@@ -920,7 +920,7 @@ class _Message extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(icon, size: 56, color: AppColors.muted),
+                    Icon(icon, size: 56, color: context.colors.muted),
                     const SizedBox(height: 12),
                     Text(text, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 16),
@@ -944,14 +944,14 @@ class _Skeleton extends StatelessWidget {
     Widget box(double h) => Container(
           height: h,
           margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(color: context.colors.border, borderRadius: BorderRadius.circular(16)),
         );
     return Column(
       children: [
         Container(
           height: 200,
-          decoration: const BoxDecoration(
-            color: AppColors.primaryDark,
+          decoration: BoxDecoration(
+            color: context.colors.primaryDark,
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
           ),
         ),

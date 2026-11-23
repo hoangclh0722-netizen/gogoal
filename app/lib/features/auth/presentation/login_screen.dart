@@ -97,7 +97,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   onPressed: () => setState(() => _hidePassword = !_hidePassword),
                   icon: Icon(
                     _hidePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    color: AppColors.muted,
+                    color: context.colors.muted,
                   ),
                 ),
               ),
@@ -107,8 +107,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () => context.push(Routes.forgotPassword, extra: _email.text.trim()),
-                child: const Text('Quên mật khẩu?',
-                    style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w600)),
+                child: Text('Quên mật khẩu?',
+                    style: TextStyle(color: context.colors.primaryText, fontWeight: FontWeight.w600)),
               ),
             ),
             const SizedBox(height: 4),
@@ -118,14 +118,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Chưa có tài khoản?', style: TextStyle(color: AppColors.muted)),
+                Text('Chưa có tài khoản?', style: TextStyle(color: context.colors.muted)),
                 InkWell(
                   onTap: _openRegister,
                   borderRadius: BorderRadius.circular(8),
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
                     child: Text('Đăng ký',
-                        style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w700)),
+                        style: TextStyle(color: context.colors.primaryText, fontWeight: FontWeight.w700)),
                   ),
                 ),
               ],

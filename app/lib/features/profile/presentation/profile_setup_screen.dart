@@ -97,7 +97,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             for (final c in districtCodes)
               ListTile(
                 title: Text(districtName(c)),
-                trailing: c == _district ? const Icon(Icons.check, color: AppColors.primaryDark) : null,
+                trailing: c == _district ? Icon(Icons.check, color: context.colors.primaryText) : null,
                 onTap: () => Navigator.of(context).pop(c),
               ),
           ],
@@ -119,7 +119,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         if (!didPop) setState(() => _step = 0);
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: context.colors.surface,
         body: SafeArea(
           child: Column(
             children: [
@@ -129,7 +129,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   children: [
                     IconButton(onPressed: _back, tooltip: 'Quay lại', icon: const Icon(Icons.arrow_back_ios_new, size: 20)),
                     Text('Bước ${_step + 1}/2',
-                        style: const TextStyle(color: AppColors.muted, fontWeight: FontWeight.w600)),
+                        style: TextStyle(color: context.colors.muted, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
@@ -143,7 +143,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         child: Container(
                           height: 6,
                           decoration: BoxDecoration(
-                            color: i <= _step ? AppColors.primary : AppColors.border,
+                            color: i <= _step ? AppColors.primary : context.colors.border,
                             borderRadius: BorderRadius.circular(3),
                           ),
                         ),
@@ -160,13 +160,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                decoration: const BoxDecoration(border: Border(top: BorderSide(color: AppColors.border))),
+                decoration: BoxDecoration(border: Border(top: BorderSide(color: context.colors.border))),
                 child: Column(
                   children: [
                     if (_error != null)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(_error!, style: const TextStyle(color: AppColors.danger)),
+                        child: Text(_error!, style: TextStyle(color: context.colors.dangerText)),
                       ),
                     _step == 0
                         ? AppButton(
@@ -192,7 +192,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         children: [
           Text(title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
-          Text(subtitle, style: const TextStyle(fontSize: 15, color: AppColors.muted)),
+          Text(subtitle, style: TextStyle(fontSize: 15, color: context.colors.muted)),
         ],
       );
 
@@ -207,7 +207,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 ProfileAvatar(photoUrl: _photoUrl, name: _name.text, radius: 48),
                 if (_photoUrl != null) ...[
                   const SizedBox(height: 8),
-                  const Text('Ảnh lấy từ tài khoản Google', style: TextStyle(color: AppColors.muted, fontSize: 13)),
+                  Text('Ảnh lấy từ tài khoản Google', style: TextStyle(color: context.colors.muted, fontSize: 13)),
                 ],
               ],
             ),
@@ -226,12 +226,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               decoration: const InputDecoration(suffixIcon: Icon(Icons.expand_more)),
               child: Text(
                 _district == null ? 'Chọn quận/huyện' : districtName(_district!),
-                style: TextStyle(color: _district == null ? AppColors.muted : AppColors.ink, fontSize: 15),
+                style: TextStyle(color: _district == null ? context.colors.muted : context.colors.ink, fontSize: 15),
               ),
             ),
           ),
           const SizedBox(height: 6),
-          const Text('Dùng để gợi ý kèo gần bạn', style: TextStyle(color: AppColors.muted, fontSize: 12)),
+          Text('Dùng để gợi ý kèo gần bạn', style: TextStyle(color: context.colors.muted, fontSize: 12)),
         ],
       );
 
@@ -288,7 +288,7 @@ class _SportTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? sport.color.withValues(alpha: 0.12) : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected ? sport.color : AppColors.border, width: selected ? 2 : 1),
+          border: Border.all(color: selected ? sport.color : context.colors.border, width: selected ? 2 : 1),
         ),
         child: Column(
           children: [
@@ -316,7 +316,7 @@ class _LevelPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: AppColors.neutralSoft, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: context.colors.neutralSoft, borderRadius: BorderRadius.circular(10)),
       child: Row(
         children: [
           for (var i = 0; i < skillLevels.length; i++)
@@ -340,7 +340,7 @@ class _LevelPicker extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: value == i + 1 ? FontWeight.w700 : FontWeight.w500,
-                      color: value == i + 1 ? AppColors.primaryDark : AppColors.muted,
+                      color: value == i + 1 ? context.colors.primaryText : context.colors.muted,
                     ),
                   ),
                 ),

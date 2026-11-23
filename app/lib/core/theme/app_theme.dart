@@ -3,63 +3,71 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
-ThemeData buildAppTheme() {
+ThemeData buildAppTheme(Brightness brightness) {
+  final c = brightness == Brightness.dark ? AppPalette.dark : AppPalette.light;
   final scheme = ColorScheme.fromSeed(
     seedColor: AppColors.primary,
-    primary: AppColors.primaryDark,
-    secondary: AppColors.accentDark,
-    surface: AppColors.surface,
-    error: AppColors.danger,
+    brightness: brightness,
+    primary: c.primaryDark,
+    onPrimary: Colors.white,
+    secondary: c.accentDark,
+    onSecondary: Colors.white,
+    surface: c.surface,
+    error: c.danger,
   );
-  final text = GoogleFonts.beVietnamProTextTheme().apply(
-    bodyColor: AppColors.ink,
-    displayColor: AppColors.ink,
+  final text = GoogleFonts.beVietnamProTextTheme(ThemeData(brightness: brightness).textTheme).apply(
+    bodyColor: c.ink,
+    displayColor: c.ink,
   );
   final buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md));
   const buttonText = TextStyle(fontSize: 15, fontWeight: FontWeight.w600);
   final inputBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(AppRadius.md),
-    borderSide: const BorderSide(color: AppColors.outline),
+    borderSide: BorderSide(color: c.outline),
   );
 
   return ThemeData(
     useMaterial3: true,
+    brightness: brightness,
+    extensions: [c],
     colorScheme: scheme,
-    scaffoldBackgroundColor: AppColors.background,
+    scaffoldBackgroundColor: c.background,
     textTheme: text,
     appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.surface,
-      surfaceTintColor: AppColors.surface,
-      foregroundColor: AppColors.ink,
-      shape: const Border(bottom: BorderSide(color: AppColors.border)),
+      backgroundColor: c.surface,
+      surfaceTintColor: c.surface,
+      foregroundColor: c.ink,
+      shape: Border(bottom: BorderSide(color: c.border)),
     ),
-    dialogTheme: const DialogThemeData(backgroundColor: AppColors.surface),
+    dialogTheme: DialogThemeData(backgroundColor: c.surface),
+    bottomSheetTheme: BottomSheetThemeData(backgroundColor: c.surface),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(shape: buttonShape, textStyle: buttonText),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(shape: buttonShape, textStyle: buttonText),
+      style: OutlinedButton.styleFrom(shape: buttonShape, textStyle: buttonText, foregroundColor: c.primaryText),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(textStyle: buttonText),
+      style: TextButton.styleFrom(textStyle: buttonText, foregroundColor: c.primaryText),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: c.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      hintStyle: const TextStyle(color: AppColors.muted, fontSize: 15),
+      hintStyle: TextStyle(color: c.muted, fontSize: 15),
       border: inputBorder,
       enabledBorder: inputBorder,
       focusedBorder: inputBorder.copyWith(
-        borderSide: const BorderSide(color: AppColors.primaryDark, width: 1.5),
+        borderSide: BorderSide(color: c.primaryText, width: 1.5),
       ),
-      errorBorder: inputBorder.copyWith(borderSide: const BorderSide(color: AppColors.danger)),
+      errorBorder: inputBorder.copyWith(borderSide: BorderSide(color: c.dangerText)),
       focusedErrorBorder:
-          inputBorder.copyWith(borderSide: const BorderSide(color: AppColors.danger, width: 1.5)),
+          inputBorder.copyWith(borderSide: BorderSide(color: c.dangerText, width: 1.5)),
     ),
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
-      backgroundColor: AppColors.ink,
+      backgroundColor: c.ink,
+      contentTextStyle: TextStyle(color: c.background),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
     ),
   );

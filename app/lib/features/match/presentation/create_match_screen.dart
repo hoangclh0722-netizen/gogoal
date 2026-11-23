@@ -330,7 +330,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
     final perPerson = (_costTotal / _format.players / 1000).ceil() * 1000;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: Text(_editing ? 'Sửa kèo' : 'Tạo kèo', style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
@@ -345,7 +345,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                   _Chip(label: s.displayName, color: s.color, selected: s.id == _sportId, onTap: () => _pickSport(s.id)),
             ]),
             if (_editing)
-              const Text('Không đổi môn khi sửa kèo', style: TextStyle(fontSize: 12, color: AppColors.muted)),
+              Text('Không đổi môn khi sửa kèo', style: TextStyle(fontSize: 12, color: context.colors.muted)),
             const _Label('Thể thức'),
             Wrap(spacing: 8, children: [
               for (final f in _formatOptions)
@@ -376,7 +376,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Text('Cần tuyển thêm', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   Text('Tổng ${_format.players} người, tính cả bạn',
-                      style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+                      style: TextStyle(fontSize: 13, color: context.colors.muted)),
                 ]),
               ),
               _Stepper(
@@ -386,10 +386,10 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
               ),
             ]),
             Row(children: [
-              const Expanded(
+              Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('Cần ít nhất', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-                  Text('Đủ số này mới đá được', style: TextStyle(fontSize: 13, color: AppColors.muted)),
+                  Text('Đủ số này mới đá được', style: TextStyle(fontSize: 13, color: context.colors.muted)),
                 ]),
               ),
               _Stepper(
@@ -419,7 +419,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
               ),
             ]),
             if (timeError != null)
-              Text(timeError, style: const TextStyle(fontSize: 13, color: AppColors.danger, fontWeight: FontWeight.w500)),
+              Text(timeError, style: TextStyle(fontSize: 13, color: context.colors.dangerText, fontWeight: FontWeight.w500)),
             const _Label('Thời lượng'),
             Wrap(spacing: 8, children: [
               for (final d in ({..._durations, _duration}.toList()..sort()))
@@ -429,7 +429,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                   onTap: () => setState(() => _duration = d),
                 ),
             ]),
-            Text('Kết thúc lúc ${formatHm(end)}', style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+            Text('Kết thúc lúc ${formatHm(end)}', style: TextStyle(fontSize: 13, color: context.colors.muted)),
             const _Label('Hạn chốt người'),
             Wrap(spacing: 8, children: [
               for (final (mode, label) in [
@@ -447,19 +447,19 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                 ),
             ]),
             if (_deadlineError case final e?)
-              Text(e, style: const TextStyle(fontSize: 13, color: AppColors.danger, fontWeight: FontWeight.w500))
+              Text(e, style: TextStyle(fontSize: 13, color: context.colors.dangerText, fontWeight: FontWeight.w500))
             else if (_deadline case final d?)
               Text('Chốt lúc ${formatHm(d)} ${formatDate(d)} · nên đặt trước hạn hủy sân miễn phí',
-                  style: const TextStyle(fontSize: 13, color: AppColors.muted))
+                  style: TextStyle(fontSize: 13, color: context.colors.muted))
             else
-              const Text('Nhận người tới giờ đá', style: TextStyle(fontSize: 13, color: AppColors.muted)),
+              Text('Nhận người tới giờ đá', style: TextStyle(fontSize: 13, color: context.colors.muted)),
           ]),
           _Section(title: 'Sân', children: [
             _VenueTile(venue: _venue, onTap: _pickVenue),
           ]),
           _Section(title: 'Trình độ', children: [
             Text(formatLevelRange(_levels.start.round(), _levels.end.round()),
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.primaryDark)),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: context.colors.primaryText)),
             RangeSlider(
               values: _levels,
               min: 1,
@@ -471,7 +471,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 for (final l in skillLevels)
-                  Text(l, style: const TextStyle(fontSize: 12, color: AppColors.muted, fontWeight: FontWeight.w500)),
+                  Text(l, style: TextStyle(fontSize: 12, color: context.colors.muted, fontWeight: FontWeight.w500)),
               ],
             ),
           ]),
@@ -485,14 +485,14 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: context.colors.primarySoft, borderRadius: BorderRadius.circular(10)),
               child: Text.rich(TextSpan(children: [
                 TextSpan(
                   text: _costTotal == 0 ? 'Miễn phí' : '≈ ${formatMoney(perPerson)}/người',
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 if (_costTotal > 0) TextSpan(text: '  chia đều ${_format.players} người'),
-              ]), style: const TextStyle(fontSize: 13, color: AppColors.primaryDark)),
+              ]), style: TextStyle(fontSize: 13, color: context.colors.primaryText)),
             ),
           ]),
           _Section(title: 'Khác', children: [
@@ -501,7 +501,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Text('Tự động nhận người', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   Text(_auto ? 'Đang bật: ai đủ điều kiện là vào luôn' : 'Đang tắt: bạn duyệt từng yêu cầu',
-                      style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+                      style: TextStyle(fontSize: 13, color: context.colors.muted)),
                 ]),
               ),
               Switch(value: _auto, onChanged: (v) => setState(() => _auto = v)),
@@ -519,9 +519,9 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
       ),
       bottomNavigationBar: Container(
         padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + MediaQuery.paddingOf(context).bottom),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AppColors.border)),
+        decoration: BoxDecoration(
+          color: context.colors.surface,
+          border: Border(top: BorderSide(color: context.colors.border)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -529,7 +529,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Text(_error!, style: const TextStyle(color: AppColors.danger, fontWeight: FontWeight.w500)),
+                child: Text(_error!, style: TextStyle(color: context.colors.dangerText, fontWeight: FontWeight.w500)),
               ),
             AppButton(
                 label: _saving ? 'Đang lưu…' : (_editing ? 'Lưu thay đổi' : 'Đăng kèo'), onPressed: _canSubmit ? _submit : null),
@@ -563,9 +563,9 @@ class _Section extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -586,7 +586,7 @@ class _Label extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Text(text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.muted));
+      Text(text, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.colors.muted));
 }
 
 class _Chip extends StatelessWidget {
@@ -599,7 +599,7 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = color ?? AppColors.primaryDark;
+    final accent = color ?? context.colors.primaryDark;
     return Semantics(
       button: true,
       selected: selected,
@@ -611,9 +611,9 @@ class _Chip extends StatelessWidget {
         child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: selected && color == null ? AppColors.primarySoft : Colors.white,
+          color: selected && color == null ? context.colors.primarySoft : context.colors.surface,
           borderRadius: BorderRadius.circular(99),
-          border: Border.all(color: selected ? accent : AppColors.outline, width: selected ? 2 : 1),
+          border: Border.all(color: selected ? accent : context.colors.outline, width: selected ? 2 : 1),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           if (color != null) ...[CircleAvatar(radius: 4, backgroundColor: color), const SizedBox(width: 6)],
@@ -621,7 +621,7 @@ class _Chip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected && color == null ? AppColors.primaryDark : AppColors.ink,
+                color: selected && color == null ? context.colors.primaryText : context.colors.ink,
               )),
         ]),
       ),
@@ -642,17 +642,17 @@ class _Stepper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: context.colors.background,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Row(children: [
-        IconButton(onPressed: onMinus, tooltip: 'Bớt', icon: const Icon(Icons.remove), color: AppColors.primaryDark),
+        IconButton(onPressed: onMinus, tooltip: 'Bớt', icon: const Icon(Icons.remove), color: context.colors.primaryText),
         SizedBox(
           width: 28,
           child: Text('$value', textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
         ),
-        IconButton(onPressed: onPlus, tooltip: 'Thêm', icon: const Icon(Icons.add), color: AppColors.primaryDark),
+        IconButton(onPressed: onPlus, tooltip: 'Thêm', icon: const Icon(Icons.add), color: context.colors.primaryText),
       ]),
     );
   }
@@ -674,12 +674,12 @@ class _Field extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: context.colors.background,
           borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: error ? AppColors.danger : AppColors.border, width: error ? 1.5 : 1),
+          border: Border.all(color: error ? context.colors.dangerText : context.colors.border, width: error ? 1.5 : 1),
         ),
         child: Row(children: [
-          Icon(icon, size: 18, color: AppColors.muted),
+          Icon(icon, size: 18, color: context.colors.muted),
           const SizedBox(width: 10),
           Text(text, style: const TextStyle(fontSize: 15)),
         ]),
@@ -703,27 +703,27 @@ class _VenueTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: context.colors.background,
           borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.colors.border),
         ),
         child: Row(children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.place_outlined, color: AppColors.primaryDark, size: 20),
+            decoration: BoxDecoration(color: context.colors.primarySoft, borderRadius: BorderRadius.circular(10)),
+            child: Icon(Icons.place_outlined, color: context.colors.primaryText, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: v == null
-                ? const Text('Chọn sân', style: TextStyle(fontSize: 15, color: AppColors.muted))
+                ? Text('Chọn sân', style: TextStyle(fontSize: 15, color: context.colors.muted))
                 : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(v.name, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                     Text('${v.address} · ${districtName(v.district)}',
-                        style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+                        style: TextStyle(fontSize: 13, color: context.colors.muted)),
                   ]),
           ),
-          const Icon(Icons.chevron_right, color: AppColors.muted),
+          Icon(Icons.chevron_right, color: context.colors.muted),
         ]),
       ),
     );
@@ -750,7 +750,7 @@ class _VenueSheet extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Text('Chọn sân', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-                Text('Các sân có môn ${sport.displayName}', style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+                Text('Các sân có môn ${sport.displayName}', style: TextStyle(fontSize: 13, color: context.colors.muted)),
               ]),
             ),
             Flexible(
@@ -772,11 +772,11 @@ class _VenueSheet extends ConsumerWidget {
                           for (final v in list)
                             ListTile(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-                              tileColor: v.id == selected ? AppColors.primarySoft : null,
+                              tileColor: v.id == selected ? context.colors.primarySoft : null,
                               leading: const Icon(Icons.place_outlined),
                               title: Text(v.venue.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                               subtitle: Text('${v.venue.address} · ${districtName(v.venue.district)}'),
-                              trailing: v.id == selected ? const Icon(Icons.check, color: AppColors.primaryDark) : null,
+                              trailing: v.id == selected ? Icon(Icons.check, color: context.colors.primaryText) : null,
                               onTap: () => Navigator.of(context).pop(v),
                             ),
                         ],

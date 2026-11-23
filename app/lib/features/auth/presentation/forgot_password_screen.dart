@@ -72,11 +72,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Center(
+            Center(
               child: CircleAvatar(
                 radius: 36,
-                backgroundColor: AppColors.primarySoft,
-                child: Icon(Icons.mark_email_read_outlined, size: 36, color: AppColors.primaryDark),
+                backgroundColor: context.colors.primarySoft,
+                child: Icon(Icons.mark_email_read_outlined, size: 36, color: context.colors.primaryText),
               ),
             ),
             const SizedBox(height: 16),
@@ -84,7 +84,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               'Nếu ${_email.text.trim()} đã đăng ký GoGoal, bạn sẽ nhận được link đặt lại mật khẩu trong vài phút. '
               'Nhớ kiểm tra cả thư mục Spam.',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.muted, height: 1.45),
+              style: TextStyle(color: context.colors.muted, height: 1.45),
             ),
             const SizedBox(height: 24),
             AppButton(label: 'Về đăng nhập', onPressed: () => context.pop()),

@@ -32,10 +32,10 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
     final choice = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: const CircleAvatar(
+        icon: CircleAvatar(
           radius: 28,
-          backgroundColor: AppColors.warningSoft,
-          child: Icon(Icons.error_outline, color: AppColors.warningInk),
+          backgroundColor: context.colors.warningSoft,
+          child: Icon(Icons.error_outline, color: context.colors.warningInk),
         ),
         title: const Text('Kèo chưa đủ người', textAlign: TextAlign.center),
         content: Text(
@@ -51,7 +51,7 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
               FilledButton(onPressed: () => Navigator.of(context).pop('lock'), child: const Text('Vẫn đá – chốt kèo')),
               OutlinedButton(onPressed: () => Navigator.of(context).pop('extend'), child: const Text('Gia hạn')),
               FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                style: FilledButton.styleFrom(backgroundColor: context.colors.danger),
                 onPressed: () => Navigator.of(context).pop('cancel'),
                 child: const Text('Hủy kèo'),
               ),
@@ -84,7 +84,7 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: Colors.white,
+      backgroundColor: context.colors.surface,
       builder: (_) => _CancelSheet(match: match),
     );
     if (done == true && mounted) {
@@ -98,7 +98,7 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: Colors.white,
+      backgroundColor: context.colors.surface,
       builder: (_) => _AttendanceSheet(members: members),
     );
     if (present == null || !mounted) return;
@@ -121,10 +121,10 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
       final ok = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          icon: const CircleAvatar(
+          icon: CircleAvatar(
             radius: 28,
-            backgroundColor: AppColors.primarySoft,
-            child: Icon(Icons.lock_outline, color: AppColors.primaryDark),
+            backgroundColor: context.colors.primarySoft,
+            child: Icon(Icons.lock_outline, color: context.colors.primaryText),
           ),
           title: const Text('Chốt kèo?', textAlign: TextAlign.center),
           content: Text(
@@ -165,10 +165,10 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: const CircleAvatar(
+        icon: CircleAvatar(
           radius: 28,
-          backgroundColor: AppColors.dangerSoft,
-          child: Icon(Icons.person_remove_outlined, color: AppColors.danger),
+          backgroundColor: context.colors.dangerSoft,
+          child: Icon(Icons.person_remove_outlined, color: context.colors.dangerText),
         ),
         title: Text('Mời ${member.displayName} ra khỏi kèo?', textAlign: TextAlign.center),
         content: Text(
@@ -184,7 +184,7 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
               ),
               Expanded(
                 child: FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                  style: FilledButton.styleFrom(backgroundColor: context.colors.danger),
                   onPressed: () => Navigator.of(context).pop(true),
                   child: const Text('Mời ra'),
                 ),
@@ -262,8 +262,8 @@ class _ManageMatchScreenState extends ConsumerState<ManageMatchScreen> {
                     loading: () => const Center(child: CircularProgressIndicator()),
                     error: (_, _) => const Center(child: Text('Không kết nối được, thử lại')),
                     data: (list) => list.isEmpty
-                        ? const Center(
-                            child: Text('Chưa có ai xin vào', style: TextStyle(color: AppColors.muted)),
+                        ? Center(
+                            child: Text('Chưa có ai xin vào', style: TextStyle(color: context.colors.muted)),
                           )
                         : ListView.separated(
                             padding: const EdgeInsets.all(16),
@@ -309,8 +309,8 @@ class _Header extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, 18),
-      decoration: const BoxDecoration(
-        color: AppColors.primaryDark,
+      decoration: BoxDecoration(
+        color: context.colors.primaryDark,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
       child: Column(
@@ -377,19 +377,19 @@ class _AttendanceBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
       decoration: BoxDecoration(
-        color: done ? AppColors.neutralSoft : AppColors.warningSoft,
+        color: done ? context.colors.neutralSoft : context.colors.warningSoft,
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
       child: Row(children: [
         Icon(done ? Icons.fact_check_outlined : Icons.how_to_reg_outlined,
-            color: done ? AppColors.ink : AppColors.warningInk, size: 20),
+            color: done ? context.colors.ink : context.colors.warningInk, size: 20),
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(done ? 'Đã điểm danh' : 'Trận đã xong · điểm danh',
-                style: TextStyle(fontWeight: FontWeight.w700, color: done ? AppColors.ink : AppColors.warningText)),
+                style: TextStyle(fontWeight: FontWeight.w700, color: done ? context.colors.ink : context.colors.warningText)),
             Text(done ? 'Số trận và lần vắng đã được cộng vào uy tín' : 'Trong 24 giờ, đánh dấu ai vắng để tính uy tín',
-                style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+                style: TextStyle(fontSize: 12, color: context.colors.muted)),
           ]),
         ),
         if (!done) FilledButton(onPressed: onTap, child: const Text('Điểm danh')),
@@ -445,14 +445,14 @@ class _AttendanceSheetState extends State<_AttendanceSheet> {
           children: [
             const Text('Điểm danh', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
-            const Text('Bấm vào người vắng mặt. Người không bị đánh dấu được tính có mặt.',
-                style: TextStyle(color: AppColors.muted)),
+            Text('Bấm vào người vắng mặt. Người không bị đánh dấu được tính có mặt.',
+                style: TextStyle(color: context.colors.muted)),
             const SizedBox(height: 12),
             if (widget.members.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Text('Kèo không có thành viên nào qua app, chỉ cộng một trận cho bạn.',
-                    style: TextStyle(color: AppColors.muted)),
+                    style: TextStyle(color: context.colors.muted)),
               ),
             Flexible(
               child: ListView(
@@ -467,15 +467,15 @@ class _AttendanceSheetState extends State<_AttendanceSheet> {
                         leading: ProfileAvatar(photoUrl: m.avatarUrl, name: m.displayName, radius: 20),
                         title: Text(m.displayName, style: const TextStyle(fontWeight: FontWeight.w600)),
                         trailing: _present[m.uid]!
-                            ? const Chip(
+                            ? Chip(
                                 label: Text('Có mặt'),
-                                backgroundColor: AppColors.primarySoft,
-                                labelStyle: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w700),
+                                backgroundColor: context.colors.primarySoft,
+                                labelStyle: TextStyle(color: context.colors.primaryText, fontWeight: FontWeight.w700),
                               )
-                            : const Chip(
+                            : Chip(
                                 label: Text('Vắng'),
-                                backgroundColor: AppColors.dangerSoft,
-                                labelStyle: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700),
+                                backgroundColor: context.colors.dangerSoft,
+                                labelStyle: TextStyle(color: context.colors.dangerText, fontWeight: FontWeight.w700),
                               ),
                         onTap: () => setState(() => _present[m.uid] = !_present[m.uid]!),
                       ),
@@ -508,13 +508,13 @@ class _LockBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
       decoration: BoxDecoration(
-        color: locked ? AppColors.neutralSoft : AppColors.primarySoft,
+        color: locked ? context.colors.neutralSoft : context.colors.primarySoft,
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
       child: Row(
         children: [
           Icon(locked ? Icons.lock_outline : Icons.group_outlined,
-              color: locked ? AppColors.ink : AppColors.primaryDark, size: 20),
+              color: locked ? context.colors.ink : context.colors.primaryText, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -523,7 +523,7 @@ class _LockBar extends StatelessWidget {
                 Text(
                   locked ? 'Đã chốt kèo' : 'Đang nhận người · ${match.slotsFilled}/${match.slotsNeeded}',
                   style: TextStyle(
-                      fontWeight: FontWeight.w700, color: locked ? AppColors.ink : AppColors.primaryDark, fontSize: 14),
+                      fontWeight: FontWeight.w700, color: locked ? context.colors.ink : context.colors.primaryText, fontSize: 14),
                 ),
                 Text(
                   locked
@@ -533,7 +533,7 @@ class _LockBar extends StatelessWidget {
                           : match.joinDeadline != null
                               ? 'Hạn chốt ${formatHm(match.joinDeadline!)} ${formatDate(match.joinDeadline!)}'
                               : 'Đủ người thì chốt để báo mọi người',
-                  style: const TextStyle(fontSize: 12, color: AppColors.muted),
+                  style: TextStyle(fontSize: 12, color: context.colors.muted),
                 ),
               ],
             ),
@@ -559,7 +559,7 @@ class _Tabs extends StatelessWidget {
     const labels = ['Chờ duyệt', 'Thành viên'];
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: context.colors.border, borderRadius: BorderRadius.circular(12)),
       child: Row(
         children: [
           for (var i = 0; i < 2; i++)
@@ -573,7 +573,7 @@ class _Tabs extends StatelessWidget {
                 child: Container(
                   height: 44,
                   decoration: BoxDecoration(
-                    color: i == index ? Colors.white : Colors.transparent,
+                    color: i == index ? context.colors.surface : Colors.transparent,
                     borderRadius: BorderRadius.circular(9),
                   ),
                   child: Row(
@@ -582,17 +582,17 @@ class _Tabs extends StatelessWidget {
                       Text(labels[i],
                           style: TextStyle(
                             fontWeight: i == index ? FontWeight.w700 : FontWeight.w500,
-                            color: i == index ? AppColors.ink : AppColors.muted,
+                            color: i == index ? context.colors.ink : context.colors.ink,
                           )),
                       const SizedBox(width: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                         decoration: BoxDecoration(
-                          color: i == index ? AppColors.accentDark : AppColors.muted,
+                          color: i == index ? context.colors.accentDark : context.colors.muted,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text('${counts[i]}',
-                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                            style: TextStyle(color: i == index ? Colors.white : context.colors.background, fontSize: 12, fontWeight: FontWeight.w700)),
                       ),
                     ],
                   ),
@@ -675,7 +675,7 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
                     ),
                     if (r.requestedAt != null)
                       Text(formatTimeAgo(r.requestedAt!, DateTime.now()),
-                          style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+                          style: TextStyle(fontSize: 12, color: context.colors.muted)),
                   ],
                 ),
                 Row(
@@ -688,7 +688,7 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
                       rep == null ? 'Chưa có đánh giá' : rep.toStringAsFixed(1),
                       style: TextStyle(
                         fontSize: 12,
-                        color: rep == null ? AppColors.muted : AppColors.ink,
+                        color: rep == null ? context.colors.muted : context.colors.ink,
                         fontWeight: rep == null ? FontWeight.w400 : FontWeight.w600,
                       ),
                     ),
@@ -702,7 +702,7 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
       if (r.message != null)
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(color: context.colors.background, borderRadius: BorderRadius.circular(10)),
           child: Text('“${r.message}”', style: const TextStyle(fontSize: 13)),
         ),
       if (widget.editable)
@@ -714,8 +714,8 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
                 onPressed: _busy ? null : () => _act(false),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(0, 40),
-                  foregroundColor: AppColors.ink,
-                  side: const BorderSide(color: AppColors.border, width: 1.5),
+                  foregroundColor: context.colors.ink,
+                  side: BorderSide(color: context.colors.border, width: 1.5),
                 ),
                 child: const Text('Từ chối'),
               ),
@@ -725,9 +725,9 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
                 onPressed: _busy || full ? null : () => _act(true),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(0, 40),
-                  backgroundColor: AppColors.primaryDark,
-                  disabledBackgroundColor: AppColors.border,
-                  disabledForegroundColor: AppColors.muted,
+                  backgroundColor: context.colors.primaryDark,
+                  disabledBackgroundColor: context.colors.border,
+                  disabledForegroundColor: context.colors.muted,
                 ),
                 child: _busy
                     ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
@@ -781,7 +781,7 @@ class _MemberTile extends StatelessWidget {
         if (onRemove != null)
           TextButton(
             onPressed: onRemove,
-            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+            style: TextButton.styleFrom(foregroundColor: context.colors.dangerText),
             child: const Text('Mời ra', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
       ],
@@ -797,11 +797,11 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = host ? AppColors.warningInk : AppColors.primaryDark;
+    final fg = host ? context.colors.warningInk : context.colors.primaryText;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: host ? AppColors.warningSoft : AppColors.primarySoft,
+        color: host ? context.colors.warningSoft : context.colors.primarySoft,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -871,8 +871,8 @@ class _CancelSheetState extends ConsumerState<_CancelSheet> {
             spacing: 10,
             children: [
               const Text('Hủy kèo này?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-              const Text('Mọi người trong kèo sẽ thấy kèo đã bị hủy. Chọn lý do:',
-                  style: TextStyle(color: AppColors.muted)),
+              Text('Mọi người trong kèo sẽ thấy kèo đã bị hủy. Chọn lý do:',
+                  style: TextStyle(color: context.colors.muted)),
               for (final r in _reasons)
                 InkWell(
                   onTap: () => setState(() => _picked = r),
@@ -880,10 +880,10 @@ class _CancelSheetState extends ConsumerState<_CancelSheet> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
-                      color: r == _picked ? AppColors.primarySoft : Colors.white,
+                      color: r == _picked ? context.colors.primarySoft : context.colors.surface,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: r == _picked ? AppColors.primaryDark : AppColors.border,
+                        color: r == _picked ? context.colors.primaryText : context.colors.border,
                         width: r == _picked ? 2 : 1,
                       ),
                     ),
@@ -891,7 +891,7 @@ class _CancelSheetState extends ConsumerState<_CancelSheet> {
                       children: [
                         Icon(
                           r == _picked ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                          color: r == _picked ? AppColors.primaryDark : AppColors.muted,
+                          color: r == _picked ? context.colors.primaryText : context.colors.muted,
                         ),
                         const SizedBox(width: 12),
                         Text(r, style: TextStyle(fontWeight: r == _picked ? FontWeight.w600 : FontWeight.w500)),
@@ -907,7 +907,7 @@ class _CancelSheetState extends ConsumerState<_CancelSheet> {
                   onChanged: (_) => setState(() {}),
                   decoration: const InputDecoration(hintText: 'Nhập lý do'),
                 ),
-              if (_error != null) Text(_error!, style: const TextStyle(color: AppColors.danger)),
+              if (_error != null) Text(_error!, style: TextStyle(color: context.colors.dangerText)),
               Row(
                 spacing: 10,
                 children: [
@@ -921,7 +921,7 @@ class _CancelSheetState extends ConsumerState<_CancelSheet> {
                   Expanded(
                     child: FilledButton(
                       onPressed: _reason.isEmpty || _sending ? null : _send,
-                      style: FilledButton.styleFrom(minimumSize: const Size(0, 48), backgroundColor: AppColors.danger),
+                      style: FilledButton.styleFrom(minimumSize: const Size(0, 48), backgroundColor: context.colors.danger),
                       child: Text(_sending ? 'Đang hủy…' : 'Hủy kèo'),
                     ),
                   ),

@@ -32,8 +32,8 @@ class HomeFilters extends ConsumerWidget {
             children: [
               _SportChip(
                 label: 'Tất cả',
-                icon: Icon(Icons.apps, color: filter.sportId == null ? Colors.white : AppColors.primaryDark, size: 24),
-                color: AppColors.primaryDark,
+                icon: Icon(Icons.apps, color: filter.sportId == null ? Colors.white : context.colors.primaryText, size: 24),
+                color: context.colors.primaryDark,
                 selected: filter.sportId == null,
                 onTap: () => controller.setSport(null),
               ),
@@ -116,7 +116,7 @@ class _SportChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected ? AppColors.ink : AppColors.muted,
+                color: selected ? context.colors.ink : context.colors.muted,
               ),
             ),
           ],
@@ -147,16 +147,16 @@ class _TimeChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? AppColors.primarySoft : Colors.white,
+          color: selected ? context.colors.primarySoft : context.colors.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: selected ? AppColors.primaryDark : AppColors.outline),
+          border: Border.all(color: selected ? context.colors.primaryText : context.colors.outline),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: selected ? AppColors.primaryDark : AppColors.muted,
+            color: selected ? context.colors.primaryText : context.colors.muted,
           ),
         ),
       ),

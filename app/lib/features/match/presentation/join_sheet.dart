@@ -15,7 +15,7 @@ Future<bool?> showJoinSheet(BuildContext context, Match match, UserProfile profi
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: Colors.white,
+      backgroundColor: context.colors.surface,
       builder: (_) => JoinSheet(match: match, profile: profile),
     );
 
@@ -73,9 +73,9 @@ class _JoinSheetState extends ConsumerState<JoinSheet> {
     final m = widget.match;
     Widget line(IconData icon, String text) => Row(
           children: [
-            Icon(icon, size: 16, color: AppColors.muted),
+            Icon(icon, size: 16, color: context.colors.muted),
             const SizedBox(width: 8),
-            Expanded(child: Text(text, style: const TextStyle(fontSize: 13, color: AppColors.muted))),
+            Expanded(child: Text(text, style: TextStyle(fontSize: 13, color: context.colors.muted))),
           ],
         );
 
@@ -91,7 +91,7 @@ class _JoinSheetState extends ConsumerState<JoinSheet> {
               const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: context.colors.background, borderRadius: BorderRadius.circular(12)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 6,
@@ -116,17 +116,17 @@ class _JoinSheetState extends ConsumerState<JoinSheet> {
               ),
               Row(
                 children: [
-                  const Icon(Icons.info_outline, size: 16, color: AppColors.muted),
+                  Icon(Icons.info_outline, size: 16, color: context.colors.muted),
                   const SizedBox(width: 8),
                   Text(
                     m.autoApprove ? 'Kèo vào ngay, bạn có chỗ luôn' : 'Chủ kèo sẽ duyệt yêu cầu của bạn',
-                    style: const TextStyle(fontSize: 13, color: AppColors.muted),
+                    style: TextStyle(fontSize: 13, color: context.colors.muted),
                   ),
                 ],
               ),
               if (_error != null) ...[
                 const SizedBox(height: 10),
-                Text(_error!, style: const TextStyle(color: AppColors.danger, fontWeight: FontWeight.w500)),
+                Text(_error!, style: TextStyle(color: context.colors.dangerText, fontWeight: FontWeight.w500)),
               ],
               const SizedBox(height: 14),
               AppButton(

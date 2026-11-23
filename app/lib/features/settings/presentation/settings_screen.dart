@@ -20,12 +20,18 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
           const _Section('Giao diện'),
-          const ListTile(
-            leading: Icon(Icons.dark_mode_outlined),
-            title: Text('Chế độ sáng / tối'),
-            subtitle: Text('Sắp có'),
-            trailing: Text('Sáng', style: TextStyle(color: AppColors.muted)),
-            enabled: false,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SegmentedButton<ThemeMode>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(value: ThemeMode.light, label: Text('Sáng')),
+                ButtonSegment(value: ThemeMode.dark, label: Text('Tối')),
+                ButtonSegment(value: ThemeMode.system, label: Text('Theo máy')),
+              ],
+              selected: {ref.watch(themeModeProvider)},
+              onSelectionChanged: (s) => ref.read(themeModeProvider.notifier).set(s.first),
+            ),
           ),
           const _Section('Thông báo'),
           SwitchListTile(
@@ -48,8 +54,8 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.logout, color: AppColors.danger),
-            title: const Text('Đăng xuất', style: TextStyle(color: AppColors.danger)),
+            leading: Icon(Icons.logout, color: context.colors.dangerText),
+            title: Text('Đăng xuất', style: TextStyle(color: context.colors.dangerText)),
             onTap: () => confirmSignOut(context, ref),
           ),
         ],
@@ -67,7 +73,7 @@ class _Section extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(title, style: const TextStyle(color: AppColors.muted, fontSize: 13, fontWeight: FontWeight.w600)),
+      child: Text(title, style: TextStyle(color: context.colors.muted, fontSize: 13, fontWeight: FontWeight.w600)),
     );
   }
 }

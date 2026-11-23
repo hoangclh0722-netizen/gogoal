@@ -61,15 +61,15 @@ class _MyMatchesScreenState extends ConsumerState<MyMatchesScreen> {
     final list = _past ? past : upcoming;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       bottomNavigationBar: HomeBottomNav(active: 'Kèo của tôi', onTap: _onTab),
       body: Column(
         children: [
           Container(
             width: double.infinity,
             padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + 12, 16, 16),
-            decoration: const BoxDecoration(
-              color: AppColors.primaryDark,
+            decoration: BoxDecoration(
+              color: context.colors.primaryDark,
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
             ),
             child: Column(
@@ -116,12 +116,12 @@ class _MyMatchesScreenState extends ConsumerState<MyMatchesScreen> {
                             if (watching.isNotEmpty) ...[
                               Padding(
                                 padding: EdgeInsets.only(top: list.isEmpty ? 0 : 8, bottom: 10),
-                                child: const Row(children: [
+                                child: Row(children: [
                                   Icon(Icons.star_rounded, size: 18, color: AppColors.tennis),
                                   SizedBox(width: 6),
                                   Text('Đang theo dõi', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                                   SizedBox(width: 6),
-                                  Text('· không chiếm chỗ', style: TextStyle(fontSize: 13, color: AppColors.muted)),
+                                  Text('· không chiếm chỗ', style: TextStyle(fontSize: 13, color: context.colors.muted)),
                                 ]),
                               ),
                               for (final m in watching) ...[
@@ -134,8 +134,8 @@ class _MyMatchesScreenState extends ConsumerState<MyMatchesScreen> {
                   : async.hasError
                       ? ListView(children: [
                           const SizedBox(height: 120),
-                          const Center(
-                            child: Text('Không tải được kèo của bạn', style: TextStyle(color: AppColors.muted)),
+                          Center(
+                            child: Text('Không tải được kèo của bạn', style: TextStyle(color: context.colors.muted)),
                           ),
                           Center(
                             child: TextButton(
@@ -178,7 +178,7 @@ class _Segment extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected ? AppColors.primaryDark : Colors.white,
+                color: selected ? context.colors.primaryDark : Colors.white,
               )),
         ),
       ),
@@ -202,21 +202,21 @@ class _MyMatchCard extends StatelessWidget {
     final health = m.health(now);
     final detail = healthDetail(m, now);
     final (label, bg, fg) = cancelled
-        ? ('Đã hủy', AppColors.dangerSoft, AppColors.dangerInk)
+        ? ('Đã hủy', context.colors.dangerSoft, context.colors.dangerInk)
         : switch (item.role) {
-            MyRole.host => ('Chủ kèo', AppColors.warningSoft, AppColors.warningInk),
-            MyRole.approved => ('Đã vào', AppColors.primarySoft, AppColors.primaryDark),
-            MyRole.pending => ('Chờ duyệt', AppColors.infoSoft, AppColors.info),
-            MyRole.watching => ('Theo dõi', AppColors.neutralSoft, AppColors.muted),
+            MyRole.host => ('Chủ kèo', context.colors.warningSoft, context.colors.warningInk),
+            MyRole.approved => ('Đã vào', context.colors.primarySoft, context.colors.primaryText),
+            MyRole.pending => ('Chờ duyệt', context.colors.infoSoft, context.colors.info),
+            MyRole.watching => ('Theo dõi', context.colors.neutralSoft, context.colors.muted),
           };
 
     return Opacity(
       opacity: cancelled ? 0.6 : 1,
       child: Material(
-        color: Colors.white,
+        color: context.colors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: context.colors.border),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -247,22 +247,22 @@ class _MyMatchCard extends StatelessWidget {
                           ),
                         ]),
                         Row(children: [
-                          const Icon(Icons.schedule, size: 16, color: AppColors.muted),
+                          Icon(Icons.schedule, size: 16, color: context.colors.muted),
                           const SizedBox(width: 6),
                           Text(formatMatchTime(m.startAt, DateTime.now()),
                               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                         ]),
                         Row(children: [
-                          const Icon(Icons.place_outlined, size: 16, color: AppColors.muted),
+                          Icon(Icons.place_outlined, size: 16, color: context.colors.muted),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text('${m.venue.name} · ${districtName(m.district)}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+                                style: TextStyle(fontSize: 13, color: context.colors.muted)),
                           ),
                           Text('${m.slotsFilled}/${m.slotsNeeded}',
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.muted)),
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.colors.muted)),
                         ]),
                         if (health != null && !cancelled)
                           Row(children: [
@@ -273,7 +273,7 @@ class _MyMatchCard extends StatelessWidget {
                                 child: Text(detail,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+                                    style: TextStyle(fontSize: 12, color: context.colors.muted)),
                               ),
                             ],
                           ]),
@@ -306,16 +306,16 @@ class _Empty extends StatelessWidget {
         Center(
           child: CircleAvatar(
             radius: 36,
-            backgroundColor: AppColors.primarySoft,
-            child: const Icon(Icons.event_note_outlined, size: 32, color: AppColors.primaryDark),
+            backgroundColor: context.colors.primarySoft,
+            child: Icon(Icons.event_note_outlined, size: 32, color: context.colors.primaryText),
           ),
         ),
         const SizedBox(height: 14),
         Text(past ? 'Chưa có kèo nào đã qua' : 'Chưa có kèo sắp tới',
             textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
         const SizedBox(height: 6),
-        const Text('Tìm kèo để xin vào, hoặc tự tạo kèo mời mọi người.',
-            textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: AppColors.muted)),
+        Text('Tìm kèo để xin vào, hoặc tự tạo kèo mời mọi người.',
+            textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: context.colors.muted)),
         if (!past) ...[
           const SizedBox(height: 18),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [

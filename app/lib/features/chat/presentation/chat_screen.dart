@@ -62,7 +62,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final open = match != null && DateTime.now().isBefore(match.endAt.add(const Duration(hours: 24)));
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +70,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Text(match?.title ?? 'Chat kèo', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
             if (match != null)
               Text(formatTimeRange(match.startAt, match.endAt),
-                  style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+                  style: TextStyle(fontSize: 12, color: context.colors.muted)),
           ],
         ),
       ),
@@ -79,16 +79,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           Expanded(
             child: messages.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, _) => const Center(
+              error: (_, _) => Center(
                 child: Padding(
                   padding: EdgeInsets.all(24),
                   child: Text('Chỉ chủ kèo và thành viên đã được nhận mới xem được chat',
-                      textAlign: TextAlign.center, style: TextStyle(color: AppColors.muted)),
+                      textAlign: TextAlign.center, style: TextStyle(color: context.colors.muted)),
                 ),
               ),
               data: (list) => list.isEmpty
-                  ? const Center(
-                      child: Text('Chưa có tin nhắn. Chào mọi người đi!', style: TextStyle(color: AppColors.muted)),
+                  ? Center(
+                      child: Text('Chưa có tin nhắn. Chào mọi người đi!', style: TextStyle(color: context.colors.muted)),
                     )
                   : ListView.builder(
                       reverse: true,
@@ -111,16 +111,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Container(
               width: double.infinity,
               padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + MediaQuery.paddingOf(context).bottom),
-              color: Colors.white,
-              child: const Text('Chat đã đóng sau 24 giờ kể từ khi kèo kết thúc',
-                  textAlign: TextAlign.center, style: TextStyle(color: AppColors.muted)),
+              color: context.colors.surface,
+              child: Text('Chat đã đóng sau 24 giờ kể từ khi kèo kết thúc',
+                  textAlign: TextAlign.center, style: TextStyle(color: context.colors.muted)),
             )
           else
             Container(
               padding: EdgeInsets.fromLTRB(12, 8, 4, 8 + MediaQuery.paddingOf(context).bottom),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: AppColors.border)),
+              decoration: BoxDecoration(
+                color: context.colors.surface,
+                border: Border(top: BorderSide(color: context.colors.border)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -139,7 +139,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     tooltip: 'Gửi',
                     onPressed: uid == null || _sending || _text.text.trim().isEmpty ? null : () => _send(uid),
                     icon: const Icon(Icons.send_rounded),
-                    color: AppColors.primaryDark,
+                    color: context.colors.primaryText,
                   ),
                 ],
               ),
@@ -169,25 +169,25 @@ class _Bubble extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 6, bottom: 3),
               child: Text(message.senderName,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.muted)),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: context.colors.muted)),
             ),
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.75),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: mine ? AppColors.primaryDark : Colors.white,
+                color: mine ? context.colors.primaryDark : context.colors.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: mine ? null : Border.all(color: AppColors.border),
+                border: mine ? null : Border.all(color: context.colors.border),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(message.text,
-                      style: TextStyle(fontSize: 15, height: 1.35, color: mine ? Colors.white : AppColors.ink)),
+                      style: TextStyle(fontSize: 15, height: 1.35, color: mine ? Colors.white : context.colors.ink)),
                   const SizedBox(height: 2),
                   Text(time == null ? 'Đang gửi…' : formatHm(time),
-                      style: TextStyle(fontSize: 12, color: mine ? Colors.white : AppColors.muted)),
+                      style: TextStyle(fontSize: 12, color: mine ? Colors.white : context.colors.muted)),
                 ],
               ),
             ),

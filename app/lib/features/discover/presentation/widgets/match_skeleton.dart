@@ -26,7 +26,7 @@ class _MatchSkeletonListState extends State<MatchSkeletonList> with SingleTicker
     return AnimatedBuilder(
       animation: _pulse,
       builder: (_, _) {
-        final tone = Color.lerp(const Color(0xFFE2E8F0), const Color(0xFFF1F5F9), _pulse.value)!;
+        final tone = Color.lerp(context.colors.border, context.colors.neutralSoft, _pulse.value)!;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
@@ -59,9 +59,9 @@ class _SkeletonCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

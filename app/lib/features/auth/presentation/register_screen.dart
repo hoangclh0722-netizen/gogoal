@@ -95,7 +95,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   onPressed: () => setState(() => _hidePassword = !_hidePassword),
                   icon: Icon(
                     _hidePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    color: AppColors.muted,
+                    color: context.colors.muted,
                   ),
                 ),
               ),
@@ -117,7 +117,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 children: [
                   Checkbox(
                     value: _agreed,
-                    activeColor: AppColors.primaryDark,
+                    activeColor: context.colors.primaryDark,
                     onChanged: (v) => setState(() {
                       _agreed = v ?? false;
                       _showAgreeError = false;
@@ -130,10 +130,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
             ),
             if (_showAgreeError)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(left: 12, bottom: 4),
                 child: Text('Bạn cần đồng ý điều khoản để tiếp tục',
-                    style: TextStyle(color: AppColors.danger, fontSize: 12)),
+                    style: TextStyle(color: context.colors.dangerText, fontSize: 12)),
               ),
             const SizedBox(height: 12),
             if (_error != null) AuthErrorText(_error!),
@@ -142,14 +142,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Đã có tài khoản?', style: TextStyle(color: AppColors.muted)),
+                Text('Đã có tài khoản?', style: TextStyle(color: context.colors.muted)),
                 InkWell(
                   onTap: () => context.pop(),
                   borderRadius: BorderRadius.circular(8),
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
                     child: Text('Đăng nhập',
-                        style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w700)),
+                        style: TextStyle(color: context.colors.primaryText, fontWeight: FontWeight.w700)),
                   ),
                 ),
               ],

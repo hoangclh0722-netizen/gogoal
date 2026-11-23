@@ -28,8 +28,8 @@ class HomeHeader extends ConsumerWidget {
 
     return Container(
       padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 12, 16, 24),
-      decoration: const BoxDecoration(
-        color: AppColors.primaryDark,
+      decoration: BoxDecoration(
+        color: context.colors.primaryDark,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
       child: Column(
@@ -63,7 +63,7 @@ class HomeHeader extends ConsumerWidget {
                     onPressed: onLogin,
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: AppColors.primaryDark,
+                      foregroundColor: context.colors.primaryDark,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       shape: const StadiumBorder(),
                       textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
@@ -104,9 +104,9 @@ class HomeHeader extends ConsumerWidget {
                     focusNode: searchFocus,
                     onChanged: ref.read(filterProvider.notifier).setQuery,
                     textInputAction: TextInputAction.search,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Tìm theo sân, quận…',
-                      prefixIcon: Icon(Icons.search, color: AppColors.muted),
+                      prefixIcon: Icon(Icons.search, color: context.colors.muted),
                       contentPadding: EdgeInsets.zero,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
@@ -165,7 +165,7 @@ class HomeCompactBar extends ConsumerWidget {
     final query = ref.watch(filterProvider.select((f) => f.query));
 
     return Material(
-      color: AppColors.primaryDark,
+      color: context.colors.primaryDark,
       elevation: 3,
       child: Padding(
         padding: EdgeInsets.fromLTRB(8, MediaQuery.paddingOf(context).top + 4, 8, 8),
@@ -199,16 +199,16 @@ class HomeCompactBar extends ConsumerWidget {
                   child: Container(
                     height: 40,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+                    decoration: BoxDecoration(color: context.colors.surface, borderRadius: BorderRadius.circular(24)),
                     child: Row(children: [
-                      const Icon(Icons.search, color: AppColors.muted, size: 20),
+                      Icon(Icons.search, color: context.colors.muted, size: 20),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           query.isEmpty ? 'Tìm theo sân, quận…' : query,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 14, color: query.isEmpty ? AppColors.muted : AppColors.ink),
+                          style: TextStyle(fontSize: 14, color: query.isEmpty ? context.colors.muted : context.colors.ink),
                         ),
                       ),
                     ]),

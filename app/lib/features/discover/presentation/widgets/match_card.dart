@@ -34,12 +34,12 @@ class MatchCard extends StatelessWidget {
       opacity: closed ? 0.6 : 1,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.colors.border),
           boxShadow: [
             BoxShadow(
-              color: AppColors.ink.withValues(alpha: 0.05),
+              color: context.colors.ink.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -91,7 +91,7 @@ class MatchCard extends StatelessWidget {
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              const Icon(Icons.schedule, size: 16, color: AppColors.muted),
+                              Icon(Icons.schedule, size: 16, color: context.colors.muted),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -110,8 +110,8 @@ class MatchCard extends StatelessWidget {
                             children: [
                               _Pill(
                                 formatLevelRange(match.levelMin, match.levelMax),
-                                background: AppColors.infoSoft,
-                                foreground: AppColors.info,
+                                background: context.colors.infoSoft,
+                                foreground: context.colors.info,
                               ),
                               _Pill(
                                 match.locked
@@ -121,14 +121,14 @@ class MatchCard extends StatelessWidget {
                                         : expired
                                             ? 'Hết hạn nhận'
                                             : 'Còn ${match.slotsLeft} chỗ',
-                                background: closed ? AppColors.border : AppColors.primarySoft,
-                                foreground: closed ? AppColors.muted : AppColors.primaryDark,
+                                background: closed ? context.colors.border : context.colors.primarySoft,
+                                foreground: closed ? context.colors.muted : context.colors.primaryText,
                               ),
                               if (match.health(DateTime.now()) == MatchHealth.atRisk && !expired)
-                                const _Pill(
+                                _Pill(
                                   'Có nguy cơ bể',
-                                  background: AppColors.accentSoft,
-                                  foreground: AppColors.accentDark,
+                                  background: context.colors.accentSoft,
+                                  foreground: context.colors.accentText,
                                 ),
                             ],
                           ),
@@ -160,7 +160,7 @@ class MatchCard extends StatelessWidget {
                                         const Icon(Icons.star_rounded, size: 14, color: AppColors.tennis),
                                         Text(
                                           match.host.rep.toStringAsFixed(1),
-                                          style: const TextStyle(fontSize: 12, color: AppColors.muted),
+                                          style: TextStyle(fontSize: 12, color: context.colors.muted),
                                         ),
                                       ],
                                     ),
@@ -171,13 +171,13 @@ class MatchCard extends StatelessWidget {
                                 TextSpan(
                                   text: formatMoney(match.costPerPerson),
                                   style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-                                  children: const [
+                                  children: [
                                     TextSpan(
                                       text: '/người',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
-                                        color: AppColors.muted,
+                                        color: context.colors.muted,
                                       ),
                                     ),
                                   ],
@@ -217,9 +217,9 @@ class _DistanceBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: context.colors.background,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

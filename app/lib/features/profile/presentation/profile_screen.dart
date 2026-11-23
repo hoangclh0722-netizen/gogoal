@@ -41,7 +41,7 @@ class ProfileScreen extends ConsumerWidget {
       bottomNavigationBar: HomeBottomNav(active: 'Hồ sơ', onTap: (t) => _onTab(context, t)),
       body: profile.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) => const Center(child: Text('Không tải được hồ sơ', style: TextStyle(color: AppColors.muted))),
+        error: (_, _) => Center(child: Text('Không tải được hồ sơ', style: TextStyle(color: context.colors.muted))),
         data: (p) {
           if (user == null) return const SizedBox.shrink();
           if (p == null) {
@@ -80,8 +80,8 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     TextButton(
                       onPressed: () => confirmSignOut(context, ref),
-                      child: const Text('Đăng xuất',
-                          style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w600, fontSize: 15)),
+                      child: Text('Đăng xuất',
+                          style: TextStyle(color: context.colors.dangerText, fontWeight: FontWeight.w600, fontSize: 15)),
                     ),
                   ],
                 ),
@@ -103,8 +103,8 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 12, 16, 18),
-      decoration: const BoxDecoration(
-        color: AppColors.primaryDark,
+      decoration: BoxDecoration(
+        color: context.colors.primaryDark,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
       child: Column(
@@ -144,20 +144,20 @@ class _VerifyBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
       decoration: BoxDecoration(
-        color: AppColors.warningSoft,
+        color: context.colors.warningSoft,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.warning),
       ),
       child: Row(
         children: [
-          const Icon(Icons.mail_outline, color: AppColors.warningInk, size: 20),
+          Icon(Icons.mail_outline, color: context.colors.warningInk, size: 20),
           const SizedBox(width: 10),
-          const Expanded(
-            child: Text('Chưa xác minh email', style: TextStyle(color: AppColors.warningText, fontWeight: FontWeight.w500)),
+          Expanded(
+            child: Text('Chưa xác minh email', style: TextStyle(color: context.colors.warningText, fontWeight: FontWeight.w500)),
           ),
           TextButton(
             onPressed: onResend,
-            child: const Text('Gửi lại', style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w700)),
+            child: Text('Gửi lại', style: TextStyle(color: context.colors.primaryText, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -179,11 +179,11 @@ class ReputationCard extends StatelessWidget {
         Row(
           children: [
             const Expanded(child: Text('Uy tín', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700))),
-            Icon(Icons.star_rounded, size: 20, color: rep == null ? AppColors.border : AppColors.tennis),
+            Icon(Icons.star_rounded, size: 20, color: rep == null ? context.colors.border : AppColors.tennis),
             const SizedBox(width: 4),
             Text(rep == null ? 'Chưa có đánh giá' : rep.toStringAsFixed(1),
                 style: TextStyle(
-                  color: rep == null ? AppColors.muted : AppColors.ink,
+                  color: rep == null ? context.colors.muted : context.colors.ink,
                   fontWeight: rep == null ? FontWeight.w500 : FontWeight.w700,
                 )),
           ],
@@ -191,9 +191,9 @@ class ReputationCard extends StatelessWidget {
         if (profile.reliability case final r?) ...[
           const SizedBox(height: 8),
           Row(children: [
-            const Expanded(child: Text('Độ tin cậy', style: TextStyle(color: AppColors.muted))),
+            Expanded(child: Text('Độ tin cậy', style: TextStyle(color: context.colors.muted))),
             Text('${(r * 100).round()}% có mặt',
-                style: TextStyle(fontWeight: FontWeight.w700, color: r >= 0.9 ? AppColors.primaryDark : AppColors.ink)),
+                style: TextStyle(fontWeight: FontWeight.w700, color: r >= 0.9 ? context.colors.primaryText : context.colors.ink)),
           ]),
           const SizedBox(height: 6),
           ClipRRect(
@@ -201,8 +201,8 @@ class ReputationCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: r,
               minHeight: 6,
-              color: AppColors.primaryDark,
-              backgroundColor: AppColors.background,
+              color: context.colors.primaryDark,
+              backgroundColor: context.colors.background,
             ),
           ),
         ],
@@ -232,11 +232,11 @@ class _Stat extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(color: context.colors.background, borderRadius: BorderRadius.circular(10)),
         child: Column(
           children: [
             Text('$value', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-            Text(label, style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+            Text(label, style: TextStyle(fontSize: 12, color: context.colors.muted)),
           ],
         ),
       ),
@@ -272,9 +272,9 @@ class SportsCard extends StatelessWidget {
               Expanded(child: Text(s.displayName, style: const TextStyle(fontWeight: FontWeight.w600))),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: context.colors.primarySoft, borderRadius: BorderRadius.circular(12)),
                 child: Text(skillLevels[sports[s.id]! - 1],
-                    style: const TextStyle(color: AppColors.primaryDark, fontSize: 12, fontWeight: FontWeight.w600)),
+                    style: TextStyle(color: context.colors.primaryText, fontSize: 12, fontWeight: FontWeight.w600)),
               ),
             ],
           ),

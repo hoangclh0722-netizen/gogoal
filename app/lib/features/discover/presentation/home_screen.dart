@@ -122,7 +122,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     Text(
                       hasPosition ? 'Sắp xếp: Gần nhất' : 'Sắp xếp: Sớm nhất',
-                      style: const TextStyle(fontSize: 13, color: AppColors.muted),
+                      style: TextStyle(fontSize: 13, color: context.colors.muted),
                     ),
                   ],
                 ),
@@ -162,11 +162,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                   ),
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 24),
                       child: Center(
-                        child: Text('Bạn đã xem hết', style: TextStyle(color: AppColors.muted, fontSize: 13)),
+                        child: Text('Bạn đã xem hết', style: TextStyle(color: context.colors.muted, fontSize: 13)),
                       ),
                     ),
                   ),

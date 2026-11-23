@@ -34,15 +34,15 @@ class NotificationsScreen extends ConsumerWidget {
     final repo = ref.read(notificationRepositoryProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       bottomNavigationBar: HomeBottomNav(active: 'Thông báo', onTap: (t) => _onTab(context, t)),
       body: Column(
         children: [
           Container(
             width: double.infinity,
             padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + 12, 8, 16),
-            decoration: const BoxDecoration(
-              color: AppColors.primaryDark,
+            decoration: BoxDecoration(
+              color: context.colors.primaryDark,
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
             ),
             child: Row(
@@ -63,15 +63,15 @@ class NotificationsScreen extends ConsumerWidget {
           Expanded(
             child: async.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, _) => const Center(
-                child: Text('Không tải được thông báo', style: TextStyle(color: AppColors.muted)),
+              error: (_, _) => Center(
+                child: Text('Không tải được thông báo', style: TextStyle(color: context.colors.muted)),
               ),
               data: (list) => list.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
-                        Icon(Icons.notifications_none_rounded, size: 48, color: AppColors.muted),
+                        Icon(Icons.notifications_none_rounded, size: 48, color: context.colors.muted),
                         SizedBox(height: 8),
-                        Text('Chưa có thông báo nào', style: TextStyle(color: AppColors.muted)),
+                        Text('Chưa có thông báo nào', style: TextStyle(color: context.colors.muted)),
                       ]),
                     )
                   : ListView.separated(
@@ -104,15 +104,15 @@ class _Tile extends StatelessWidget {
   Widget build(BuildContext context) {
     final (icon, color) = switch (n.type) {
       NotificationType.joinRequested => (Icons.person_add_alt_1_rounded, AppColors.badminton),
-      NotificationType.memberJoined || NotificationType.joinApproved => (Icons.check_circle_rounded, AppColors.primaryDark),
-      NotificationType.matchLocked => (Icons.lock_rounded, AppColors.primaryDark),
-      NotificationType.joinRejected || NotificationType.removed => (Icons.block_rounded, AppColors.muted),
+      NotificationType.memberJoined || NotificationType.joinApproved => (Icons.check_circle_rounded, context.colors.primaryText),
+      NotificationType.matchLocked => (Icons.lock_rounded, context.colors.primaryText),
+      NotificationType.joinRejected || NotificationType.removed => (Icons.block_rounded, context.colors.muted),
       NotificationType.memberLeft => (Icons.logout_rounded, AppColors.warning),
-      NotificationType.matchCancelled => (Icons.event_busy_rounded, AppColors.danger),
+      NotificationType.matchCancelled => (Icons.event_busy_rounded, context.colors.dangerText),
       NotificationType.matchUpdated => (Icons.edit_calendar_rounded, AppColors.accent),
     };
     return Material(
-      color: n.read ? Colors.transparent : AppColors.primarySoft.withValues(alpha: 0.5),
+      color: n.read ? Colors.transparent : context.colors.primarySoft.withValues(alpha: 0.5),
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -134,14 +134,14 @@ class _Tile extends StatelessWidget {
                         style: TextStyle(fontSize: 14, fontWeight: n.read ? FontWeight.w400 : FontWeight.w600, height: 1.35)),
                     const SizedBox(height: 4),
                     Text(n.createdAt == null ? 'Vừa xong' : formatTimeAgo(n.createdAt!, DateTime.now()),
-                        style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+                        style: TextStyle(fontSize: 12, color: context.colors.muted)),
                   ],
                 ),
               ),
               if (!n.read)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 6, left: 8),
-                  child: CircleAvatar(radius: 4, backgroundColor: AppColors.primaryDark),
+                  child: CircleAvatar(radius: 4, backgroundColor: context.colors.primaryDark),
                 ),
             ],
           ),
