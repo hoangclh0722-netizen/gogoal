@@ -61,6 +61,17 @@ class FakeMatchRepository implements MatchRepository {
       ];
 
   @override
+  Future<VenueOption> addVenue({
+    required String uid,
+    required String name,
+    required String address,
+    required String district,
+    required List<String> sportIds,
+    required GeoPoint geo,
+  }) async =>
+      VenueOption(id: 'v-new', venue: Venue(id: 'v-new', name: name, district: district, address: address), geo: geo, verified: false);
+
+  @override
   String newId() => 'm1';
 
   @override

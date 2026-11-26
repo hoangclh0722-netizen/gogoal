@@ -1,3 +1,4 @@
+import 'geo_point.dart';
 import 'match.dart';
 
 abstract interface class MatchRepository {
@@ -27,6 +28,16 @@ abstract interface class MatchRepository {
   Future<({int hosted, int cancelled})> hostedStats(String uid);
 
   Future<List<VenueOption>> venues(String sportId);
+
+  /// Chủ kèo tự thêm sân chưa có trong danh sách, dùng được ngay nhưng chưa xác nhận.
+  Future<VenueOption> addVenue({
+    required String uid,
+    required String name,
+    required String address,
+    required String district,
+    required List<String> sportIds,
+    required GeoPoint geo,
+  });
 
   /// Id sinh trước để bấm "thử lại" sau khi mất mạng không tạo ra hai kèo.
   String newId();

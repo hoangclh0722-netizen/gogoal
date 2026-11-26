@@ -148,11 +148,14 @@ class Match {
 }
 
 class VenueOption {
-  const VenueOption({required this.id, required this.venue, required this.geo});
+  const VenueOption({required this.id, required this.venue, required this.geo, this.verified = true});
 
   final String id;
   final Venue venue;
   final GeoPoint geo;
+
+  /// false với sân người dùng tự thêm, chưa được admin xác nhận.
+  final bool verified;
 }
 
 /// Dữ liệu chủ kèo nhập ở màn Tạo kèo.

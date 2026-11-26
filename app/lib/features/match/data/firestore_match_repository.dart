@@ -167,9 +167,38 @@ class FirestoreMatchRepository implements MatchRepository {
         id: doc.id,
         venue: Venue(name: d['name'] as String, district: d['district'] as String, address: d['address'] as String? ?? ''),
         geo: GeoPoint(point.latitude, point.longitude),
+        verified: d['verified'] != false,
       );
     }).toList();
     return list..sort((a, b) => a.venue.name.compareTo(b.venue.name));
+  }
+
+  @override
+  Future<VenueOption> addVenue({
+    required String uid,
+    required String name,
+    required String address,
+    required String district,
+    required List<String> sportIds,
+    required GeoPoint geo,
+  }) async {
+    final ref = _db.collection('venues').doc();
+    await ref.set({
+      'name': name,
+      'address': address,
+      'district': district,
+      'sportIds': sportIds,
+      'geo': {'geohash': _geohash(geo.lat, geo.lng), 'geopoint': fs.GeoPoint(geo.lat, geo.lng)},
+      'createdBy': uid,
+      'verified': false,
+      'createdAt': FieldValue.serverTimestamp(),
+    }).timeout(const Duration(seconds: 10));
+    return VenueOption(
+      id: ref.id,
+      venue: Venue(id: ref.id, name: name, district: district, address: address),
+      geo: geo,
+      verified: false,
+    );
   }
 
   @override

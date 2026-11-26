@@ -118,9 +118,27 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Sân người dùng tự thêm: đúng khuôn, nằm trong Việt Nam, chưa xác nhận
+    function venueOk(v) {
+      return v.keys().hasOnly(['name', 'address', 'district', 'sportIds', 'geo', 'createdBy', 'verified', 'createdAt'])
+        && v.name is string && v.name.size() >= 2 && v.name.size() <= 60
+        && v.address is string && v.address.size() >= 1 && v.address.size() <= 120
+        && v.district is string && v.district.size() >= 1 && v.district.size() <= 30
+        && v.sportIds is list && v.sportIds.size() >= 1
+        && v.sportIds.hasOnly(['football', 'badminton', 'basketball', 'pickleball', 'tennis'])
+        && v.geo.keys().hasOnly(['geohash', 'geopoint'])
+        && v.geo.geohash is string && v.geo.geohash.size() == 9
+        && v.geo.geopoint is latlng
+        && v.geo.geopoint.latitude() >= 8 && v.geo.geopoint.latitude() <= 24
+        && v.geo.geopoint.longitude() >= 102 && v.geo.geopoint.longitude() <= 110
+        && v.createdBy == me() && v.verified == false && v.createdAt == request.time;
+    }
+
     match /venues/{venueId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create: if isAdmin()
+        || (notBanned() && userDoc(me()).profileCompleted == true && venueOk(request.resource.data));
+      allow update, delete: if isAdmin();
     }
 
     match /users/{uid} {

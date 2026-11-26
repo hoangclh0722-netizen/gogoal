@@ -12,7 +12,7 @@ Một màn cuộn, mở từ nút "+" ở thanh dưới (khách phải đăng nh
 | Số chỗ cần tuyển | Nút − / + | 1 đến tổng số người − 1 (chủ kèo chiếm 1 chỗ) |
 | Ngày, giờ bắt đầu | Date picker, time picker | Sau hiện tại ít nhất 30 phút, trong vòng 30 ngày (BR01) |
 | Thời lượng | Chip 1 giờ / 1,5 giờ / 2 giờ / 3 giờ | Mặc định 2 giờ |
-| Sân | Bảng chọn danh sách sân có môn đã chọn | Bắt buộc |
+| Sân | Bảng chọn danh sách sân có môn đã chọn, không có thì thêm sân mới ([12-add-venue](12-add-venue.md)) | Bắt buộc |
 | Trình độ | Thanh kéo khoảng Mới chơi – Giỏi | Mặc định cả 4 mức |
 | Tổng tiền sân | Ô số (đồng), hiện ngay "≈ X đ/người" (BR02) | ≥ 0, 0 = miễn phí |
 | Tự động nhận người | Công tắc | Mặc định tắt (duyệt tay) |
@@ -38,7 +38,6 @@ Mở từ nút "Sửa" ở màn Quản lý kèo (chỉ khi kèo chưa bắt đ�
 ## Để sau
 
 - Báo cho thành viên khi đổi giờ hoặc sân (chờ lát Thông báo).
-- Ghim sân trên bản đồ, nhập sân ngoài danh sách.
 - Nhắc bổ sung tài khoản ngân hàng khi có thu tiền (10a), bản sao `private/payment`.
 - Uy tín tối thiểu.
 - Nút chia sẻ link sau khi đăng.

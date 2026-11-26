@@ -17,6 +17,7 @@ import '../../sport/domain/sport.dart';
 import '../../sport/presentation/sport_style.dart';
 import '../application/match_providers.dart';
 import '../domain/entities/match.dart';
+import 'add_venue_screen.dart';
 
 typedef _Format = ({String id, String label, int players});
 
@@ -767,7 +768,7 @@ class _VenueSheet extends ConsumerWidget {
                     ? const Padding(padding: EdgeInsets.all(24), child: Text('Chưa có sân nào cho môn này'))
                     : ListView(
                         shrinkWrap: true,
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                         children: [
                           for (final v in list)
                             ListTile(
@@ -775,12 +776,30 @@ class _VenueSheet extends ConsumerWidget {
                               tileColor: v.id == selected ? context.colors.primarySoft : null,
                               leading: const Icon(Icons.place_outlined),
                               title: Text(v.venue.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                              subtitle: Text('${v.venue.address} · ${districtName(v.venue.district)}'),
+                              subtitle: Text(
+                                '${v.venue.address} · ${districtName(v.venue.district)}'
+                                '${v.verified ? '' : '\nDo người dùng thêm'}',
+                              ),
+                              isThreeLine: !v.verified,
                               trailing: v.id == selected ? Icon(Icons.check, color: context.colors.primaryText) : null,
                               onTap: () => Navigator.of(context).pop(v),
                             ),
                         ],
                       ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+                icon: const Icon(Icons.add_location_alt_outlined),
+                label: const Text('Không thấy sân? Thêm sân mới'),
+                onPressed: () async {
+                  final v = await Navigator.of(context).push<VenueOption>(
+                    MaterialPageRoute(builder: (_) => AddVenueScreen(sport: sport)),
+                  );
+                  if (v != null && context.mounted) Navigator.of(context).pop(v);
+                },
               ),
             ),
           ],
